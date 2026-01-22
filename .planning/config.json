@@ -1,0 +1,8 @@
+{
+  "mode": "yolo",
+  "depth": "quick",
+  "parallelization": true,
+  "commit_docs": true,
+  "created": "2025-01-22",
+  "project": "virtual-clothing-model-generator"
+}

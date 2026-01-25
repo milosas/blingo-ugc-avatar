@@ -5,23 +5,26 @@
 See: .planning/PROJECT.md (updated 2025-01-22)
 
 **Core value:** Viena nuotrauka įkelta → trys profesionalios nuotraukos su modeliu per 60 sekundžių
-**Current focus:** Phase 2 - Building n8n workflow
+**Current focus:** Phase 3 - Integration & Results
 
 ## Current Status
 
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 1. Frontend Foundation | ✅ Complete | 100% |
-| 2. n8n Backend | 🔧 In Progress | 50% |
-| 3. Integration & Results | ○ Pending | 0% |
+| 2. n8n Backend | 🔧 Near Complete | 95% |
+| 3. Integration & Results | 🔧 In Progress | 25% |
 
-**Overall:** 1/3 phases complete (~50% total progress)
+**Overall:** 1/3 phases complete, 1/3 in progress (~70% total progress)
+
+**Progress:** ████████████████████████████░░░░░░░░░░░░ (70%)
 
 ## Active Context
 
-**Last action:** Phase 2 setup files created and pushed to GitHub
-**Next action:** Build n8n workflow in Hostinger using N8N-SETUP-GUIDE.md
-**Blocking:** Need to configure n8n workflow in UI
+**Last action:** Completed plan 03-01 - Generation hook and loading UI
+**Next action:** Execute plan 03-02 - Wire generation to App component
+**Phase 3 Progress:** 1/4 plans complete
+**Recent commit:** `dc72411` - LoadingOverlay component
 
 ## Session Log
 
@@ -32,6 +35,11 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 | 2025-01-24 | Phase 1 executed | Frontend complete, commit `3d79db9` |
 | 2025-01-24 | GitHub setup | Repository connected: milosas/blingo-ugc-avatar |
 | 2025-01-24 | Phase 2 started | n8n setup files created, commit `85e2bb7` |
+| 2025-01-24 | Phase 2 prep complete | Workflow JSON, checklist, .env template created |
+| 2025-01-24 | Phase 2 verification | Webhook responds (200 OK) but OpenAI integration broken |
+| 2025-01-24 | Workflow corruption diagnosed | Node ID mismatch found between JSON and n8n database |
+| 2025-01-24 | Workflow recreated | Deleted old (9MsSOa...3), created new (jSZLk...Tk) with credentials |
+| 2026-01-25 | Phase 3 started | Plan 03-01 complete - generation hook and loading UI |
 
 ## Phase Details
 
@@ -52,43 +60,88 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 
 **Dev server:** http://localhost:5173/
 
-### 🔧 Phase 2: n8n Backend (In Progress - 50%)
+### 🔧 Phase 2: n8n Backend (Near Complete - 95%)
 
-**Status:** Setup files ready, workflow needs building
-**Commit:** `85e2bb7` - docs(phase-2): add n8n workflow setup files
+**Status:** Workflow recreated with proper configuration, needs activation (1 click)
+**Commit:** `205de04` - feat(phase-2): add n8n workflow JSON for import
+**Verification:** `.planning/phases/02-n8n-backend/VERIFICATION.md`
+**New Workflow:** `jSZLkx2zqxpYg0Tk` (replaced corrupted `9MsSOa6Z4cRViTTGy_zE3`)
 
 **Completed:**
-- ✅ n8n-prompt-generator.js (generates 3 camera angle prompts)
-- ✅ n8n-response-formatter.js (formats OpenAI responses)
-- ✅ n8n-error-handler.js (Lithuanian error messages)
-- ✅ N8N-SETUP-GUIDE.md (complete setup instructions)
-- ✅ test-webhook.sh & test-webhook.ps1 (testing scripts)
+- ✅ ugc-generator-workflow.json created and tested
+- ✅ New OpenAI credential created via API: `kqaCCU1eZMyC5kpz`
+- ✅ Old corrupted workflow deleted: `9MsSOa6Z4cRViTTGy_zE3`
+- ✅ New workflow created with proper node structure: `jSZLkx2zqxpYg0Tk`
+- ✅ OpenAI credential assigned to OpenAI Request node
+- ✅ .env.local created with webhook URL: `https://n8n.blingo.lt/webhook/generate-ugc`
+- ✅ test-webhook.ps1 created for testing
+- ✅ Workflow corruption diagnosed (node ID mismatch)
+- ✅ GSD folder structure: `.planning/phases/02-n8n-backend/`
 
-**TODO:**
-- ⏳ Create n8n workflow in Hostinger (10 nodes)
-- ⏳ Configure kie.ai API credentials
-- ⏳ Test webhook endpoint
-- ⏳ Document production webhook URL
+**Current Test Results:**
+```
+⏸️  Workflow: INACTIVE (needs activation)
+❌ Webhook: 404 (inactive workflow)
+✅ Credential: Assigned correctly
+✅ Node structure: Fixed (no corruption)
+```
+
+**Root Cause Found:** Original workflow had corrupted node references (Webhook ID changed during import)
+
+**Solution Applied:** Deleted old workflow, created fresh one with proper node IDs and credential assignment
+
+**Remaining Task:**
+- ⏳ **Activate workflow** in n8n UI (1 click) - n8n API doesn't allow programmatic activation
+- ⏳ Test webhook after activation (expect 3 images, 30-60s)
+- ⏳ Update VERIFICATION.md with success results
 
 **Next steps:**
-1. Open n8n instance in Hostinger
-2. Follow N8N-SETUP-GUIDE.md step-by-step
-3. Copy-paste code from n8n-*.js files
-4. Test with test-webhook scripts
-5. Save webhook URL for Phase 3
+1. **Open workflow:** `https://n8n.blingo.lt/workflow/jSZLkx2zqxpYg0Tk`
+2. **Click toggle** in top-right: Inactive → Active (green)
+3. **Test webhook:** `.\test-webhook.ps1 -WebhookUrl "https://n8n.blingo.lt/webhook/generate-ugc"`
+4. **Verify:** 3 images generated, 30-60s response time
+5. **Update VERIFICATION.md** with success results
+6. **Commit** Phase 2 completion
 
-### ○ Phase 3: Integration & Results (Not Started)
+**See:** `SUTVARKYTAS.md` for detailed summary of changes made
 
-**Status:** Waiting for Phase 2 completion
-**Dependencies:** Phase 1 ✅ + Phase 2 webhook URL
+### 🔧 Phase 3: Integration & Results (In Progress - 25%)
 
-**TODO:**
-- Frontend API integration (connect Generate button to n8n)
-- Loading states
-- Results gallery component
-- Download functionality
-- Error handling UI
-- Regenerate functionality
+**Status:** Plan 03-01 complete (generation foundation)
+**Progress:** 1/4 plans complete
+**Latest commit:** `dc72411` - feat(03-01): create LoadingOverlay component
+
+**Plan 03-01 Complete (Generation Foundation):**
+- ✅ Generation types and state machine (GenerationState, GeneratedImage, etc.)
+- ✅ API constants with webhook URL from environment
+- ✅ useGeneration hook with AbortController timeout/cancellation
+- ✅ LoadingOverlay component with progress stages and Lithuanian messages
+- ✅ 60-second timeout enforcement via AbortSignal.timeout
+- ✅ Progress stages: sending → generating 1/3 → 2/3 → 3/3
+- ✅ Error type discrimination (TIMEOUT, NETWORK, API_ERROR)
+- ✅ Random tips display during loading
+
+**Key Files Created:**
+- `src/types/generation.ts` - Generation types
+- `src/constants/api.ts` - API configuration
+- `src/hooks/useGeneration.ts` - Generation hook
+- `src/components/generation/LoadingOverlay.tsx` - Loading UI
+
+**Remaining Plans:**
+- ⏳ Plan 03-02: Wire generation to App component
+- ⏳ Plan 03-03: Results gallery and download
+- ⏳ Plan 03-04: Error handling and regenerate
+
+**Next:** Execute plan 03-02 to integrate generation flow into App.tsx
+
+## Key Decisions
+
+| Decision | Rationale | Phase |
+|----------|-----------|-------|
+| Use AbortSignal.any instead of Promise.race | Modern standard (2023+), cleaner API | 03-01 |
+| Silent cancel on user abort | Cancel is intentional, not an error | 03-01 |
+| Progress stages at 20s/40s/50s | Conservative timing for 30-60s range | 03-01 |
+| Random tip selection on mount | Variety without complexity | 03-01 |
 
 ## Notes
 
@@ -105,7 +158,7 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 npm run dev
 
 # Check git status
-git log --oneline
+git log --online
 
 # Test n8n webhook (after Phase 2 complete)
 ./test-webhook.sh <webhook-url>
@@ -115,4 +168,4 @@ git log --oneline
 ```
 
 ---
-*Last updated: 2025-01-24*
+*Last updated: 2026-01-25 (Plan 03-01 complete - generation foundation)*

@@ -33,11 +33,13 @@ export async function generateImages(
     images.map(img => imageToBase64(img.file))
   );
 
-  // Build request body
+  // Build request body matching n8n workflow structure
   const requestBody = {
-    avatar: config.avatar?.id,
-    scene: config.scene?.id,
-    style: config.style?.id,
+    config: {
+      avatar: config.avatar?.id,
+      scene: config.scene?.id,
+      style: config.style?.id
+    },
     images: base64Images
   };
 

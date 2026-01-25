@@ -77,17 +77,26 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 py-8">
-        {state.status === 'success' && state.results ? (
-          // Results View
+        {(state.status === 'success' || state.status === 'polling') && state.results && state.results.length > 0 ? (
+          // Results View (including partial results while polling)
           <>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {UI_TEXT.results.title}
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {UI_TEXT.results.title}
+              </h2>
+              {state.status === 'polling' && (
+                <span className="text-sm text-amber-600">
+                  Generuojama... ({state.results.length}/3)
+                </span>
+              )}
+            </div>
             <ResultsGallery images={state.results} />
-            <ResultsActions
-              onRegenerate={handleRegenerate}
-              onNewUpload={handleNewUpload}
-            />
+            {state.status === 'success' && (
+              <ResultsActions
+                onRegenerate={handleRegenerate}
+                onNewUpload={handleNewUpload}
+              />
+            )}
           </>
         ) : (
           // Upload & Config View (idle state)
@@ -164,7 +173,7 @@ function App() {
         Virtual Clothing Model Generator &copy; 2025
       </footer>
 
-      {/* Loading Overlay (fixed on top when loading) */}
+      {/* Loading Overlay (fixed on top when loading, hidden during polling) */}
       {state.status === 'loading' && (
         <LoadingOverlay progress={state.progress} onCancel={cancel} />
       )}

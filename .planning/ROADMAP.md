@@ -41,10 +41,10 @@
 **Plans:** 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project setup + types/constants
-- [ ] 01-02-PLAN.md — UI primitives + upload system
-- [ ] 01-03-PLAN.md — Configuration panel
-- [ ] 01-04-PLAN.md — App integration + visual verification
+- [x] 01-01-PLAN.md — Project setup + types/constants
+- [x] 01-02-PLAN.md — UI primitives + upload system
+- [x] 01-03-PLAN.md — Configuration panel
+- [x] 01-04-PLAN.md — App integration + visual verification
 
 **Deliverables:**
 - React + TypeScript + Tailwind projektas
@@ -101,6 +101,14 @@ Plans:
 6. "Naujas upload" grazina i pradzia
 7. Klaidos rodomos lietuviskai
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Generation hook & loading UI
+- [ ] 03-02-PLAN.md — Results gallery & actions
+- [ ] 03-03-PLAN.md — App integration & error handling
+- [ ] 03-04-PLAN.md — Human verification of full flow
+
 **Deliverables:**
 - API integration frontend -> n8n
 - Gallery komponentas
@@ -125,3 +133,4 @@ Phase 3 reikalauja abieju.
 
 *Roadmap created: 2025-01-22*
 *Phase 1 planned: 2025-01-22*
+*Phase 3 planned: 2025-01-25*

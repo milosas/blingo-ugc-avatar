@@ -13,18 +13,18 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 |-------|--------|----------|
 | 1. Frontend Foundation | ✅ Complete | 100% |
 | 2. n8n Backend | 🔧 Near Complete | 95% |
-| 3. Integration & Results | 🔧 In Progress | 25% |
+| 3. Integration & Results | 🔧 In Progress | 50% |
 
-**Overall:** 1/3 phases complete, 1/3 in progress (~70% total progress)
+**Overall:** 1/3 phases complete, 1/3 in progress (~75% total progress)
 
-**Progress:** ████████████████████████████░░░░░░░░░░░░ (70%)
+**Progress:** ██████████████████████████████░░░░░░░░░░ (75%)
 
 ## Active Context
 
-**Last action:** Completed plan 03-01 - Generation hook and loading UI
-**Next action:** Execute plan 03-02 - Wire generation to App component
-**Phase 3 Progress:** 1/4 plans complete
-**Recent commit:** `dc72411` - LoadingOverlay component
+**Last action:** Completed plan 03-02 - Results gallery with lightbox and actions
+**Next action:** Execute plan 03-03 - Wire generation to App component
+**Phase 3 Progress:** 2/4 plans complete
+**Recent commit:** `2d613f4` - ResultsActions component
 
 ## Session Log
 
@@ -40,6 +40,7 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 | 2025-01-24 | Workflow corruption diagnosed | Node ID mismatch found between JSON and n8n database |
 | 2025-01-24 | Workflow recreated | Deleted old (9MsSOa...3), created new (jSZLk...Tk) with credentials |
 | 2026-01-25 | Phase 3 started | Plan 03-01 complete - generation hook and loading UI |
+| 2026-01-25 | Plan 03-02 complete | Results gallery with lightbox, downloads, and action buttons |
 
 ## Phase Details
 
@@ -105,11 +106,11 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 
 **See:** `SUTVARKYTAS.md` for detailed summary of changes made
 
-### 🔧 Phase 3: Integration & Results (In Progress - 25%)
+### 🔧 Phase 3: Integration & Results (In Progress - 50%)
 
-**Status:** Plan 03-01 complete (generation foundation)
-**Progress:** 1/4 plans complete
-**Latest commit:** `dc72411` - feat(03-01): create LoadingOverlay component
+**Status:** Plan 03-02 complete (results gallery and actions)
+**Progress:** 2/4 plans complete
+**Latest commit:** `2d613f4` - feat(03-02): create ResultsActions component
 
 **Plan 03-01 Complete (Generation Foundation):**
 - ✅ Generation types and state machine (GenerationState, GeneratedImage, etc.)
@@ -121,18 +122,28 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 - ✅ Error type discrimination (TIMEOUT, NETWORK, API_ERROR)
 - ✅ Random tips display during loading
 
+**Plan 03-02 Complete (Results Gallery & Actions):**
+- ✅ Yet Another React Lightbox installed and integrated
+- ✅ downloadImage utility with filename sanitization
+- ✅ ResultsGallery component (3-col responsive grid, lightbox, downloads)
+- ✅ Angle labels overlay (Toli, Arti, Labai arti)
+- ✅ ResultsActions component (Regeneruoti, Naujas upload)
+- ✅ Lithuanian action texts in UI_TEXT constants
+
 **Key Files Created:**
 - `src/types/generation.ts` - Generation types
 - `src/constants/api.ts` - API configuration
 - `src/hooks/useGeneration.ts` - Generation hook
 - `src/components/generation/LoadingOverlay.tsx` - Loading UI
+- `src/utils/download.ts` - Download utility
+- `src/components/generation/ResultsGallery.tsx` - Results gallery
+- `src/components/generation/ResultsActions.tsx` - Action buttons
 
 **Remaining Plans:**
-- ⏳ Plan 03-02: Wire generation to App component
-- ⏳ Plan 03-03: Results gallery and download
+- ⏳ Plan 03-03: Wire generation to App component
 - ⏳ Plan 03-04: Error handling and regenerate
 
-**Next:** Execute plan 03-02 to integrate generation flow into App.tsx
+**Next:** Execute plan 03-03 to integrate generation flow into App.tsx
 
 ## Key Decisions
 
@@ -142,6 +153,10 @@ See: .planning/PROJECT.md (updated 2025-01-22)
 | Silent cancel on user abort | Cancel is intentional, not an error | 03-01 |
 | Progress stages at 20s/40s/50s | Conservative timing for 30-60s range | 03-01 |
 | Random tip selection on mount | Variety without complexity | 03-01 |
+| Anchor download pattern (not fetch+blob) | Simpler for external URLs, avoids CORS issues | 03-02 |
+| Filename sanitization: replace non-alphanumeric | Filesystem compatibility, 255-char limit | 03-02 |
+| Yet Another React Lightbox | Modern, accessible, clean API | 03-02 |
+| No confirmation on regenerate/new upload | Immediate action, reduces friction | 03-02 |
 
 ## Notes
 
@@ -168,4 +183,4 @@ git log --online
 ```
 
 ---
-*Last updated: 2026-01-25 (Plan 03-01 complete - generation foundation)*
+*Last updated: 2026-01-25 (Plan 03-02 complete - results gallery with lightbox and actions)*

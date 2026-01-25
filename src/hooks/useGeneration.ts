@@ -49,18 +49,18 @@ export function useGeneration() {
       timeoutSignal
     ]);
 
-    // Set up progress stage timers (20 second intervals)
+    // Set up progress stage timers (adjusted for 120s timeout)
     const timer1 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-1' } : prev);
-    }, 20000);
+    }, 30000); // 30s
 
     const timer2 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-2' } : prev);
-    }, 40000);
+    }, 60000); // 60s
 
     const timer3 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-3' } : prev);
-    }, 50000);
+    }, 90000); // 90s
 
     progressTimersRef.current = [timer1, timer2, timer3];
 

@@ -77,13 +77,13 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 py-8">
-        {state.status === 'success' ? (
+        {state.status === 'success' && state.results ? (
           // Results View
           <>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {UI_TEXT.results.title}
             </h2>
-            <ResultsGallery images={state.results!} />
+            <ResultsGallery images={state.results} />
             <ResultsActions
               onRegenerate={handleRegenerate}
               onNewUpload={handleNewUpload}

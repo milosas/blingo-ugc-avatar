@@ -66,18 +66,31 @@ export function useGeneration() {
 
     try {
       // Use n8nService to make the API call
-      const data: GenerationResponse = await generateImages(config, images, combinedSignal);
+      const data: any = await generateImages(config, images, combinedSignal);
+
+      console.log('n8n response:', data);
 
       // Clear progress timers on success
       progressTimersRef.current.forEach(timer => clearTimeout(timer));
       progressTimersRef.current = [];
 
-      setState({
-        status: 'success',
-        progress: 'complete',
-        results: data.images,
-        error: null
-      });
+      // Check if we got images or tasks
+      if (data.images && Array.isArray(data.images)) {
+        setState({
+          status: 'success',
+          progress: 'complete',
+          results: data.images,
+          error: null
+        });
+      } else {
+        console.error('Invalid response format - no images array:', data);
+        setState({
+          status: 'error',
+          progress: 'sending',
+          results: null,
+          error: 'API_ERROR'
+        });
+      }
     } catch (err: any) {
       // Clear progress timers on error
       progressTimersRef.current.forEach(timer => clearTimeout(timer));

@@ -20,12 +20,31 @@ export const UI_TEXT = {
   },
   actions: {
     generate: 'Generuoti',
-    generating: 'Generuojama...'
+    generating: 'Generuojama...',
+    cancel: 'Atšaukti'
   },
   validation: {
     noImages: 'Ikelkite bent viena nuotrauka',
     noAvatar: 'Pasirinkite avatara',
     noScene: 'Pasirinkite scena',
     noStyle: 'Pasirinkite stiliu'
+  },
+  loading: {
+    sending: 'Siunčiama...',
+    generating1: 'Generuojama 1/3...',
+    generating2: 'Generuojama 2/3...',
+    generating3: 'Beveik baigta...',
+    complete: 'Baigta!'
+  },
+  tips: [
+    'Patarimas: Geriausi rezultatai su vienspalviais drabužiais',
+    'Patarimas: Aiškios nuotraukos duoda geriausius rezultatus',
+    'Patarimas: Vengti per daug priedų ar raštų'
+  ],
+  errors: {
+    timeout: 'Užtruko per ilgai. Bandykite dar kartą.',
+    network: 'Patikrinkite interneto ryšį ir bandykite dar kartą.',
+    api: 'Nepavyko sugeneruoti. Bandykite vėliau.',
+    default: 'Įvyko klaida. Bandykite dar kartą.'
   }
 } as const;

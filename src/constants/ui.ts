@@ -21,7 +21,12 @@ export const UI_TEXT = {
   actions: {
     generate: 'Generuoti',
     generating: 'Generuojama...',
-    cancel: 'Atšaukti'
+    cancel: 'At�aukti',
+    regenerate: 'Regeneruoti',
+    newUpload: 'Naujas upload'
+  },
+  results: {
+    title: 'Sugeneruotos nuotraukos'
   },
   validation: {
     noImages: 'Ikelkite bent viena nuotrauka',
@@ -48,3 +53,4 @@ export const UI_TEXT = {
     default: 'Įvyko klaida. Bandykite dar kartą.'
   }
 } as const;
+

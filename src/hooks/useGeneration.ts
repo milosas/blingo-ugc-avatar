@@ -34,19 +34,17 @@ export function useGeneration() {
   // Poll kie.ai API for task status
   const pollTask = async (taskId: string): Promise<{ status: string; url?: string }> => {
     try {
-      const response = await fetch('https://api.kie.ai/api/v1/jobs/queryTask', {
-        method: 'POST',
+      const response = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${KIE_AI_API_KEY}`
-        },
-        body: JSON.stringify({ taskId })
+        }
       });
 
       const data = await response.json();
 
-      // kie.ai response: { code: 200, data: { status: "SUCCESS", output: { output_urls: [...] } } }
-      if (data.data) {
+      // kie.ai response: { code: 200, msg: "success", data: { status: "SUCCESS", output: { output_urls: [...] } } }
+      if (data.code === 200 && data.data) {
         const status = data.data.status;
         const url = data.data.output?.output_urls?.[0];
 

@@ -1,4 +1,5 @@
 import { API_CONFIG } from '../constants/api';
+import { buildPrompt } from '../constants/fluxOptions';
 import type { Config, UploadedImage } from '../types';
 import type { GenerationResponse } from '../types/generation';
 
@@ -22,25 +23,43 @@ function imageToBase64(file: File): Promise<string> {
 
 /**
  * Send generation request to n8n webhook
+ * Uses flux-2/pro-image-to-image model
+ *
+ * Combines user selections (avatar, scene, style, mood) with user's custom prompt
+ * to create the full generation prompt
  */
 export async function generateImages(
   config: Config,
   images: UploadedImage[],
   signal: AbortSignal
 ): Promise<GenerationResponse> {
-  // Convert all images to base64
+  // Convert uploaded clothing images to base64
   const base64Images = await Promise.all(
     images.map(img => imageToBase64(img.file))
   );
 
-  // Build request body matching n8n workflow structure
+  // Build the full prompt from config
+  const fullPrompt = buildPrompt({
+    avatar: config.avatar,
+    scene: config.scene,
+    style: config.style,
+    mood: config.mood,
+    userPrompt: config.userPrompt
+  });
+
+  console.log('Generated prompt:', fullPrompt);
+
+  // Build request body for flux-2/pro-image-to-image model
   const requestBody = {
-    config: {
-      avatar: config.avatar?.id,
-      scene: config.scene?.id,
-      style: config.style?.id
-    },
-    images: base64Images
+    // Full constructed prompt
+    prompt: fullPrompt,
+    // Technical settings
+    aspect_ratio: config.aspectRatio,
+    resolution: config.resolution,
+    // Clothing images
+    images: base64Images,
+    // Avatar info (for potential avatar image handling)
+    avatarId: config.avatar?.id || null
   };
 
   // POST to n8n webhook

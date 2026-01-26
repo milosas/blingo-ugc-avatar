@@ -10,6 +10,7 @@ import { ResultsGallery } from './components/generation/ResultsGallery';
 import { ResultsActions } from './components/generation/ResultsActions';
 import { ErrorMessage } from './components/generation/ErrorMessage';
 import { UI_TEXT } from './constants/ui';
+import { DEFAULT_USER_PROMPT } from './constants/fluxOptions';
 import type { Config } from './types';
 
 function App() {
@@ -23,19 +24,23 @@ function App() {
     hasImages
   } = useImageUpload();
 
-  // Configuration state
+  // Configuration state with flux-2/pro-image-to-image defaults
   const [config, setConfig] = useState<Config>({
     avatar: null,
     scene: null,
-    style: null
+    style: null,
+    mood: null,
+    userPrompt: DEFAULT_USER_PROMPT,
+    aspectRatio: '2:3',
+    resolution: '1K'
   });
 
   // Generation state
   const { state, generate, cancel, reset } = useGeneration();
 
-  // Form validation
-  const isConfigComplete = config.avatar && config.scene && config.style;
-  const canGenerate = hasImages && isConfigComplete;
+  // Form validation - need image, avatar, and user prompt
+  const isConfigValid = config.avatar !== null && config.userPrompt.trim().length >= 3;
+  const canGenerate = hasImages && isConfigValid;
 
   // Handlers
   const handleGenerate = () => {
@@ -53,7 +58,11 @@ function App() {
     setConfig({
       avatar: null,
       scene: null,
-      style: null
+      style: null,
+      mood: null,
+      userPrompt: DEFAULT_USER_PROMPT,
+      aspectRatio: '2:3',
+      resolution: '1K'
     });
   };
 
@@ -152,13 +161,10 @@ function App() {
                       <p className="text-sm text-gray-500">• {UI_TEXT.validation.noImages}</p>
                     )}
                     {!config.avatar && (
-                      <p className="text-sm text-gray-500">• {UI_TEXT.validation.noAvatar}</p>
+                      <p className="text-sm text-gray-500">• Select an avatar</p>
                     )}
-                    {!config.scene && (
-                      <p className="text-sm text-gray-500">• {UI_TEXT.validation.noScene}</p>
-                    )}
-                    {!config.style && (
-                      <p className="text-sm text-gray-500">• {UI_TEXT.validation.noStyle}</p>
+                    {config.userPrompt.trim().length < 3 && (
+                      <p className="text-sm text-gray-500">• Add instructions (min 3 characters)</p>
                     )}
                   </div>
                 )}

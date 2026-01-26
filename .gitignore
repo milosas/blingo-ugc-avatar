@@ -25,3 +25,52 @@ dist-ssr
 
 # Temp files
 tmpclaude-*
+
+# ===========================================
+# SECURITY - Exclude files with credentials
+# ===========================================
+
+# PowerShell scripts (contain hardcoded API keys)
+*.ps1
+
+# MCP configuration (contains API keys)
+.mcp.json
+
+# Claude settings (contains credentials)
+.claude/
+
+# Planning files (may contain sensitive info)
+.planning/
+
+# Workflow exports and execution logs
+current-workflow.json
+workflow-details.json
+new-workflow-details.json
+full-execution-data.json
+*-execution*.json
+*-workflow*.json
+status-*.json
+latest-*.json
+generate-*.json
+debug-*.json
+ugc-*.json
+
+# Credential files
+*-credential*.json
+new-credential-id.txt
+new-workflow-id.txt
+workflow-*-id.txt
+
+# Debug and test output files
+nul
+
+# Markdown files with sensitive instructions
+COMPLETE-*.md
+DELETE-*.md
+FIX-*.md
+N8N-*.md
+PHASE-*.md
+QUICK*.md
+SETUP-*.md
+SOLUTION.md
+SUTVARKYTAS.md

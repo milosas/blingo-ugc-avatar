@@ -17,12 +17,6 @@ export function Select<T>({
   placeholder = 'Pasirinkite...',
   label
 }: SelectProps<T>) {
-  // Convert null to undefined for Headless UI compatibility
-  const headlessValue = value === null ? undefined : value;
-  const handleChange = (newValue: T | undefined) => {
-    onChange(newValue as T);
-  };
-
   return (
     <div className="w-full">
       {label && (
@@ -30,7 +24,7 @@ export function Select<T>({
           {label}
         </label>
       )}
-      <Listbox value={headlessValue} onChange={handleChange}>
+      <Listbox value={value ?? undefined} onChange={(val) => val && onChange(val)}>
         <div className="relative">
           <ListboxButton className="relative w-full cursor-pointer rounded-lg border border-gray-300 bg-white py-3 pl-4 pr-10 text-left shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
             <span className={value ? 'text-gray-900' : 'text-gray-500'}>

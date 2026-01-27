@@ -148,7 +148,7 @@ export const IMAGE_COUNTS: ImageCountOption[] = [
   { id: 3, name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
 ];
 
-// Build the full prompt from config
+// Build the prompt - just use user's text directly
 export function buildPrompt(config: {
   avatar: Avatar | null;
   scene: Scene | null;
@@ -156,37 +156,8 @@ export function buildPrompt(config: {
   mood: Mood | null;
   userPrompt: string;
 }): string {
-  const parts: string[] = [];
-
-  // Start with user's instruction
-  if (config.userPrompt.trim()) {
-    parts.push(config.userPrompt.trim());
-  }
-
-  // Add avatar description
-  if (config.avatar) {
-    parts.push(`Model: ${config.avatar.promptDescription}`);
-  }
-
-  // Add style
-  if (config.style) {
-    parts.push(config.style.promptDescription);
-  }
-
-  // Add mood
-  if (config.mood) {
-    parts.push(config.mood.promptDescription);
-  }
-
-  // Add scene
-  if (config.scene) {
-    parts.push(config.scene.promptDescription);
-  }
-
-  // Add quality keywords
-  parts.push('high quality fashion photography, professional lighting');
-
-  return parts.join(', ');
+  // Return user's prompt as-is (image provides the visual context)
+  return config.userPrompt.trim() || 'Professional fashion photo';
 }
 
 export const DEFAULT_USER_PROMPT = 'Put this clothing on the model, full body photo';

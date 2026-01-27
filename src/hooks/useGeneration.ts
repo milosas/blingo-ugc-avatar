@@ -15,7 +15,7 @@ const INITIAL_STATE: GenerationState = {
 export function useGeneration() {
   const [state, setState] = useState<GenerationState>(INITIAL_STATE);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const progressTimersRef = useRef<NodeJS.Timeout[]>([]);
+  const progressTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Cleanup on unmount
   useEffect(() => {

@@ -42,6 +42,9 @@ export type AspectRatio = '1:1' | '4:3' | '3:4' | '16:9' | '9:16' | '3:2' | '2:3
 // Resolution options
 export type Resolution = '1K' | '2K';
 
+// Image count options
+export type ImageCount = 1 | 2 | 3;
+
 export interface AspectRatioOption {
   id: AspectRatio;
   name: string;
@@ -50,6 +53,12 @@ export interface AspectRatioOption {
 
 export interface ResolutionOption {
   id: Resolution;
+  name: string;
+  description: string;
+}
+
+export interface ImageCountOption {
+  id: ImageCount;
   name: string;
   description: string;
 }
@@ -65,4 +74,5 @@ export interface Config {
   // Technical settings
   aspectRatio: AspectRatio;
   resolution: Resolution;
+  imageCount: ImageCount;
 }

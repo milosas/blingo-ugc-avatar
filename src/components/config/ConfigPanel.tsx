@@ -1,6 +1,6 @@
 import { Select } from '../ui/Select';
-import { AVATARS, SCENES, STYLES, MOODS, ASPECT_RATIOS, RESOLUTIONS } from '../../constants/fluxOptions';
-import type { Avatar, Scene, Style, Mood, AspectRatioOption, ResolutionOption, Config } from '../../types';
+import { AVATARS, SCENES, STYLES, MOODS, ASPECT_RATIOS, RESOLUTIONS, IMAGE_COUNTS } from '../../constants/fluxOptions';
+import type { Avatar, Scene, Style, Mood, AspectRatioOption, ResolutionOption, ImageCountOption, Config } from '../../types';
 
 interface ConfigPanelProps {
   config: Config;
@@ -36,9 +36,14 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
     onConfigChange({ ...config, resolution: option.id });
   };
 
+  const handleImageCountChange = (option: ImageCountOption) => {
+    onConfigChange({ ...config, imageCount: option.id });
+  };
+
   // Find selected options for Select components
   const selectedAspectRatio = ASPECT_RATIOS.find(ar => ar.id === config.aspectRatio) || null;
   const selectedResolution = RESOLUTIONS.find(r => r.id === config.resolution) || null;
+  const selectedImageCount = IMAGE_COUNTS.find(ic => ic.id === config.imageCount) || null;
 
   return (
     <div className="space-y-5">
@@ -140,6 +145,16 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
       {/* Technical Settings */}
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-gray-700">Technical Settings</h3>
+
+        {/* Image Count - Full Width */}
+        <Select<ImageCountOption>
+          value={selectedImageCount}
+          onChange={handleImageCountChange}
+          options={IMAGE_COUNTS}
+          getLabel={(option) => option.name}
+          label="Nuotraukų kiekis"
+          placeholder="Pasirinkite"
+        />
 
         <div className="grid grid-cols-2 gap-3">
           {/* Aspect Ratio */}

@@ -56,6 +56,7 @@ export async function generateImages(
     // Technical settings
     aspect_ratio: config.aspectRatio,
     resolution: config.resolution,
+    imageCount: config.imageCount,
     // Clothing images
     images: base64Images,
     // Avatar info (for potential avatar image handling)

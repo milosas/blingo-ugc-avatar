@@ -1,4 +1,4 @@
-import type { AspectRatioOption, ResolutionOption, Avatar, Scene, Style, Mood } from '../types';
+import type { AspectRatioOption, ResolutionOption, ImageCountOption, Avatar, Scene, Style, Mood } from '../types';
 
 // Avatar options with reference images
 export const AVATARS: Avatar[] = [
@@ -139,6 +139,13 @@ export const ASPECT_RATIOS: AspectRatioOption[] = [
 export const RESOLUTIONS: ResolutionOption[] = [
   { id: '1K', name: '1K', description: 'Standard quality (faster)' },
   { id: '2K', name: '2K', description: 'High quality (slower)' }
+];
+
+// Image count options
+export const IMAGE_COUNTS: ImageCountOption[] = [
+  { id: 1, name: '1 nuotrauka', description: 'Greičiau, pigiau' },
+  { id: 2, name: '2 nuotraukos', description: 'Daugiau pasirinkimų' },
+  { id: 3, name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
 ];
 
 // Build the full prompt from config

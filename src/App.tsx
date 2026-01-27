@@ -32,7 +32,8 @@ function App() {
     mood: null,
     userPrompt: DEFAULT_USER_PROMPT,
     aspectRatio: '2:3',
-    resolution: '1K'
+    resolution: '1K',
+    imageCount: 1
   });
 
   // Generation state
@@ -62,7 +63,8 @@ function App() {
       mood: null,
       userPrompt: DEFAULT_USER_PROMPT,
       aspectRatio: '2:3',
-      resolution: '1K'
+      resolution: '1K',
+      imageCount: 1
     });
   };
 

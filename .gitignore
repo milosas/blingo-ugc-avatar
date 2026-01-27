@@ -64,6 +64,9 @@ workflow-*-id.txt
 # Debug and test output files
 nul
 
+# YouTube transcript history (personal)
+.yt-history/
+
 # Markdown files with sensitive instructions
 COMPLETE-*.md
 DELETE-*.md

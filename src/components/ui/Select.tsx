@@ -7,6 +7,7 @@ interface SelectProps<T> {
   getLabel: (option: T) => string;
   placeholder?: string;
   label?: string;
+  required?: boolean;
 }
 
 export function Select<T>({
@@ -15,13 +16,14 @@ export function Select<T>({
   options,
   getLabel,
   placeholder = 'Pasirinkite...',
-  label
+  label,
+  required
 }: SelectProps<T>) {
   return (
     <div className="w-full">
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <Listbox value={value ?? undefined} onChange={(val) => val && onChange(val)}>
@@ -36,10 +38,7 @@ export function Select<T>({
               </svg>
             </span>
           </ListboxButton>
-          <ListboxOptions
-            anchor="bottom"
-            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          >
+          <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {options.map((option, index) => (
               <ListboxOption
                 key={index}

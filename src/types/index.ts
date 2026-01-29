@@ -37,7 +37,7 @@ export interface UploadedImage {
 }
 
 // Aspect ratio options for flux-2/pro-image-to-image
-export type AspectRatio = '1:1' | '4:3' | '3:4' | '16:9' | '9:16' | '3:2' | '2:3' | 'auto';
+export type AspectRatio = '1:1' | '4:3' | '3:4' | '4:5' | '16:9' | '9:16' | '3:2' | '2:3';
 
 // Resolution options
 export type Resolution = '1K' | '2K';

@@ -1,5 +1,5 @@
 import { useDropzone } from 'react-dropzone';
-import { UI_TEXT } from '../../constants/ui';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ImageUploaderProps {
   onFilesSelected: (files: File[]) => void;
@@ -8,12 +8,14 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({ onFilesSelected, disabled, canAddMore }: ImageUploaderProps) {
+  const { t } = useLanguage();
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'image/jpeg': ['.jpg', '.jpeg'],
       'image/png': ['.png']
     },
-    maxFiles: 3,
+    maxFiles: 1,
     disabled: disabled || !canAddMore,
     onDrop: onFilesSelected
   });
@@ -39,14 +41,14 @@ export function ImageUploader({ onFilesSelected, disabled, canAddMore }: ImageUp
       <div className="space-y-2">
         <div className="text-4xl">📷</div>
         <p className="text-gray-700 font-medium">
-          {UI_TEXT.upload.description}
+          {t.upload.description}
         </p>
         <p className="text-sm text-gray-500">
-          {UI_TEXT.upload.hint}
+          {t.upload.hint}
         </p>
         {!canAddMore && (
           <p className="text-sm text-amber-600 font-medium">
-            Maksimalus nuotrauku skaicius pasiektas
+            {t.upload.imageOf}
           </p>
         )}
       </div>

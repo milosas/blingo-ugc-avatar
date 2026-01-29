@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { useImageUpload } from './hooks/useImageUpload';
 import { useGeneration } from './hooks/useGeneration';
+import { useLanguage } from './contexts/LanguageContext';
 import { ImageUploader } from './components/upload/ImageUploader';
 import { ImagePreviewGrid } from './components/upload/ImagePreviewGrid';
 import { ConfigPanel } from './components/config/ConfigPanel';
 import { Button } from './components/ui/Button';
+import { LanguageSelector } from './components/ui/LanguageSelector';
 import { LoadingOverlay } from './components/generation/LoadingOverlay';
 import { ResultsGallery } from './components/generation/ResultsGallery';
 import { ResultsActions } from './components/generation/ResultsActions';
 import { ErrorMessage } from './components/generation/ErrorMessage';
-import { UI_TEXT } from './constants/ui';
 import { DEFAULT_USER_PROMPT } from './constants/fluxOptions';
 import type { Config } from './types';
 
 function App() {
+  const { t } = useLanguage();
+
   // Image upload state
   const {
     images,
@@ -31,7 +34,7 @@ function App() {
     style: null,
     mood: null,
     userPrompt: DEFAULT_USER_PROMPT,
-    aspectRatio: '2:3',
+    aspectRatio: '1:1',
     resolution: '1K',
     imageCount: 1
   });
@@ -62,7 +65,7 @@ function App() {
       style: null,
       mood: null,
       userPrompt: DEFAULT_USER_PROMPT,
-      aspectRatio: '2:3',
+      aspectRatio: '1:1',
       resolution: '1K',
       imageCount: 1
     });
@@ -77,12 +80,17 @@ function App() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            {UI_TEXT.header.title}
-          </h1>
-          <p className="mt-1 text-gray-600">
-            {UI_TEXT.header.subtitle}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                {t.header.title}
+              </h1>
+              <p className="mt-1 text-gray-600">
+                {t.header.subtitle}
+              </p>
+            </div>
+            <LanguageSelector />
+          </div>
         </div>
       </header>
 
@@ -93,11 +101,11 @@ function App() {
           <>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {UI_TEXT.results.title}
+                {t.results.title}
               </h2>
               {state.status === 'polling' && (
                 <span className="text-sm text-amber-600">
-                  Generuojama... ({state.results.length}/3)
+                  {t.loading.generating} ({state.results.length}/3)
                 </span>
               )}
             </div>
@@ -116,7 +124,7 @@ function App() {
             <div className="w-full md:w-1/2">
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  {UI_TEXT.upload.title}
+                  {t.upload.title}
                 </h2>
 
                 <ImageUploader
@@ -131,7 +139,7 @@ function App() {
 
                 {!hasImages && (
                   <p className="mt-4 text-sm text-amber-600">
-                    {UI_TEXT.validation.noImages}
+                    {t.validation.noImages}
                   </p>
                 )}
               </div>
@@ -153,20 +161,20 @@ function App() {
                   disabled={!canGenerate}
                   className="w-full text-lg py-4"
                 >
-                  {UI_TEXT.actions.generate}
+                  {t.actions.generate}
                 </Button>
 
                 {/* Validation Messages */}
                 {!canGenerate && (
                   <div className="mt-3 space-y-1">
                     {!hasImages && (
-                      <p className="text-sm text-gray-500">• {UI_TEXT.validation.noImages}</p>
+                      <p className="text-sm text-gray-500">• {t.validation.noImages}</p>
                     )}
                     {!config.avatar && (
-                      <p className="text-sm text-gray-500">• Select an avatar</p>
+                      <p className="text-sm text-gray-500">• {t.validation.noAvatar}</p>
                     )}
                     {config.userPrompt.trim().length < 3 && (
-                      <p className="text-sm text-gray-500">• Add instructions (min 3 characters)</p>
+                      <p className="text-sm text-gray-500">• {t.validation.noPrompt}</p>
                     )}
                   </div>
                 )}
@@ -178,7 +186,7 @@ function App() {
 
       {/* Footer */}
       <footer className="mt-auto py-6 text-center text-sm text-gray-500">
-        Virtual Clothing Model Generator &copy; 2025
+        {t.footer} &copy; 2025
       </footer>
 
       {/* Loading Overlay (fixed on top when loading, hidden during polling) */}

@@ -4,37 +4,37 @@ import type { AspectRatioOption, ResolutionOption, ImageCountOption, Avatar, Sce
 export const AVATARS: Avatar[] = [
   {
     id: 'elegant-woman',
-    name: 'Elegant Woman',
-    description: 'Professional female model',
-    imageUrl: '/avatars/elegant-woman.jpg',
+    name: 'Elegantiška moteris',
+    description: 'Profesionali, stilinga išvaizda',
+    imageUrl: '/avatars/elegant-woman.svg',
     promptDescription: 'elegant professional woman model'
   },
   {
     id: 'casual-woman',
-    name: 'Casual Woman',
-    description: 'Relaxed, everyday look',
-    imageUrl: '/avatars/casual-woman.jpg',
+    name: 'Kasdienis stilius',
+    description: 'Atsipalaidavusi, kasdienė išvaizda',
+    imageUrl: '/avatars/casual-woman.svg',
     promptDescription: 'casual young woman'
   },
   {
     id: 'athletic-woman',
-    name: 'Athletic Woman',
-    description: 'Sporty, fit appearance',
-    imageUrl: '/avatars/athletic-woman.jpg',
+    name: 'Sportinė moteris',
+    description: 'Sportiška, aktyvi išvaizda',
+    imageUrl: '/avatars/athletic-woman.svg',
     promptDescription: 'athletic fit woman'
   },
   {
     id: 'business-man',
-    name: 'Business Man',
-    description: 'Professional male model',
-    imageUrl: '/avatars/business-man.jpg',
+    name: 'Verslo vyras',
+    description: 'Profesionalus, dalykiškas',
+    imageUrl: '/avatars/business-man.svg',
     promptDescription: 'professional business man'
   },
   {
     id: 'casual-man',
-    name: 'Casual Man',
-    description: 'Relaxed male look',
-    imageUrl: '/avatars/casual-man.jpg',
+    name: 'Kasdienis vyras',
+    description: 'Atsipalaidavęs, paprastas stilius',
+    imageUrl: '/avatars/casual-man.svg',
     promptDescription: 'casual young man'
   }
 ];
@@ -43,26 +43,26 @@ export const AVATARS: Avatar[] = [
 export const SCENES: Scene[] = [
   {
     id: 'minimal',
-    name: 'Minimal',
-    description: 'Clean, simple background',
+    name: 'Minimalistinė',
+    description: 'Švarus, paprastas fonas',
     promptDescription: 'minimal clean white background'
   },
   {
     id: 'photo-studio',
-    name: 'Photo Studio',
-    description: 'Professional studio setup',
+    name: 'Foto studija',
+    description: 'Profesionali studijos aplinka',
     promptDescription: 'professional photo studio with soft lighting'
   },
   {
     id: 'urban',
-    name: 'Urban',
-    description: 'City street setting',
+    name: 'Miesto aplinka',
+    description: 'Gatvės, miesto fonas',
     promptDescription: 'urban city street background'
   },
   {
     id: 'nature',
-    name: 'Nature',
-    description: 'Outdoor natural setting',
+    name: 'Gamta',
+    description: 'Lauko, gamtos aplinka',
     promptDescription: 'natural outdoor setting with greenery'
   }
 ];
@@ -71,26 +71,26 @@ export const SCENES: Scene[] = [
 export const STYLES: Style[] = [
   {
     id: 'casual',
-    name: 'Casual',
-    description: 'Relaxed, everyday style',
+    name: 'Kasdienis',
+    description: 'Atsipalaidavęs, kasdieniškas',
     promptDescription: 'casual relaxed style'
   },
   {
     id: 'sport',
-    name: 'Sport',
-    description: 'Athletic, sporty look',
+    name: 'Sportinis',
+    description: 'Atletiškas, sportiškas',
     promptDescription: 'sporty athletic style'
   },
   {
     id: 'elegant',
-    name: 'Elegant',
-    description: 'Sophisticated, refined',
+    name: 'Elegantiškas',
+    description: 'Rafinuotas, išskirtinis',
     promptDescription: 'elegant sophisticated style'
   },
   {
     id: 'streetwear',
-    name: 'Streetwear',
-    description: 'Urban fashion style',
+    name: 'Gatvės mada',
+    description: 'Miestietiška mada',
     promptDescription: 'modern streetwear style'
   }
 ];
@@ -99,46 +99,45 @@ export const STYLES: Style[] = [
 export const MOODS: Mood[] = [
   {
     id: 'serious',
-    name: 'Serious',
-    description: 'Professional, focused',
+    name: 'Rimtas',
+    description: 'Profesionalus, susikaupęs',
     promptDescription: 'serious confident expression'
   },
   {
     id: 'playful',
-    name: 'Playful',
-    description: 'Fun, energetic',
+    name: 'Žaismingas',
+    description: 'Linksmas, energingas',
     promptDescription: 'playful happy expression'
   },
   {
     id: 'relaxed',
-    name: 'Relaxed',
-    description: 'Calm, at ease',
+    name: 'Atsipalaidavęs',
+    description: 'Ramus, natūralus',
     promptDescription: 'relaxed natural expression'
   },
   {
     id: 'confident',
-    name: 'Confident',
-    description: 'Strong, assured',
+    name: 'Pasitikintis',
+    description: 'Stiprus, užtikrintas',
     promptDescription: 'confident powerful expression'
   }
 ];
 
-// Aspect ratio options
+// Aspect ratio options - common social media & e-shop formats
 export const ASPECT_RATIOS: AspectRatioOption[] = [
-  { id: '2:3', name: '2:3 Portrait', description: 'Classic portrait orientation' },
-  { id: '3:4', name: '3:4 Portrait', description: 'Standard portrait' },
-  { id: '1:1', name: '1:1 Square', description: 'Square format' },
-  { id: '4:3', name: '4:3 Landscape', description: 'Standard landscape' },
-  { id: '3:2', name: '3:2 Classic', description: 'Classic photo ratio' },
-  { id: '16:9', name: '16:9 Widescreen', description: 'Widescreen format' },
-  { id: '9:16', name: '9:16 Vertical', description: 'Vertical/mobile format' },
-  { id: 'auto', name: 'Auto', description: 'Match input image ratio' }
+  { id: '1:1', name: 'Instagram postas', description: '1:1 kvadratas - idealus Instagram feed' },
+  { id: '4:5', name: 'Instagram portretas', description: '4:5 - populiariausias IG formatas' },
+  { id: '9:16', name: 'Stories / Reels', description: '9:16 - IG Stories, TikTok, Reels' },
+  { id: '4:3', name: 'Facebook postas', description: '4:3 - optimalus Facebook' },
+  { id: '2:3', name: 'E-shop produktas', description: '2:3 - standartinis produkto formatas' },
+  { id: '3:4', name: 'Pinterest', description: '3:4 - Pinterest rekomenduojamas' },
+  { id: '16:9', name: 'YouTube / Cover', description: '16:9 - cover photo, banneriai' }
 ];
 
 // Resolution options
 export const RESOLUTIONS: ResolutionOption[] = [
-  { id: '1K', name: '1K', description: 'Standard quality (faster)' },
-  { id: '2K', name: '2K', description: 'High quality (slower)' }
+  { id: '1K', name: '1K Standartinė', description: 'Greitesnis generavimas' },
+  { id: '2K', name: '2K Aukšta', description: 'Aukščiausia kokybė' }
 ];
 
 // Image count options
@@ -148,7 +147,39 @@ export const IMAGE_COUNTS: ImageCountOption[] = [
   { id: 3, name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
 ];
 
-// Build the prompt - just use user's text directly
+// Prompt placeholder examples - TIK pozos ir formatas (AI pats mato kas įkelta)
+export const PROMPT_PLACEHOLDERS: string[] = [
+  // Pilnas ūgis
+  'pilnas ūgis, stovi tiesiai, žiūri į kamerą',
+  'pilnas ūgis, natūraliai stovi, rankos prie šono',
+  'pilnas ūgis, viena ranka ant klubo',
+  'pilnas ūgis, lengvai pasukta į šoną',
+  'pilnas ūgis, žingsnis į priekį',
+  'pilnas ūgis, modelio poza',
+  'pilnas ūgis, eina, natūralus judesys',
+
+  // Iki pusės (waist up)
+  'iki pusės, žiūri į kamerą',
+  'iki pusės, pusiau pasukta',
+  'iki pusės, rankos sukryžiuotos',
+  'iki pusės, ranka ant klubo',
+  'iki pusės, sėdi, atsipalaidavusi',
+  'iki pusės, lengva šypsena',
+
+  // Tik veidas / portretas
+  'portretas, žiūri tiesiai',
+  'portretas, lengvai pasukta galva',
+  'portretas, šypsosi',
+  'close-up veido'
+];
+
+// Get random placeholder
+export function getRandomPlaceholder(): string {
+  const index = Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length);
+  return PROMPT_PLACEHOLDERS[index];
+}
+
+// Build the prompt - combine all selections into one prompt
 export function buildPrompt(config: {
   avatar: Avatar | null;
   scene: Scene | null;
@@ -156,8 +187,34 @@ export function buildPrompt(config: {
   mood: Mood | null;
   userPrompt: string;
 }): string {
-  // Return user's prompt as-is (image provides the visual context)
-  return config.userPrompt.trim() || 'Professional fashion photo';
+  const parts: string[] = [];
+
+  // Modelio aprašymas
+  if (config.avatar) {
+    parts.push(config.avatar.promptDescription);
+  }
+
+  // Aplinkos aprašymas
+  if (config.scene) {
+    parts.push(config.scene.promptDescription);
+  }
+
+  // Stiliaus aprašymas
+  if (config.style) {
+    parts.push(config.style.promptDescription);
+  }
+
+  // Nuotaikos aprašymas
+  if (config.mood) {
+    parts.push(config.mood.promptDescription);
+  }
+
+  // Vartotojo instrukcijos (poza, formatas)
+  if (config.userPrompt.trim()) {
+    parts.push(config.userPrompt.trim());
+  }
+
+  return parts.join(', ') || 'Professional fashion photo';
 }
 
-export const DEFAULT_USER_PROMPT = 'Put this clothing on the model, full body photo';
+export const DEFAULT_USER_PROMPT = '';

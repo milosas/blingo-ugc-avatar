@@ -1,5 +1,5 @@
 import { Button } from '../ui/Button';
-import { UI_TEXT } from '../../constants/ui';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ResultsActionsProps {
   onRegenerate: () => void;
@@ -7,6 +7,8 @@ interface ResultsActionsProps {
 }
 
 export function ResultsActions({ onRegenerate, onNewUpload }: ResultsActionsProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 mt-8">
       {/* Regenerate Button - Primary */}
@@ -15,7 +17,7 @@ export function ResultsActions({ onRegenerate, onNewUpload }: ResultsActionsProp
         onClick={onRegenerate}
         className="w-full sm:w-auto"
       >
-        {UI_TEXT.actions.regenerate}
+        {t.actions.regenerate}
       </Button>
 
       {/* New Upload Button - Secondary */}
@@ -24,7 +26,7 @@ export function ResultsActions({ onRegenerate, onNewUpload }: ResultsActionsProp
         onClick={onNewUpload}
         className="w-full sm:w-auto"
       >
-        {UI_TEXT.actions.newUpload}
+        {t.actions.newUpload}
       </Button>
     </div>
   );

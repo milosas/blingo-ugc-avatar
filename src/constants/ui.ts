@@ -1,50 +1,53 @@
 export const UI_TEXT = {
   header: {
-    title: 'Virtualus Drabuziu Modelis',
-    subtitle: 'Ikelkite drabuziu nuotraukas ir gaukite profesionalias nuotraukas su modeliu'
+    title: 'UGC Nuotraukų Generatorius',
+    subtitle: 'Įkelkite nuotrauką ir sukurkite profesionalias UGC nuotraukas su AI'
   },
   upload: {
-    title: 'Ikelti nuotraukas',
-    description: 'Paspauskite arba vilkite nuotraukas cia',
-    hint: 'JPG arba PNG, iki 3 nuotrauku',
-    remove: 'Pasalinti',
+    title: 'Įkelti nuotrauką',
+    description: 'Paspauskite arba vilkite nuotrauką čia',
+    hint: 'JPG arba PNG formatas',
+    remove: 'Pašalinti',
     imageOf: 'Nuotrauka'
   },
   config: {
     title: 'Nustatymai',
-    avatarLabel: 'Pasirinkite avatara',
-    sceneLabel: 'Pasirinkite scena',
-    styleLabel: 'Pasirinkite stiliu',
+    avatarLabel: 'Pasirinkite modelį',
+    sceneLabel: 'Pasirinkite aplinką',
+    styleLabel: 'Pasirinkite stilių',
+    moodLabel: 'Pasirinkite nuotaiką',
     placeholder: 'Pasirinkite...',
-    descriptionLabel: 'Avataro aprasymas'
+    promptLabel: 'Jūsų instrukcijos',
+    promptHint: 'Aprašykite, ką norite matyti nuotraukoje'
   },
   actions: {
     generate: 'Generuoti',
     generating: 'Generuojama...',
-    cancel: 'At�aukti',
-    regenerate: 'Regeneruoti',
-    newUpload: 'Naujas upload'
+    cancel: 'Atšaukti',
+    regenerate: 'Generuoti dar kartą',
+    newUpload: 'Nauja nuotrauka'
   },
   results: {
     title: 'Sugeneruotos nuotraukos'
   },
   validation: {
-    noImages: 'Ikelkite bent viena nuotrauka',
-    noAvatar: 'Pasirinkite avatara',
-    noScene: 'Pasirinkite scena',
-    noStyle: 'Pasirinkite stiliu'
+    noImages: 'Įkelkite nuotrauką',
+    noAvatar: 'Pasirinkite modelį',
+    noPrompt: 'Įrašykite instrukcijas (min. 3 simboliai)'
   },
   loading: {
     sending: 'Siunčiama...',
-    generating1: 'Generuojama 1/3...',
-    generating2: 'Generuojama 2/3...',
-    generating3: 'Beveik baigta...',
+    generating: 'Generuojama...',
+    almostDone: 'Beveik baigta...',
     complete: 'Baigta!'
   },
   tips: [
-    'Patarimas: Geriausi rezultatai su vienspalviais drabužiais',
     'Patarimas: Aiškios nuotraukos duoda geriausius rezultatus',
-    'Patarimas: Vengti per daug priedų ar raštų'
+    'Patarimas: Geras apšvietimas labai pagerina kokybę',
+    'Patarimas: Detalizuotos instrukcijos = geresni rezultatai',
+    'Patarimas: Naudokite aukštą raišką originalui',
+    'Patarimas: Išvenkite susiliečusių nuotraukų',
+    'Patarimas: Galite generuoti kelias nuotraukas iš karto'
   ],
   errors: {
     timeout: 'Užtruko per ilgai. Bandykite dar kartą.',
@@ -53,4 +56,3 @@ export const UI_TEXT = {
     default: 'Įvyko klaida. Bandykite dar kartą.'
   }
 } as const;
-

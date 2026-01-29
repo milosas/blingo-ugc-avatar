@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { ErrorType } from '../../types/generation';
-import { UI_TEXT } from '../../constants/ui';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ErrorMessageProps {
   errorType: ErrorType;
@@ -8,17 +8,19 @@ interface ErrorMessageProps {
 }
 
 export function ErrorMessage({ errorType, onDismiss }: ErrorMessageProps) {
+  const { t } = useLanguage();
+
   // Map error type to message
   const getErrorMessage = () => {
     switch (errorType) {
       case 'TIMEOUT':
-        return UI_TEXT.errors.timeout;
+        return t.errors.timeout;
       case 'NETWORK':
-        return UI_TEXT.errors.network;
+        return t.errors.network;
       case 'API_ERROR':
-        return UI_TEXT.errors.api;
+        return t.errors.api;
       default:
-        return UI_TEXT.errors.default;
+        return t.errors.default;
     }
   };
 
@@ -38,7 +40,7 @@ export function ErrorMessage({ errorType, onDismiss }: ErrorMessageProps) {
         <div className="flex items-center gap-3 mb-4">
           {/* Error icon */}
           <div className="text-4xl">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-900">Klaida</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Error</h2>
         </div>
 
         {/* Error message */}

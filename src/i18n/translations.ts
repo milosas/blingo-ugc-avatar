@@ -413,4 +413,6 @@ export const translations = {
   }
 } as const;
 
-export type Translations = typeof translations.lt;
+// Use a deep writable type to allow any language's translations
+type DeepString<T> = T extends string ? string : { [K in keyof T]: DeepString<T[K]> };
+export type Translations = DeepString<typeof translations.lt>;

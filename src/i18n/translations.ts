@@ -112,6 +112,48 @@ export const translations = {
       1: { name: '1 nuotrauka', description: 'Greičiau, pigiau' },
       2: { name: '2 nuotraukos', description: 'Daugiau pasirinkimų' },
       3: { name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
+    },
+    auth: {
+      // Login/Signup modal
+      signIn: 'Prisijungti',
+      signUp: 'Registruotis',
+      signOut: 'Atsijungti',
+      orContinueWith: 'arba tęsti su',
+      continueWithGoogle: 'Tęsti su Google',
+
+      // Form fields
+      email: 'El. paštas',
+      password: 'Slaptažodis',
+      confirmPassword: 'Pakartokite slaptažodį',
+
+      // Buttons
+      signInButton: 'Prisijungti',
+      signUpButton: 'Registruotis',
+      createAccount: 'Sukurti paskyrą',
+      alreadyHaveAccount: 'Jau turite paskyrą?',
+      dontHaveAccount: 'Neturite paskyros?',
+
+      // Guest mode
+      continueAsGuest: 'Tęsti kaip svečias',
+      guestMode: 'Svečio režimas',
+
+      // Status messages
+      signingIn: 'Jungiamasi...',
+      signingUp: 'Registruojama...',
+      signingOut: 'Atsijungiama...',
+      checkEmail: 'Patikrinkite el. paštą patvirtinimui',
+
+      // Error messages
+      invalidCredentials: 'Neteisingas el. paštas arba slaptažodis',
+      emailNotConfirmed: 'Patvirtinkite el. paštą prieš prisijungiant',
+      emailAlreadyExists: 'Šis el. paštas jau užregistruotas',
+      weakPassword: 'Slaptažodis per silpnas (min. 6 simboliai)',
+      rateLimitExceeded: 'Per daug bandymų. Pabandykite vėliau',
+      genericError: 'Įvyko klaida. Bandykite dar kartą',
+
+      // User menu
+      signedInAs: 'Prisijungęs kaip',
+      myAccount: 'Mano paskyra'
     }
   },
   lv: {
@@ -211,6 +253,48 @@ export const translations = {
       1: { name: '1 attēls', description: 'Ātrāk, lētāk' },
       2: { name: '2 attēli', description: 'Vairāk izvēļu' },
       3: { name: '3 attēli', description: 'Maksimāla izvēle' }
+    },
+    auth: {
+      // Login/Signup modal
+      signIn: 'Pieslēgties',
+      signUp: 'Reģistrēties',
+      signOut: 'Iziet',
+      orContinueWith: 'vai turpināt ar',
+      continueWithGoogle: 'Turpināt ar Google',
+
+      // Form fields
+      email: 'E-pasts',
+      password: 'Parole',
+      confirmPassword: 'Atkārtojiet paroli',
+
+      // Buttons
+      signInButton: 'Pieslēgties',
+      signUpButton: 'Reģistrēties',
+      createAccount: 'Izveidot kontu',
+      alreadyHaveAccount: 'Jau ir konts?',
+      dontHaveAccount: 'Nav konta?',
+
+      // Guest mode
+      continueAsGuest: 'Turpināt kā viesis',
+      guestMode: 'Viesa režīms',
+
+      // Status messages
+      signingIn: 'Pieslēdzas...',
+      signingUp: 'Reģistrējas...',
+      signingOut: 'Iziet...',
+      checkEmail: 'Pārbaudiet e-pastu apstiprināšanai',
+
+      // Error messages
+      invalidCredentials: 'Nepareizs e-pasts vai parole',
+      emailNotConfirmed: 'Lūdzu apstipriniet e-pastu pirms pieslēgšanās',
+      emailAlreadyExists: 'Šis e-pasts jau ir reģistrēts',
+      weakPassword: 'Parole pārāk vāja (min. 6 simboli)',
+      rateLimitExceeded: 'Pārāk daudz mēģinājumu. Mēģiniet vēlāk',
+      genericError: 'Radās kļūda. Mēģiniet vēlreiz',
+
+      // User menu
+      signedInAs: 'Pieslēdzies kā',
+      myAccount: 'Mans konts'
     }
   },
   ee: {
@@ -310,6 +394,48 @@ export const translations = {
       1: { name: '1 pilt', description: 'Kiirem, odavam' },
       2: { name: '2 pilti', description: 'Rohkem valikuid' },
       3: { name: '3 pilti', description: 'Maksimaalne valik' }
+    },
+    auth: {
+      // Login/Signup modal
+      signIn: 'Logi sisse',
+      signUp: 'Registreeru',
+      signOut: 'Logi välja',
+      orContinueWith: 'või jätka',
+      continueWithGoogle: 'Jätka Google\'iga',
+
+      // Form fields
+      email: 'E-post',
+      password: 'Parool',
+      confirmPassword: 'Korda parooli',
+
+      // Buttons
+      signInButton: 'Logi sisse',
+      signUpButton: 'Registreeru',
+      createAccount: 'Loo konto',
+      alreadyHaveAccount: 'On juba konto?',
+      dontHaveAccount: 'Pole kontot?',
+
+      // Guest mode
+      continueAsGuest: 'Jätka külalisena',
+      guestMode: 'Külalise režiim',
+
+      // Status messages
+      signingIn: 'Sisselogimine...',
+      signingUp: 'Registreerimine...',
+      signingOut: 'Väljalogimine...',
+      checkEmail: 'Kontrolli e-posti kinnitamiseks',
+
+      // Error messages
+      invalidCredentials: 'Vale e-post või parool',
+      emailNotConfirmed: 'Palun kinnita e-post enne sisselogimist',
+      emailAlreadyExists: 'See e-post on juba registreeritud',
+      weakPassword: 'Parool liiga nõrk (min. 6 tähemärki)',
+      rateLimitExceeded: 'Liiga palju katseid. Proovi hiljem',
+      genericError: 'Tekkis viga. Proovi uuesti',
+
+      // User menu
+      signedInAs: 'Sisse logitud kui',
+      myAccount: 'Minu konto'
     }
   },
   en: {
@@ -409,6 +535,48 @@ export const translations = {
       1: { name: '1 photo', description: 'Faster, cheaper' },
       2: { name: '2 photos', description: 'More choices' },
       3: { name: '3 photos', description: 'Maximum selection' }
+    },
+    auth: {
+      // Login/Signup modal
+      signIn: 'Sign In',
+      signUp: 'Sign Up',
+      signOut: 'Sign Out',
+      orContinueWith: 'or continue with',
+      continueWithGoogle: 'Continue with Google',
+
+      // Form fields
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+
+      // Buttons
+      signInButton: 'Sign In',
+      signUpButton: 'Sign Up',
+      createAccount: 'Create Account',
+      alreadyHaveAccount: 'Already have an account?',
+      dontHaveAccount: "Don't have an account?",
+
+      // Guest mode
+      continueAsGuest: 'Continue as Guest',
+      guestMode: 'Guest Mode',
+
+      // Status messages
+      signingIn: 'Signing in...',
+      signingUp: 'Signing up...',
+      signingOut: 'Signing out...',
+      checkEmail: 'Check your email for confirmation',
+
+      // Error messages
+      invalidCredentials: 'Invalid email or password',
+      emailNotConfirmed: 'Please verify your email before signing in',
+      emailAlreadyExists: 'This email is already registered',
+      weakPassword: 'Password too weak (min. 6 characters)',
+      rateLimitExceeded: 'Too many attempts. Please try again later',
+      genericError: 'An error occurred. Please try again',
+
+      // User menu
+      signedInAs: 'Signed in as',
+      myAccount: 'My Account'
     }
   }
 } as const;

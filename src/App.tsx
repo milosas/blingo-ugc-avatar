@@ -7,6 +7,7 @@ import { ImagePreviewGrid } from './components/upload/ImagePreviewGrid';
 import { ConfigPanel } from './components/config/ConfigPanel';
 import { Button } from './components/ui/Button';
 import { LanguageSelector } from './components/ui/LanguageSelector';
+import { AuthButton } from './components/auth/AuthButton';
 import { LoadingOverlay } from './components/generation/LoadingOverlay';
 import { ResultsGallery } from './components/generation/ResultsGallery';
 import { ResultsActions } from './components/generation/ResultsActions';
@@ -89,7 +90,10 @@ function App() {
                 {t.header.subtitle}
               </p>
             </div>
-            <LanguageSelector />
+            <div className="flex items-center gap-3">
+              <AuthButton />
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       </header>

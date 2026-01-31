@@ -3,6 +3,9 @@ import type { GenerationState, ErrorType } from '../types/generation';
 import type { Config, UploadedImage } from '../types';
 import { API_CONFIG } from '../constants/api';
 import { generateImages } from '../services/generationService';
+import { useSupabaseStorage } from './useSupabaseStorage';
+import { useAuth } from './useAuth';
+import { buildPrompt } from '../constants/fluxOptions';
 
 const INITIAL_STATE: GenerationState = {
   status: 'idle',
@@ -16,6 +19,8 @@ export function useGeneration() {
   const [state, setState] = useState<GenerationState>(INITIAL_STATE);
   const abortControllerRef = useRef<AbortController | null>(null);
   const progressTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { user } = useAuth();
+  const { saveGeneratedImage } = useSupabaseStorage();
 
   // Cleanup on unmount
   useEffect(() => {
@@ -85,6 +90,37 @@ export function useGeneration() {
           tasks: null,
           error: null
         });
+
+        // Save to Supabase if user is authenticated (non-blocking)
+        if (user) {
+          // Build the prompt that was used for generation
+          const generatedPrompt = buildPrompt({
+            avatar: config.avatar,
+            scene: config.scene,
+            style: config.style,
+            mood: config.mood,
+            userPrompt: config.userPrompt
+          });
+
+          // Save each generated image (Promise.all but don't await - non-blocking)
+          data.images.forEach((image) => {
+            saveGeneratedImage({
+              imageUrl: image.url,
+              prompt: generatedPrompt,
+              config: {
+                avatar: config.avatar?.id ?? null,
+                scene: config.scene?.id ?? null,
+                style: config.style?.id ?? null,
+                mood: config.mood?.id ?? null,
+                aspectRatio: config.aspectRatio,
+                resolution: config.resolution
+              }
+            }).catch((err) => {
+              // Log but don't block UX - user already has ephemeral image
+              console.error('Failed to save image to Supabase:', err);
+            });
+          });
+        }
       } else {
         console.error('No images in response:', data);
         setState({
@@ -124,7 +160,7 @@ export function useGeneration() {
         error: errorType
       });
     }
-  }, []);
+  }, [user, saveGeneratedImage]);
 
   const cancel = useCallback(() => {
     abortControllerRef.current?.abort();

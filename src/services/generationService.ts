@@ -22,8 +22,8 @@ function imageToBase64(file: File): Promise<string> {
 }
 
 /**
- * Send generation request to n8n webhook
- * Uses flux-2/pro-image-to-image model
+ * Send generation request to Supabase Edge Function
+ * Uses flux-2/pro-image-to-image model via kie.ai
  *
  * Combines user selections (avatar, scene, style, mood) with user's custom prompt
  * to create the full generation prompt
@@ -63,11 +63,13 @@ export async function generateImages(
     avatarId: config.avatar?.id || null
   };
 
-  // POST to n8n webhook
-  const response = await fetch(API_CONFIG.webhookUrl, {
+  // POST to Supabase Edge Function
+  const response = await fetch(API_CONFIG.generateUrl, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_CONFIG.supabaseAnonKey}`,
+      'apikey': API_CONFIG.supabaseAnonKey
     },
     body: JSON.stringify(requestBody),
     signal

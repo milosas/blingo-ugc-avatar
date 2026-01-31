@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import type { GenerationState, ErrorType } from '../types/generation';
 import type { Config, UploadedImage } from '../types';
 import { API_CONFIG } from '../constants/api';
-import { generateImages } from '../services/n8nService';
+import { generateImages } from '../services/generationService';
 
 const INITIAL_STATE: GenerationState = {
   status: 'idle',
@@ -42,7 +42,7 @@ export function useGeneration() {
       error: null
     });
 
-    // Create timeout signal (n8n does server-side polling)
+    // Create timeout signal (Edge Function does server-side polling)
     const timeoutSignal = AbortSignal.timeout(API_CONFIG.timeout);
 
     // Combine user abort and timeout signals
@@ -51,7 +51,7 @@ export function useGeneration() {
       timeoutSignal
     ]);
 
-    // Set up progress stage timers (n8n polling takes ~60-120s)
+    // Set up progress stage timers (generation takes ~60-120s)
     const timer1 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-1' } : prev);
     }, 10000); // 10s
@@ -67,16 +67,16 @@ export function useGeneration() {
     progressTimersRef.current = [timer1, timer2, timer3];
 
     try {
-      // Use n8nService to make the API call - n8n now handles polling
+      // Call Edge Function - it handles kie.ai polling
       const data = await generateImages(config, images, combinedSignal);
 
-      console.log('n8n response:', data);
+      console.log('Generation response:', data);
 
       // Clear timers on success
       progressTimersRef.current.forEach(timer => clearTimeout(timer));
       progressTimersRef.current = [];
 
-      // n8n returns { success: true, images: [...] }
+      // Edge Function returns { success: true, images: [...] }
       if (data.images && Array.isArray(data.images) && data.images.length > 0) {
         setState({
           status: 'success',

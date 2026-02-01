@@ -45,7 +45,7 @@ export function useSupabaseStorage() {
       const storagePath = `${user.id}/${fileName}`;
 
       // 3. Upload to Supabase Storage bucket
-      const { data: uploadData, error: uploadError } = await supabase
+      const { error: uploadError } = await supabase
         .storage
         .from('generated-images')
         .upload(storagePath, blob, {

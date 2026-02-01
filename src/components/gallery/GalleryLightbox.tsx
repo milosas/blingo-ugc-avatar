@@ -90,17 +90,11 @@ function DeleteButton({ slides, onDelete, onClose }: DeleteButtonProps) {
     }
   }, [currentSlide, confirmDelete, onDelete, slides.length, onClose]);
 
-  // Reset confirmation when slide changes
-  const handleReset = useCallback(() => {
-    setConfirmDelete(false);
-  }, []);
-
-  // We need to reset on index change - using a simple approach
-  // by including currentIndex in the key to force re-render
+  // We reset on index change via including currentIndex in the key to force re-render
   return (
     <IconButton
       key={`delete-${currentIndex}`}
-      label={confirmDelete ? 'Confirm delete' : 'Delete'}
+      label="Delete"
       icon={DeleteIcon}
       onClick={handleClick}
       disabled={isDeleting}

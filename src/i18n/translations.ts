@@ -154,6 +154,31 @@ export const translations = {
       // User menu
       signedInAs: 'Prisijungęs kaip',
       myAccount: 'Mano paskyra'
+    },
+    gallery: {
+      title: 'Mano Galerija',
+      empty: {
+        title: 'Dar nera nuotrauku',
+        subtitle: 'Sugeneruokite pirma nuotrauka ir pradekite savo galerija',
+        cta: 'Generuoti nuotrauka'
+      },
+      guest: {
+        title: 'Prisijunkite, kad matytumete galerija',
+        subtitle: 'Sukurkite paskyra, kad galetumete issaugoti ir valdyti sugeneruotas nuotraukas',
+        cta: 'Prisijungti'
+      },
+      actions: {
+        download: 'Atsisiusti',
+        delete: 'Istrinti',
+        confirm: 'Patvirtinti',
+        back: 'Grizti i generatoriu'
+      },
+      loading: 'Kraunama galerija...',
+      error: 'Nepavyko ikelti galerijos'
+    },
+    nav: {
+      gallery: 'Galerija',
+      generate: 'Generuoti'
     }
   },
   lv: {
@@ -295,6 +320,31 @@ export const translations = {
       // User menu
       signedInAs: 'Pieslēdzies kā',
       myAccount: 'Mans konts'
+    },
+    gallery: {
+      title: 'Mana Galerija',
+      empty: {
+        title: 'Vel nav attelu',
+        subtitle: 'Generejiet pirmo attelu, lai sāktu savu galeriju',
+        cta: 'Generēt attēlu'
+      },
+      guest: {
+        title: 'Pieslēdzieties, lai redzētu galeriju',
+        subtitle: 'Izveidojiet kontu, lai saglabātu un pārvaldītu ģenerētos attēlus',
+        cta: 'Pieslēgties'
+      },
+      actions: {
+        download: 'Lejupielādēt',
+        delete: 'Dzēst',
+        confirm: 'Apstiprināt',
+        back: 'Atpakaļ uz ģeneratoru'
+      },
+      loading: 'Ielādē galeriju...',
+      error: 'Neizdevās ielādēt galeriju'
+    },
+    nav: {
+      gallery: 'Galerija',
+      generate: 'Ģenerēt'
     }
   },
   ee: {
@@ -436,6 +486,31 @@ export const translations = {
       // User menu
       signedInAs: 'Sisse logitud kui',
       myAccount: 'Minu konto'
+    },
+    gallery: {
+      title: 'Minu Galerii',
+      empty: {
+        title: 'Pilte pole veel',
+        subtitle: 'Genereerige esimene pilt, et alustada oma galeriid',
+        cta: 'Genereeri pilt'
+      },
+      guest: {
+        title: 'Logi sisse, et näha galeriid',
+        subtitle: 'Loo konto, et salvestada ja hallata genereeritud pilte',
+        cta: 'Logi sisse'
+      },
+      actions: {
+        download: 'Laadi alla',
+        delete: 'Kustuta',
+        confirm: 'Kinnita',
+        back: 'Tagasi generaatorisse'
+      },
+      loading: 'Laadin galeriid...',
+      error: 'Galerii laadimine ebaõnnestus'
+    },
+    nav: {
+      gallery: 'Galerii',
+      generate: 'Genereeri'
     }
   },
   en: {
@@ -577,6 +652,31 @@ export const translations = {
       // User menu
       signedInAs: 'Signed in as',
       myAccount: 'My Account'
+    },
+    gallery: {
+      title: 'My Gallery',
+      empty: {
+        title: 'No images yet',
+        subtitle: 'Generate your first image to start your gallery',
+        cta: 'Generate Image'
+      },
+      guest: {
+        title: 'Sign in to see your gallery',
+        subtitle: 'Create an account to save and manage your generated images',
+        cta: 'Sign In'
+      },
+      actions: {
+        download: 'Download',
+        delete: 'Delete',
+        confirm: 'Confirm',
+        back: 'Back to Generator'
+      },
+      loading: 'Loading gallery...',
+      error: 'Failed to load gallery'
+    },
+    nav: {
+      gallery: 'Gallery',
+      generate: 'Generate'
     }
   }
 } as const;

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import Lightbox, { useLightboxState, IconButton, createIcon } from 'yet-another-react-lightbox';
-import Download from 'yet-another-react-lightbox/plugins/download';
 import 'yet-another-react-lightbox/styles.css';
 import type { GeneratedImage } from '../../types/database';
 import { downloadImage } from '../../utils/download';
@@ -47,7 +46,6 @@ interface GallerySlide {
   id: string;
   storagePath: string;
   notes?: string | null;
-  download: string; // For download plugin
 }
 
 // Delete button component that uses lightbox state
@@ -148,7 +146,6 @@ export function GalleryLightbox({
     id: img.id,
     storagePath: img.storage_path,
     notes: img.prompt, // Using prompt as notes for now (notes field will be in Phase 7)
-    download: img.image_url, // For download plugin fallback
   }));
 
   // Handle slide change
@@ -169,7 +166,7 @@ export function GalleryLightbox({
       index={index}
       slides={slides}
       on={{ view: handleView }}
-      plugins={[Download]}
+      plugins={[]}
       carousel={{
         finite: false, // Allow looping
       }}

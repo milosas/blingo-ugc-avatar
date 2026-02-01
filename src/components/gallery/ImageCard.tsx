@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { downloadImage } from '../../utils/download';
 import { formatRelativeTime } from '../../utils/date';
+import { useNotes } from '../../hooks/useNotes';
+import { NotesEditor } from './NotesEditor';
 import type { GeneratedImage } from '../../types/database';
 
 interface ImageCardProps {
@@ -12,7 +14,11 @@ interface ImageCardProps {
 export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showNoteOverlay, setShowNoteOverlay] = useState(false);
   const confirmTimeoutRef = useRef<number | null>(null);
+
+  // Use notes hook
+  const { note, saveNote, deleteNote } = useNotes(image.id);
 
   // Clean up timeout on unmount
   useEffect(() => {
@@ -57,7 +63,7 @@ export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
     }
   };
 
-  const hasNotes = Boolean(image.prompt);
+  const hasNotes = Boolean(note?.note_text);
 
   return (
     <div
@@ -134,24 +140,51 @@ export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
         </span>
       </div>
 
-      {/* Note indicator */}
-      {hasNotes && (
-        <div className="absolute top-2 right-2">
-          <div className="p-1 bg-black/60 rounded" title="Has notes">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-              />
-            </svg>
-          </div>
+      {/* Note icon - always visible, full opacity when note exists */}
+      <button
+        className={`absolute top-2 right-2 p-1 rounded transition-colors ${
+          hasNotes ? 'bg-black/60 hover:bg-black/80' : 'bg-black/40 hover:bg-black/60'
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowNoteOverlay(true);
+        }}
+        title={hasNotes ? 'View/edit note' : 'Add note'}
+      >
+        <svg
+          className="w-4 h-4 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+          />
+        </svg>
+      </button>
+
+      {/* Note overlay */}
+      {showNoteOverlay && (
+        <div
+          className="absolute inset-0 bg-black/80 flex items-end p-3 z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <NotesEditor
+            initialNote={note?.note_text || ''}
+            onSave={async (text) => {
+              await saveNote(text);
+              setShowNoteOverlay(false);
+            }}
+            onDelete={async () => {
+              await deleteNote();
+              setShowNoteOverlay(false);
+            }}
+            onClose={() => setShowNoteOverlay(false)}
+            hasExistingNote={Boolean(note)}
+          />
         </div>
       )}
     </div>

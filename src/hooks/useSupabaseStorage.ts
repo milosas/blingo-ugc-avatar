@@ -33,7 +33,29 @@ export function useSupabaseStorage() {
     setError(null);
 
     try {
-      // 1. Fetch image from provided URL (n8n returns image URL)
+      // 0. Ensure profile exists (backfill for users created before migration)
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        // Profile doesn't exist - create it (backfill)
+        const { error: insertProfileError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id, email: user.email })
+          .select()
+          .single();
+
+        if (insertProfileError) {
+          console.error('Failed to create profile:', insertProfileError);
+          throw new Error(`Profile creation failed: ${insertProfileError.message}`);
+        }
+        console.log('Profile backfilled for user:', user.id);
+      }
+
+      // 1. Fetch image from provided URL (Edge Function returns image URL)
       const response = await fetch(options.imageUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.statusText}`);
@@ -54,20 +76,28 @@ export function useSupabaseStorage() {
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
 
-      // 4. Get public URL (works with private bucket + auth)
-      const { data: { publicUrl } } = supabase
+      // 4. Get signed URL for private bucket (valid for 1 year)
+      const { data: signedUrlData, error: signedUrlError } = await supabase
         .storage
         .from('generated-images')
-        .getPublicUrl(storagePath);
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
+
+      if (signedUrlError || !signedUrlData) {
+        console.error('Failed to create signed URL:', signedUrlError);
+        throw new Error(`Signed URL creation failed: ${signedUrlError?.message}`);
+      }
 
       // 5. Insert metadata into generated_images table
       const { data: dbData, error: dbError } = await supabase
         .from('generated_images')
         .insert({
           user_id: user.id,
-          image_url: publicUrl,
+          image_url: signedUrlData.signedUrl,
           storage_path: storagePath,
           prompt: options.prompt,
           config: options.config as GenerationConfig
@@ -75,11 +105,14 @@ export function useSupabaseStorage() {
         .select()
         .single();
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database insert error:', dbError);
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
 
       return {
         id: dbData.id,
-        publicUrl,
+        publicUrl: signedUrlData.signedUrl,
         storagePath
       };
     } catch (err) {

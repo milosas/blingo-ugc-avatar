@@ -6,6 +6,15 @@ export interface Profile {
   created_at: string;
 }
 
+export interface ImageNote {
+  id: string;
+  image_id: string;
+  user_id: string;
+  note_text: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface GeneratedImage {
   id: string;
   user_id: string;
@@ -15,6 +24,7 @@ export interface GeneratedImage {
   config: GenerationConfig | null;
   created_at: string;
   updated_at: string;
+  note?: ImageNote | null; // Optional: populated when joined
 }
 
 export interface GenerationConfig {

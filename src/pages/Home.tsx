@@ -197,7 +197,13 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mt-auto py-6 text-center text-sm text-gray-500">
-        {t.footer} &copy; 2025
+        <div className="flex items-center justify-center gap-4">
+          <span>{t.footer} &copy; {new Date().getFullYear()}</span>
+          <span className="text-gray-300">|</span>
+          <Link to="/privacy" className="hover:text-indigo-600 transition-colors">
+            Privacy Policy
+          </Link>
+        </div>
       </footer>
 
       {/* Loading Overlay (fixed on top when loading, hidden during polling) */}

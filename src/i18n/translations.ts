@@ -16,8 +16,8 @@ export const LANGUAGES: LanguageOption[] = [
 export const translations = {
   lt: {
     header: {
-      title: 'UGC Nuotraukų Generatorius',
-      subtitle: 'Įkelkite nuotrauką ir sukurkite profesionalias UGC nuotraukas su AI'
+      title: 'Re Edit Me',
+      subtitle: 'Įkelkite nuotrauką ir sukurkite profesionalias nuotraukas su AI'
     },
     upload: {
       title: 'Įkelti nuotrauką',
@@ -77,7 +77,7 @@ export const translations = {
       api: 'Nepavyko sugeneruoti. Bandykite vėliau.',
       default: 'Įvyko klaida. Bandykite dar kartą.'
     },
-    footer: 'UGC Nuotraukų Generatorius',
+    footer: 'Re Edit Me',
     // Options
     avatars: {
       'elegant-woman': { name: 'Elegantiška moteris', description: 'Profesionali, stilinga išvaizda' },
@@ -183,8 +183,8 @@ export const translations = {
   },
   lv: {
     header: {
-      title: 'UGC Attēlu Ģenerators',
-      subtitle: 'Augšupielādējiet attēlu un izveidojiet profesionālus UGC attēlus ar AI'
+      title: 'Re Edit Me',
+      subtitle: 'Augšupielādējiet attēlu un izveidojiet profesionālus attēlus ar AI'
     },
     upload: {
       title: 'Augšupielādēt attēlu',
@@ -244,7 +244,7 @@ export const translations = {
       api: 'Neizdevās ģenerēt. Mēģiniet vēlāk.',
       default: 'Radās kļūda. Mēģiniet vēlreiz.'
     },
-    footer: 'UGC Attēlu Ģenerators',
+    footer: 'Re Edit Me',
     avatars: {
       'elegant-woman': { name: 'Eleganta sieviete', description: 'Profesionāls, stilīgs izskats' },
       'casual-woman': { name: 'Ikdienas stils', description: 'Atslābināts, ikdienas izskats' },
@@ -349,8 +349,8 @@ export const translations = {
   },
   ee: {
     header: {
-      title: 'UGC Piltide Generaator',
-      subtitle: 'Laadige pilt üles ja looge professionaalseid UGC pilte AI-ga'
+      title: 'Re Edit Me',
+      subtitle: 'Laadige pilt üles ja looge professionaalseid pilte AI-ga'
     },
     upload: {
       title: 'Laadi pilt üles',
@@ -410,7 +410,7 @@ export const translations = {
       api: 'Genereerimine ebaõnnestus. Proovige hiljem.',
       default: 'Tekkis viga. Proovige uuesti.'
     },
-    footer: 'UGC Piltide Generaator',
+    footer: 'Re Edit Me',
     avatars: {
       'elegant-woman': { name: 'Elegantne naine', description: 'Professionaalne, stiilne välimus' },
       'casual-woman': { name: 'Vabaaeg stiil', description: 'Lõõgastunud, igapäevane välimus' },
@@ -515,8 +515,8 @@ export const translations = {
   },
   en: {
     header: {
-      title: 'UGC Photo Generator',
-      subtitle: 'Upload a photo and create professional UGC images with AI'
+      title: 'Re Edit Me',
+      subtitle: 'Upload a photo and create professional images with AI'
     },
     upload: {
       title: 'Upload photo',
@@ -576,7 +576,7 @@ export const translations = {
       api: 'Failed to generate. Please try later.',
       default: 'An error occurred. Please try again.'
     },
-    footer: 'UGC Photo Generator',
+    footer: 'Re Edit Me',
     avatars: {
       'elegant-woman': { name: 'Elegant woman', description: 'Professional, stylish look' },
       'casual-woman': { name: 'Casual style', description: 'Relaxed, everyday look' },

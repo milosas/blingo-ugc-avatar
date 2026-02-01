@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+/* Masonry Grid - react-masonry-css */
+.masonry-grid {
+  display: flex;
+  margin-left: -16px;
+  width: auto;
+}
+
+.masonry-column {
+  padding-left: 16px;
+  background-clip: padding-box;
+}
+
+.masonry-column > div {
+  margin-bottom: 16px;
+}
+
+/* Card animations */
+.card-actions {
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.card-hover:hover .card-actions {
+  opacity: 1;
+}
+
+/* Fade out animation for deleted cards */
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+.animate-fade-out {
+  animation: fadeOut 300ms ease-out forwards;
+}

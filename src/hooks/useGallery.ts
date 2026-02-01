@@ -37,7 +37,33 @@ export function useGallery(): UseGalleryReturn {
 
       if (queryError) throw queryError;
 
-      setImages(data || []);
+      if (!data || data.length === 0) {
+        setImages([]);
+        return;
+      }
+
+      // Generate fresh signed URLs for private bucket
+      // (stored URLs may be public URLs that don't work, or expired signed URLs)
+      const imagesWithSignedUrls = await Promise.all(
+        data.map(async (img) => {
+          const { data: signedUrlData, error: signedUrlError } = await supabase
+            .storage
+            .from('generated-images')
+            .createSignedUrl(img.storage_path, 60 * 60); // 1 hour validity
+
+          if (signedUrlError || !signedUrlData) {
+            console.error('Failed to create signed URL for', img.storage_path, signedUrlError);
+            return img; // Return original (may not display)
+          }
+
+          return {
+            ...img,
+            image_url: signedUrlData.signedUrl,
+          };
+        })
+      );
+
+      setImages(imagesWithSignedUrls);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch images';
       setError(errorMessage);

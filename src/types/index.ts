@@ -5,6 +5,7 @@ export interface Avatar {
   description: string;
   imageUrl: string; // URL to avatar image
   promptDescription: string; // How to describe in prompt
+  isCustom?: boolean; // true for custom avatars
 }
 
 // Scene options

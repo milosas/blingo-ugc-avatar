@@ -11,6 +11,7 @@ interface UseCustomAvatarsReturn {
   updateDescription: (avatarId: string, description: string) => Promise<void>;
   deleteAvatar: (avatarId: string, storagePath: string) => Promise<void>;
   refresh: () => Promise<void>;
+  refreshAvatar: (avatarId: string) => Promise<CustomAvatar | null>;
 }
 
 export function useCustomAvatars(): UseCustomAvatarsReturn {
@@ -118,6 +119,23 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
 
+      // Trigger Edge Function (non-blocking) - don't await
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      fetch(`${supabaseUrl}/functions/v1/analyze-avatar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          avatarId: dbData.id,
+          imageUrl: signedUrlData.signedUrl
+        })
+      }).catch(err => {
+        // Log error but don't fail upload
+        console.error('Edge Function call failed:', err);
+      });
+
       // Refresh list to include new avatar
       await fetchAvatars();
 
@@ -190,6 +208,28 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     await fetchAvatars();
   }, [fetchAvatars]);
 
+  const refreshAvatar = useCallback(async (avatarId: string): Promise<CustomAvatar | null> => {
+    // Guest mode - nothing to refresh
+    if (!user) return null;
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from('custom_avatars')
+        .select('*')
+        .eq('id', avatarId)
+        .single();
+
+      if (queryError || !data) return null;
+
+      // Update local state
+      setAvatars(prev => prev.map(a => a.id === avatarId ? data : a));
+      return data;
+    } catch (err) {
+      console.error('Refresh avatar error:', err);
+      return null;
+    }
+  }, [user]);
+
   // Fetch avatars when user changes
   useEffect(() => {
     fetchAvatars();
@@ -202,6 +242,7 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     createAvatar,
     updateDescription,
     deleteAvatar,
-    refresh
+    refresh,
+    refreshAvatar
   };
 }

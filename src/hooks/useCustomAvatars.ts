@@ -57,6 +57,28 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     }
 
     try {
+      // Ensure profile exists (backfill for users created before migration)
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        // Profile doesn't exist - create it (backfill)
+        const { error: insertProfileError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id, email: user.email })
+          .select()
+          .single();
+
+        if (insertProfileError) {
+          console.error('Failed to create profile:', insertProfileError);
+          throw new Error(`Profile creation failed: ${insertProfileError.message}`);
+        }
+        console.log('Profile backfilled for user:', user.id);
+      }
+
       // Validate file type
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         throw new Error('Only JPEG and PNG images are supported');

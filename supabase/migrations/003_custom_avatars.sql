@@ -81,7 +81,7 @@ values ('custom-avatars', 'custom-avatars', false);
 -- ============================================================================
 
 -- Users can upload to their own folder (user_id/)
-create policy "Users can upload to own folder"
+create policy "Users can upload custom avatars to own folder"
 on storage.objects for insert
 to authenticated
 with check (
@@ -90,7 +90,7 @@ with check (
 );
 
 -- Users can read their own files
-create policy "Users can read own files"
+create policy "Users can read own custom avatars"
 on storage.objects for select
 to authenticated
 using (
@@ -99,7 +99,7 @@ using (
 );
 
 -- Users can delete their own files
-create policy "Users can delete own files"
+create policy "Users can delete own custom avatars"
 on storage.objects for delete
 to authenticated
 using (

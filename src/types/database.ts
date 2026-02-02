@@ -15,6 +15,17 @@ export interface ImageNote {
   updated_at: string;
 }
 
+export interface CustomAvatar {
+  id: string;
+  user_id: string;
+  storage_path: string;
+  image_url: string;
+  description: string | null;
+  avatar_type: 'photo' | 'stylized' | 'pending';
+  created_at: string;
+  updated_at: string;
+}
+
 export interface GeneratedImage {
   id: string;
   user_id: string;

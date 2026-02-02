@@ -16,7 +16,7 @@ interface ConfigPanelProps {
 export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { avatars: customAvatars, createAvatar, updateDescription, deleteAvatar, loading: loadingAvatars } = useCustomAvatars();
+  const { avatars: customAvatars, createAvatar, deleteAvatar } = useCustomAvatars();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarChange = (avatar: Avatar) => {
@@ -80,7 +80,8 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
       await createAvatar(file);
     } catch (error) {
       console.error('Failed to upload avatar:', error);
-      alert('Failed to upload avatar. You may have reached the limit (10 avatars).');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to upload avatar: ${errorMessage}`);
     }
 
     // Reset input
@@ -169,7 +170,6 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
                   avatar={ca}
                   isSelected={config.avatar?.id === ca.id}
                   onSelect={() => handleAvatarChange(customAvatarToAvatar(ca))}
-                  onUpdateDescription={(desc) => updateDescription(ca.id, desc)}
                   onDelete={() => deleteAvatar(ca.id, ca.storage_path)}
                 />
               ))}

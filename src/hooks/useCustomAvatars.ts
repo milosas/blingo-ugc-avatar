@@ -8,10 +8,8 @@ interface UseCustomAvatarsReturn {
   loading: boolean;
   error: string | null;
   createAvatar: (file: File) => Promise<CustomAvatar | null>;
-  updateDescription: (avatarId: string, description: string) => Promise<void>;
   deleteAvatar: (avatarId: string, storagePath: string) => Promise<void>;
   refresh: () => Promise<void>;
-  refreshAvatar: (avatarId: string) => Promise<CustomAvatar | null>;
 }
 
 export function useCustomAvatars(): UseCustomAvatarsReturn {
@@ -130,8 +128,8 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
           user_id: user.id,
           storage_path: storagePath,
           image_url: signedUrlData.signedUrl,
-          description: 'Analyzing image...',
-          avatar_type: 'pending'
+          description: null,
+          avatar_type: 'photo'
         })
         .select()
         .single();
@@ -141,23 +139,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
 
-      // Trigger Edge Function (non-blocking) - don't await
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      fetch(`${supabaseUrl}/functions/v1/analyze-avatar`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          avatarId: dbData.id,
-          imageUrl: signedUrlData.signedUrl
-        })
-      }).catch(err => {
-        // Log error but don't fail upload
-        console.error('Edge Function call failed:', err);
-      });
-
       // Refresh list to include new avatar
       await fetchAvatars();
 
@@ -166,31 +147,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create avatar';
       setError(errorMessage);
       console.error('Create avatar error:', err);
-      throw err;
-    }
-  }, [user, fetchAvatars]);
-
-  const updateDescription = useCallback(async (avatarId: string, description: string): Promise<void> => {
-    // Guest mode - nothing to update
-    if (!user) return;
-
-    try {
-      const { error: updateError } = await supabase
-        .from('custom_avatars')
-        .update({
-          description,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', avatarId);
-
-      if (updateError) throw updateError;
-
-      // Refresh to get latest data
-      await fetchAvatars();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update description';
-      setError(errorMessage);
-      console.error('Update description error:', err);
       throw err;
     }
   }, [user, fetchAvatars]);
@@ -230,28 +186,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     await fetchAvatars();
   }, [fetchAvatars]);
 
-  const refreshAvatar = useCallback(async (avatarId: string): Promise<CustomAvatar | null> => {
-    // Guest mode - nothing to refresh
-    if (!user) return null;
-
-    try {
-      const { data, error: queryError } = await supabase
-        .from('custom_avatars')
-        .select('*')
-        .eq('id', avatarId)
-        .single();
-
-      if (queryError || !data) return null;
-
-      // Update local state
-      setAvatars(prev => prev.map(a => a.id === avatarId ? data : a));
-      return data;
-    } catch (err) {
-      console.error('Refresh avatar error:', err);
-      return null;
-    }
-  }, [user]);
-
   // Fetch avatars when user changes
   useEffect(() => {
     fetchAvatars();
@@ -262,9 +196,7 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     loading,
     error,
     createAvatar,
-    updateDescription,
     deleteAvatar,
-    refresh,
-    refreshAvatar
+    refresh
   };
 }

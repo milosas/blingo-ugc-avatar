@@ -8,7 +8,9 @@ interface UseCustomAvatarsReturn {
   loading: boolean;
   error: string | null;
   createAvatar: (file: File) => Promise<CustomAvatar | null>;
+  saveGeneratedAvatar: (base64Data: string, description: string) => Promise<CustomAvatar | null>;
   deleteAvatar: (avatarId: string, storagePath: string) => Promise<void>;
+  updateDescription: (avatarId: string, description: string) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -151,6 +153,97 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     }
   }, [user, fetchAvatars]);
 
+  const saveGeneratedAvatar = useCallback(async (base64Data: string, description: string): Promise<CustomAvatar | null> => {
+    if (!user) {
+      throw new Error('Must be logged in to save avatars');
+    }
+
+    try {
+      // Ensure profile exists
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        const { error: insertProfileError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id, email: user.email })
+          .select()
+          .single();
+
+        if (insertProfileError) {
+          throw new Error(`Profile creation failed: ${insertProfileError.message}`);
+        }
+      }
+
+      // Convert base64 data URL to blob
+      const base64String = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+      const mimeMatch = base64Data.match(/data:([^;]+);/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+      const byteCharacters = atob(base64String);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], { type: mimeType });
+
+      const ext = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+      const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
+      const storagePath = `${user.id}/${fileName}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase
+        .storage
+        .from('custom-avatars')
+        .upload(storagePath, blob, {
+          contentType: mimeType,
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      // Create signed URL
+      const { data: signedUrlData, error: signedUrlError } = await supabase
+        .storage
+        .from('custom-avatars')
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365);
+
+      if (signedUrlError || !signedUrlData) {
+        throw new Error(`Signed URL creation failed: ${signedUrlError?.message}`);
+      }
+
+      // Insert into DB
+      const { data: dbData, error: dbError } = await supabase
+        .from('custom_avatars')
+        .insert({
+          user_id: user.id,
+          storage_path: storagePath,
+          image_url: signedUrlData.signedUrl,
+          description,
+          avatar_type: 'stylized'
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
+
+      await fetchAvatars();
+      return dbData;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save generated avatar';
+      setError(errorMessage);
+      console.error('Save generated avatar error:', err);
+      throw err;
+    }
+  }, [user, fetchAvatars]);
+
   const deleteAvatar = useCallback(async (avatarId: string, storagePath: string): Promise<void> => {
     // Guest mode - nothing to delete
     if (!user) return;
@@ -182,6 +275,29 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     }
   }, [user, fetchAvatars]);
 
+  const updateDescription = useCallback(async (avatarId: string, description: string): Promise<void> => {
+    // Guest mode - cannot update
+    if (!user) return;
+
+    try {
+      const { error: dbError } = await supabase
+        .from('custom_avatars')
+        .update({ description: description || null })
+        .eq('id', avatarId)
+        .eq('user_id', user.id); // Security: ensure user owns avatar
+
+      if (dbError) throw dbError;
+
+      // Refresh list to show updated description
+      await fetchAvatars();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update description';
+      setError(errorMessage);
+      console.error('Update description error:', err);
+      throw err;
+    }
+  }, [user, fetchAvatars]);
+
   const refresh = useCallback(async (): Promise<void> => {
     await fetchAvatars();
   }, [fetchAvatars]);
@@ -196,7 +312,9 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     loading,
     error,
     createAvatar,
+    saveGeneratedAvatar,
     deleteAvatar,
+    updateDescription,
     refresh
   };
 }

@@ -5,10 +5,11 @@ export type GenerationProgress =
   | 'generating-3'
   | 'complete';
 
-export type ErrorType = 'TIMEOUT' | 'NETWORK' | 'API_ERROR';
+export type ErrorType = 'TIMEOUT' | 'NETWORK' | 'API_ERROR' | 'AVATAR_LOAD_FAILED';
 
 export interface GeneratedImage {
   url: string;
+  base64?: string; // Base64 data URL for CORS-free storage (from Edge Function)
   angle: 'far' | 'medium' | 'close';
 }
 

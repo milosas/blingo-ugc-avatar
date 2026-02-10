@@ -16,16 +16,16 @@ export interface Scene {
   promptDescription: string;
 }
 
-// Style options
-export interface Style {
+// Mood options
+export interface Mood {
   id: string;
   name: string;
   description: string;
   promptDescription: string;
 }
 
-// Mood options
-export interface Mood {
+// Pose options
+export interface Pose {
   id: string;
   name: string;
   description: string;
@@ -68,8 +68,8 @@ export interface Config {
   // Selection fields
   avatar: Avatar | null;
   scene: Scene | null;
-  style: Style | null;
   mood: Mood | null;
+  pose: Pose | null;
   // User's custom instruction
   userPrompt: string;
   // Technical settings

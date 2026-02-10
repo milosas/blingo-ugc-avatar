@@ -19,6 +19,8 @@ export function ErrorMessage({ errorType, onDismiss }: ErrorMessageProps) {
         return t.errors.network;
       case 'API_ERROR':
         return t.errors.api;
+      case 'AVATAR_LOAD_FAILED':
+        return t.errors.avatarLoad || t.errors.default;
       default:
         return t.errors.default;
     }

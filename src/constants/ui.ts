@@ -47,7 +47,7 @@ export const UI_TEXT = {
     'Patarimas: Detalizuotos instrukcijos = geresni rezultatai',
     'Patarimas: Naudokite aukštą raišką originalui',
     'Patarimas: Išvenkite susiliečusių nuotraukų',
-    'Patarimas: Galite generuoti kelias nuotraukas iš karto'
+    'Patarimas: Išbandykite skirtingas pozas įvairesniam rezultatui'
   ],
   errors: {
     timeout: 'Užtruko per ilgai. Bandykite dar kartą.',

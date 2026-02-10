@@ -1,6 +1,7 @@
 -- Initial database schema for Virtual Clothing Model Generator
 -- Profiles and generated images tables with RLS policies
 
+
 -- Enable necessary extensions
 create extension if not exists "uuid-ossp";
 create extension if not exists moddatetime schema extensions;
@@ -72,6 +73,12 @@ create policy "Users can update own profile"
 on public.profiles for update
 to authenticated
 using ( (select auth.uid()) = id )
+with check ( (select auth.uid()) = id );
+
+-- Allow users to insert their own profile (for backfill of pre-migration users)
+create policy "Users can insert own profile"
+on public.profiles for insert
+to authenticated
 with check ( (select auth.uid()) = id );
 
 -- ============================================================================

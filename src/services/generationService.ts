@@ -22,6 +22,30 @@ function imageToBase64(file: File): Promise<string> {
 }
 
 /**
+ * Fetch image URL and convert to base64 data URL
+ * Used for custom avatars where Edge Function can't access signed URLs
+ */
+async function urlToBase64(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image: ${response.status}`);
+  }
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to convert blob to data URL'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/**
  * Send generation request to Supabase Edge Function
  * Uses flux-2/pro-image-to-image model via kie.ai
  *
@@ -42,12 +66,36 @@ export async function generateImages(
   const fullPrompt = buildPrompt({
     avatar: config.avatar,
     scene: config.scene,
-    style: config.style,
     mood: config.mood,
+    pose: config.pose,
     userPrompt: config.userPrompt
   });
 
   console.log('Generated prompt:', fullPrompt);
+
+  // For custom avatars, convert image URL to base64 (Edge Function can't access signed URLs)
+  // For preset avatars, send URL directly (Unsplash URLs are publicly accessible)
+  let avatarImageBase64: string | null = null;
+  let avatarImageUrl: string | null = null;
+
+  if (config.avatar?.imageUrl) {
+    if (config.avatar.isCustom) {
+      // Custom avatar: convert to base64 for Edge Function
+      // CRITICAL: If this fails, we must throw error - user explicitly selected this avatar
+      console.log('Converting custom avatar to base64...');
+      try {
+        avatarImageBase64 = await urlToBase64(config.avatar.imageUrl);
+        console.log('Custom avatar converted to base64, length:', avatarImageBase64.length);
+      } catch (err) {
+        console.error('CRITICAL: Failed to convert custom avatar to base64:', err);
+        // DON'T continue without avatar - throw error so user knows
+        throw new Error('AVATAR_LOAD_FAILED');
+      }
+    } else {
+      // Preset avatar: URL is publicly accessible
+      avatarImageUrl = config.avatar.imageUrl;
+    }
+  }
 
   // Build request body for flux-2/pro-image-to-image model
   const requestBody = {
@@ -59,8 +107,11 @@ export async function generateImages(
     imageCount: config.imageCount,
     // Clothing images
     images: base64Images,
-    // Avatar info (for potential avatar image handling)
-    avatarId: config.avatar?.id || null
+    // Avatar info for identity preservation
+    avatarId: config.avatar?.id || null,
+    avatarImageUrl: avatarImageUrl,
+    avatarImageBase64: avatarImageBase64,
+    avatarIsCustom: config.avatar?.isCustom || false
   };
 
   // POST to Supabase Edge Function
@@ -76,6 +127,15 @@ export async function generateImages(
   });
 
   if (!response.ok) {
+    // Try to parse error response for specific error types
+    try {
+      const errorData = await response.json();
+      if (errorData.error?.includes('AVATAR_UPLOAD_FAILED')) {
+        throw new Error('AVATAR_LOAD_FAILED');
+      }
+    } catch (parseErr) {
+      // If parsing fails, throw generic error
+    }
     throw new Error('API_ERROR');
   }
 

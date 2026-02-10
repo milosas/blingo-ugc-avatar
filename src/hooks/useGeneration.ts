@@ -91,35 +91,46 @@ export function useGeneration() {
           error: null
         });
 
-        // Save to Supabase if user is authenticated (non-blocking)
+        // Save to Supabase if user is authenticated
         if (user) {
+          console.log('User authenticated, saving images to gallery...', { userId: user.id, imageCount: data.images?.length || 0 });
+
           // Build the prompt that was used for generation
           const generatedPrompt = buildPrompt({
             avatar: config.avatar,
             scene: config.scene,
-            style: config.style,
             mood: config.mood,
+            pose: config.pose,
             userPrompt: config.userPrompt
           });
 
-          // Save each generated image (Promise.all but don't await - non-blocking)
-          data.images.forEach((image) => {
-            saveGeneratedImage({
-              imageUrl: image.url,
-              prompt: generatedPrompt,
-              config: {
-                avatar: config.avatar?.id ?? null,
-                scene: config.scene?.id ?? null,
-                style: config.style?.id ?? null,
-                mood: config.mood?.id ?? null,
-                aspectRatio: config.aspectRatio,
-                resolution: config.resolution
-              }
-            }).catch((err) => {
-              // Log but don't block UX - user already has ephemeral image
-              console.error('Failed to save image to Supabase:', err);
-            });
-          });
+          // Save all generated images - await to ensure they're saved
+          try {
+            const savedImages = await Promise.all(
+              data.images.map((image, index) => {
+                console.log(`Saving image ${index + 1}/${data.images?.length || 0}:`, image.url.substring(0, 50) + '...', 'has base64:', !!image.base64);
+                return saveGeneratedImage({
+                  imageUrl: image.url,
+                  imageBase64: image.base64, // Pass base64 for CORS-free storage
+                  prompt: generatedPrompt,
+                  config: {
+                    avatar: config.avatar?.id ?? null,
+                    scene: config.scene?.id ?? null,
+                    mood: config.mood?.id ?? null,
+                    pose: config.pose?.id ?? null,
+                    aspectRatio: config.aspectRatio,
+                    resolution: config.resolution
+                  }
+                });
+              })
+            );
+            console.log('All images saved to gallery successfully:', savedImages);
+          } catch (err) {
+            console.error('Failed to save images to gallery:', err);
+            // Don't throw - user already has the generated images displayed
+          }
+        } else {
+          console.log('User not authenticated, skipping gallery save');
         }
       } else {
         console.error('No images in response:', data);
@@ -148,6 +159,8 @@ export function useGeneration() {
         return;
       } else if (error.message === 'API_ERROR') {
         errorType = 'API_ERROR';
+      } else if (error.message === 'AVATAR_LOAD_FAILED') {
+        errorType = 'AVATAR_LOAD_FAILED';
       } else {
         errorType = 'NETWORK';
       }

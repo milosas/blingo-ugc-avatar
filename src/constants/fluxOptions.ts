@@ -1,41 +1,82 @@
-import type { AspectRatioOption, ResolutionOption, ImageCountOption, Avatar, Scene, Style, Mood } from '../types';
+import type { AspectRatioOption, ResolutionOption, ImageCountOption, Avatar, Scene, Mood, Pose } from '../types';
 
-// Avatar options with reference images
+// Avatar options with reference images (Unsplash free photos)
+// Variety of body framings: full body, half body (waist up), face
 export const AVATARS: Avatar[] = [
+  // Female avatars - Full body (3)
   {
-    id: 'elegant-woman',
+    id: 'fashion-woman-full',
+    name: 'Mados modelis',
+    description: 'Pilnas kūnas, stilinga poza',
+    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200&h=300&fit=crop',
+    promptDescription: 'fashion model woman, full body, stylish pose'
+  },
+  {
+    id: 'elegant-woman-full',
     name: 'Elegantiška moteris',
-    description: 'Profesionali, stilinga išvaizda',
-    imageUrl: '/avatars/elegant-woman.svg',
-    promptDescription: 'elegant professional woman model'
+    description: 'Pilnas kūnas, elegantiškas stilius',
+    imageUrl: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=200&h=300&fit=crop',
+    promptDescription: 'elegant woman, full body, sophisticated style'
   },
   {
-    id: 'casual-woman',
+    id: 'casual-woman-full',
     name: 'Kasdienis stilius',
-    description: 'Atsipalaidavusi, kasdienė išvaizda',
-    imageUrl: '/avatars/casual-woman.svg',
-    promptDescription: 'casual young woman'
+    description: 'Pilnas kūnas, atsipalaidavusi',
+    imageUrl: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=200&h=300&fit=crop',
+    promptDescription: 'casual young woman, full body, relaxed pose'
+  },
+  // Female avatars - Half body (2)
+  {
+    id: 'professional-woman-half',
+    name: 'Profesionali moteris',
+    description: 'Pusė kūno, dalykiškas stilius',
+    imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=250&fit=crop',
+    promptDescription: 'professional woman, waist up, business attire'
   },
   {
-    id: 'athletic-woman',
-    name: 'Sportinė moteris',
-    description: 'Sportiška, aktyvi išvaizda',
-    imageUrl: '/avatars/athletic-woman.svg',
-    promptDescription: 'athletic fit woman'
+    id: 'creative-woman-half',
+    name: 'Kūrybinga moteris',
+    description: 'Pusė kūno, meninė išraiška',
+    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=250&fit=crop',
+    promptDescription: 'creative artistic woman, waist up, unique style'
   },
+  // Female avatar - Face (1)
   {
-    id: 'business-man',
+    id: 'portrait-woman-face',
+    name: 'Portretas moteris',
+    description: 'Veido close-up, natūrali grožybė',
+    imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
+    promptDescription: 'beautiful woman, face close-up, natural beauty'
+  },
+  // Male avatars - Full body (2)
+  {
+    id: 'business-man-full',
     name: 'Verslo vyras',
-    description: 'Profesionalus, dalykiškas',
-    imageUrl: '/avatars/business-man.svg',
-    promptDescription: 'professional business man'
+    description: 'Pilnas kūnas, profesionalus',
+    imageUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=300&fit=crop',
+    promptDescription: 'business man, full body, professional suit'
   },
   {
-    id: 'casual-man',
+    id: 'casual-man-full',
     name: 'Kasdienis vyras',
-    description: 'Atsipalaidavęs, paprastas stilius',
-    imageUrl: '/avatars/casual-man.svg',
-    promptDescription: 'casual young man'
+    description: 'Pilnas kūnas, atsipalaidavęs',
+    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=300&fit=crop',
+    promptDescription: 'casual man, full body, relaxed style'
+  },
+  // Male avatars - Half body (2)
+  {
+    id: 'athletic-man-half',
+    name: 'Sportinis vyras',
+    description: 'Pusė kūno, atletiškas',
+    imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=250&fit=crop',
+    promptDescription: 'athletic man, waist up, fit physique'
+  },
+  {
+    id: 'stylish-man-half',
+    name: 'Stilingas vyras',
+    description: 'Pusė kūno, madinga išvaizda',
+    imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=250&fit=crop',
+    promptDescription: 'stylish man, waist up, fashionable look'
   }
 ];
 
@@ -67,34 +108,6 @@ export const SCENES: Scene[] = [
   }
 ];
 
-// Style options
-export const STYLES: Style[] = [
-  {
-    id: 'casual',
-    name: 'Kasdienis',
-    description: 'Atsipalaidavęs, kasdieniškas',
-    promptDescription: 'casual relaxed style'
-  },
-  {
-    id: 'sport',
-    name: 'Sportinis',
-    description: 'Atletiškas, sportiškas',
-    promptDescription: 'sporty athletic style'
-  },
-  {
-    id: 'elegant',
-    name: 'Elegantiškas',
-    description: 'Rafinuotas, išskirtinis',
-    promptDescription: 'elegant sophisticated style'
-  },
-  {
-    id: 'streetwear',
-    name: 'Gatvės mada',
-    description: 'Miestietiška mada',
-    promptDescription: 'modern streetwear style'
-  }
-];
-
 // Mood options
 export const MOODS: Mood[] = [
   {
@@ -120,18 +133,76 @@ export const MOODS: Mood[] = [
     name: 'Pasitikintis',
     description: 'Stiprus, užtikrintas',
     promptDescription: 'confident powerful expression'
+  },
+  {
+    id: 'mysterious',
+    name: 'Paslaptingas',
+    description: 'Intriguojantis, paslaptingas',
+    promptDescription: 'mysterious intriguing expression'
+  },
+  {
+    id: 'energetic',
+    name: 'Energingas',
+    description: 'Dinamiškas, pilnas energijos',
+    promptDescription: 'energetic dynamic expression'
+  },
+  {
+    id: 'dreamy',
+    name: 'Svajingas',
+    description: 'Romantiškas, svajingas',
+    promptDescription: 'dreamy romantic expression'
+  },
+  {
+    id: 'fierce',
+    name: 'Ryžtingas',
+    description: 'Stiprus, ryžtingas',
+    promptDescription: 'fierce determined expression'
   }
 ];
 
-// Aspect ratio options - common social media & e-shop formats
+// Pose options - body position and framing
+export const POSES: Pose[] = [
+  {
+    id: 'full-body',
+    name: 'Pilnas kūnas',
+    description: 'Viso kūno kadras, stovint',
+    promptDescription: 'full body shot, standing pose'
+  },
+  {
+    id: 'half-body',
+    name: 'Pusė kūno',
+    description: 'Nuo juosmens į viršų',
+    promptDescription: 'waist up, upper body shot'
+  },
+  {
+    id: 'portrait',
+    name: 'Portretas',
+    description: 'Galva ir pečiai',
+    promptDescription: 'portrait, head and shoulders'
+  },
+  {
+    id: 'face',
+    name: 'Veidas',
+    description: 'Veido close-up',
+    promptDescription: 'face close-up, detailed facial features'
+  },
+  {
+    id: 'from-behind',
+    name: 'Nuo nugaros',
+    description: 'Foto iš nugaros pusės',
+    promptDescription: 'shot from behind, back view'
+  }
+];
+
+// Aspect ratio options - common formats for e-commerce and marketing
 export const ASPECT_RATIOS: AspectRatioOption[] = [
-  { id: '1:1', name: 'Instagram postas', description: '1:1 kvadratas - idealus Instagram feed' },
-  { id: '4:5', name: 'Instagram portretas', description: '4:5 - populiariausias IG formatas' },
-  { id: '9:16', name: 'Stories / Reels', description: '9:16 - IG Stories, TikTok, Reels' },
-  { id: '4:3', name: 'Facebook postas', description: '4:3 - optimalus Facebook' },
-  { id: '2:3', name: 'E-shop produktas', description: '2:3 - standartinis produkto formatas' },
-  { id: '3:4', name: 'Pinterest', description: '3:4 - Pinterest rekomenduojamas' },
-  { id: '16:9', name: 'YouTube / Cover', description: '16:9 - cover photo, banneriai' }
+  { id: '1:1', name: 'Kvadratas 1:1', description: 'Universalus kvadratinis formatas' },
+  { id: '4:5', name: 'Portretas 4:5', description: 'Populiarus portreto formatas' },
+  { id: '9:16', name: 'Vertikalus 9:16', description: 'Pilno ekrano vertikalus formatas' },
+  { id: '4:3', name: 'Standartinis 4:3', description: 'Klasikinis foto formatas' },
+  { id: '2:3', name: 'Produktas 2:3', description: 'E-shop produktų formatas' },
+  { id: '3:4', name: 'Portretas 3:4', description: 'Aukštas portreto formatas' },
+  { id: '16:9', name: 'Platus 16:9', description: 'Horizontalus plataus ekrano formatas' }
 ];
 
 // Resolution options
@@ -147,30 +218,32 @@ export const IMAGE_COUNTS: ImageCountOption[] = [
   { id: 3, name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
 ];
 
-// Prompt placeholder examples - TIK pozos ir formatas (AI pats mato kas įkelta)
+// Prompt placeholder examples - papildomi patikslinimai (be pozų - tos pasirenkamos dropdown)
 export const PROMPT_PLACEHOLDERS: string[] = [
-  // Pilnas ūgis
-  'pilnas ūgis, stovi tiesiai, žiūri į kamerą',
-  'pilnas ūgis, natūraliai stovi, rankos prie šono',
-  'pilnas ūgis, viena ranka ant klubo',
-  'pilnas ūgis, lengvai pasukta į šoną',
-  'pilnas ūgis, žingsnis į priekį',
-  'pilnas ūgis, modelio poza',
-  'pilnas ūgis, eina, natūralus judesys',
+  // Rankų padėtis
+  'rankos sukryžiuotos',
+  'viena ranka ant klubo',
+  'rankos kišenėse',
+  'rankos už nugaros',
+  'ranka ant smakro',
 
-  // Iki pusės (waist up)
-  'iki pusės, žiūri į kamerą',
-  'iki pusės, pusiau pasukta',
-  'iki pusės, rankos sukryžiuotos',
-  'iki pusės, ranka ant klubo',
-  'iki pusės, sėdi, atsipalaidavusi',
-  'iki pusės, lengva šypsena',
+  // Žvilgsnio kryptis
+  'žiūri į kamerą',
+  'žiūri į šoną',
+  'žiūri žemyn',
+  'žvilgsnis į tolį',
 
-  // Tik veidas / portretas
-  'portretas, žiūri tiesiai',
-  'portretas, lengvai pasukta galva',
-  'portretas, šypsosi',
-  'close-up veido'
+  // Išraiška
+  'lengva šypsena',
+  'rimta išraiška',
+  'natūrali išraiška',
+  'mįslinga šypsena',
+
+  // Papildomi detalės
+  'plaukai palaidi',
+  'plaukai surišti',
+  'su akiniais',
+  'su skrybėle'
 ];
 
 // Get random placeholder
@@ -183,8 +256,8 @@ export function getRandomPlaceholder(): string {
 export function buildPrompt(config: {
   avatar: Avatar | null;
   scene: Scene | null;
-  style: Style | null;
   mood: Mood | null;
+  pose: Pose | null;
   userPrompt: string;
 }): string {
   const parts: string[] = [];
@@ -194,14 +267,14 @@ export function buildPrompt(config: {
     parts.push(config.avatar.promptDescription);
   }
 
+  // Pozos aprašymas (kūno padėtis, kadras) - prieš sceną
+  if (config.pose) {
+    parts.push(config.pose.promptDescription);
+  }
+
   // Aplinkos aprašymas
   if (config.scene) {
     parts.push(config.scene.promptDescription);
-  }
-
-  // Stiliaus aprašymas
-  if (config.style) {
-    parts.push(config.style.promptDescription);
   }
 
   // Nuotaikos aprašymas
@@ -209,7 +282,7 @@ export function buildPrompt(config: {
     parts.push(config.mood.promptDescription);
   }
 
-  // Vartotojo instrukcijos (poza, formatas)
+  // Vartotojo papildomi patikslinimai
   if (config.userPrompt.trim()) {
     parts.push(config.userPrompt.trim());
   }

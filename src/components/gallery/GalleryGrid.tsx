@@ -12,7 +12,7 @@ const breakpointColumns = {
   default: 4,  // Desktop
   1024: 3,     // Laptop
   768: 2,      // Tablet
-  640: 1       // Mobile
+  640: 2       // Mobile - 2 columns
 };
 
 export function GalleryGrid({ images, onImageClick, onDelete }: GalleryGridProps) {

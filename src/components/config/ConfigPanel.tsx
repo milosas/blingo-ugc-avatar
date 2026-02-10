@@ -1,11 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Select } from '../ui/Select';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { AVATARS, SCENES, STYLES, MOODS, ASPECT_RATIOS, RESOLUTIONS, IMAGE_COUNTS, getRandomPlaceholder } from '../../constants/fluxOptions';
-import type { Avatar, Scene, Style, Mood, AspectRatioOption, ResolutionOption, ImageCountOption, Config } from '../../types';
+import { AVATARS, SCENES, MOODS, POSES, ASPECT_RATIOS, RESOLUTIONS, IMAGE_COUNTS, getRandomPlaceholder } from '../../constants/fluxOptions';
+import type { Avatar, Scene, Mood, Pose, AspectRatioOption, ResolutionOption, ImageCountOption, Config } from '../../types';
 import { useCustomAvatars } from '../../hooks/useCustomAvatars';
 import { useAuth } from '../../hooks/useAuth';
-import { CustomAvatarCard } from '../avatars/CustomAvatarCard';
+import { SimpleAvatarCard } from '../avatars/SimpleAvatarCard';
+import { AvatarCreatorModal } from '../avatars/AvatarCreatorModal';
 import type { CustomAvatar } from '../../types/database';
 
 interface ConfigPanelProps {
@@ -16,23 +17,29 @@ interface ConfigPanelProps {
 export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { avatars: customAvatars, createAvatar, deleteAvatar } = useCustomAvatars();
+  const { avatars: customAvatars, createAvatar } = useCustomAvatars();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showCreatorModal, setShowCreatorModal] = useState(false);
 
   const handleAvatarChange = (avatar: Avatar) => {
-    onConfigChange({ ...config, avatar });
+    // Toggle behavior: click again to deselect
+    if (config.avatar?.id === avatar.id) {
+      onConfigChange({ ...config, avatar: null });
+    } else {
+      onConfigChange({ ...config, avatar });
+    }
   };
 
   const handleSceneChange = (scene: Scene) => {
     onConfigChange({ ...config, scene });
   };
 
-  const handleStyleChange = (style: Style) => {
-    onConfigChange({ ...config, style });
-  };
-
   const handleMoodChange = (mood: Mood) => {
     onConfigChange({ ...config, mood });
+  };
+
+  const handlePoseChange = (pose: Pose) => {
+    onConfigChange({ ...config, pose });
   };
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -91,10 +98,11 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
   // Convert custom avatar to Avatar type for selection
   const customAvatarToAvatar = (ca: CustomAvatar): Avatar => ({
     id: ca.id,
-    name: 'Custom Avatar',
-    description: ca.description || 'Custom avatar',
+    name: t.customAvatars?.customAvatar || 'Custom Avatar',
+    description: ca.description || t.customAvatars?.customAvatar || 'Custom avatar',
     imageUrl: ca.image_url,
-    promptDescription: ca.description || 'person',
+    // IMPORTANT: Tell AI to use the reference image, not just "person"
+    promptDescription: ca.description || 'the person shown in the reference image',
     isCustom: true
   });
 
@@ -105,7 +113,7 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
 
   // Get translated name for avatar
   const getAvatarName = (avatar: Avatar) => {
-    if (avatar.isCustom) return 'Custom Avatar';
+    if (avatar.isCustom) return t.customAvatars?.customAvatar || 'Custom Avatar';
     const translated = t.avatars[avatar.id as keyof typeof t.avatars];
     return translated?.name || avatar.name;
   };
@@ -122,16 +130,16 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
     return translated?.name || scene.name;
   };
 
-  // Get translated name for style
-  const getStyleName = (style: Style) => {
-    const translated = t.styles[style.id as keyof typeof t.styles];
-    return translated?.name || style.name;
-  };
-
   // Get translated name for mood
   const getMoodName = (mood: Mood) => {
     const translated = t.moods[mood.id as keyof typeof t.moods];
     return translated?.name || mood.name;
+  };
+
+  // Get translated name for pose
+  const getPoseName = (pose: Pose) => {
+    const translated = t.poses?.[pose.id as keyof typeof t.poses];
+    return translated?.name || pose.name;
   };
 
   // Get translated name for resolution
@@ -148,50 +156,59 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-semibold text-gray-900">
-        {t.config.title}
-      </h2>
-
       {/* Avatar Selection with Image Preview */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          {t.config.modelLabel} <span className="text-red-500">*</span>
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-[#1A1A1A]">
+          {t.config.modelLabel}
         </label>
 
         {/* My Avatars Section - only show for logged in users */}
         {user && (
-          <div className="mb-3">
-            <p className="text-xs text-gray-500 mb-2">My Avatars</p>
+          <div className="mb-4">
+            <p className="text-xs text-[#999999] mb-2">{t.customAvatars?.myAvatars || 'My Avatars'}</p>
             <div className="grid grid-cols-3 gap-2">
-              {/* Custom avatar cards */}
+              {/* Custom avatar cards - simple selection only */}
               {customAvatars.map((ca) => (
-                <CustomAvatarCard
+                <SimpleAvatarCard
                   key={ca.id}
                   avatar={ca}
                   isSelected={config.avatar?.id === ca.id}
                   onSelect={() => handleAvatarChange(customAvatarToAvatar(ca))}
-                  onDelete={() => deleteAvatar(ca.id, ca.storage_path)}
                 />
               ))}
 
-              {/* Add button */}
+              {/* Upload photo button */}
               <button
                 onClick={handleAddAvatarClick}
-                className="relative p-2 rounded-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 hover:bg-indigo-50 transition-all"
-                title="Add custom avatar"
+                className="relative p-2 rounded-xl border border-dashed border-[#D4D4D2] hover:border-[#FF6B35] hover:bg-[#FFF0EB] transition-all group"
+                title={t.avatarCreator?.uploadPhoto || 'Upload photo'}
               >
                 <div className="aspect-square flex items-center justify-center">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7 text-[#999999] group-hover:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-xs text-[#999999] text-center mt-1">{t.avatarCreator?.uploadPhoto || 'Upload'}</p>
+              </button>
+
+              {/* Create avatar button */}
+              <button
+                onClick={() => setShowCreatorModal(true)}
+                className="relative p-2 rounded-xl border border-dashed border-[#D4D4D2] hover:border-[#FF6B35] hover:bg-[#FFF0EB] transition-all group"
+                title={t.avatarCreator?.createAvatar || 'Create avatar'}
+              >
+                <div className="aspect-square flex items-center justify-center">
+                  <svg className="w-7 h-7 text-[#999999] group-hover:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <p className="text-xs text-gray-500 text-center mt-1">Add</p>
+                <p className="text-xs text-[#999999] text-center mt-1">{t.avatarCreator?.createAvatar || 'Create'}</p>
               </button>
             </div>
 
             {/* Empty state message */}
             {customAvatars.length === 0 && (
-              <p className="text-xs text-gray-400 mt-1">Upload your own photos or art to use as avatars</p>
+              <p className="text-xs text-[#999999] mt-2">{t.customAvatars?.uploadHint || 'Upload your own photos or art to use as avatars'}</p>
             )}
 
             {/* Hidden file input */}
@@ -207,42 +224,68 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
 
         {/* Preset Avatars Section */}
         <div>
-          {user && <p className="text-xs text-gray-500 mb-2">Presets</p>}
+          {user && <p className="text-xs text-[#999999] mb-2">{t.customAvatars?.presets || 'Presets'}</p>}
           <div className="grid grid-cols-3 gap-2">
-            {AVATARS.map((avatar) => (
-              <button
-                key={avatar.id}
-                onClick={() => handleAvatarChange(avatar)}
-                className={`relative p-2 rounded-lg border-2 transition-all ${
-                  config.avatar?.id === avatar.id
-                    ? 'border-indigo-500 bg-indigo-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="aspect-square bg-gray-100 rounded-md mb-1 overflow-hidden">
-                  <img
-                    src={avatar.imageUrl}
-                    alt={getAvatarName(avatar)}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.style.display = 'none';
-                      if (target.parentElement) {
-                        target.parentElement.innerHTML = `<div class="flex items-center justify-center text-2xl w-full h-full">${avatar.id.includes('woman') ? '👩' : '👨'}</div>`;
-                      }
-                    }}
-                  />
-                </div>
-                <p className="text-xs font-medium text-gray-700 truncate">{getAvatarName(avatar)}</p>
-              </button>
-            ))}
+            {AVATARS.map((avatar) => {
+              const isSelected = config.avatar?.id === avatar.id;
+              return (
+                <button
+                  key={avatar.id}
+                  onClick={() => handleAvatarChange(avatar)}
+                  className={`relative p-2 rounded-xl transition-all ${
+                    isSelected
+                      ? 'bg-[#FFF0EB] ring-2 ring-[#FF6B35]'
+                      : 'bg-[#F7F7F5] hover:bg-[#EFEFED] border border-[#E5E5E3] hover:border-[#D4D4D2]'
+                  }`}
+                >
+                  {/* Checkmark overlay when selected */}
+                  {isSelected && (
+                    <div className="absolute top-1 right-1 z-10 bg-[#FF6B35] rounded-full p-0.5">
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="aspect-square bg-[#EFEFED] rounded-lg mb-1 overflow-hidden">
+                    <img
+                      src={avatar.imageUrl}
+                      alt={getAvatarName(avatar)}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                        if (target.parentElement) {
+                          target.parentElement.innerHTML = `<div class="flex items-center justify-center text-2xl w-full h-full">${avatar.id.includes('woman') ? '👩' : '👨'}</div>`;
+                        }
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs font-medium text-[#666666] truncate">{getAvatarName(avatar)}</p>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {config.avatar && (
-          <p className="text-xs text-gray-500">{getAvatarDescription(config.avatar)}</p>
+          <p className="text-xs text-[#999999]">{getAvatarDescription(config.avatar)}</p>
         )}
       </div>
+
+      {/* Pose Selection - Body position and framing */}
+      <Select<Pose>
+        value={config.pose}
+        onChange={handlePoseChange}
+        options={POSES}
+        getLabel={getPoseName}
+        label={t.config?.poseLabel || 'Poza'}
+        placeholder={t.config.placeholder}
+      />
+      {config.pose && (
+        <p className="text-xs text-[#999999] -mt-3">
+          {t.poses?.[config.pose.id as keyof typeof t.poses]?.description || config.pose.description}
+        </p>
+      )}
 
       {/* Scene Selection */}
       <Select<Scene>
@@ -254,23 +297,8 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
         placeholder={t.config.placeholder}
       />
       {config.scene && (
-        <p className="text-xs text-gray-500 -mt-3">
+        <p className="text-xs text-[#999999] -mt-3">
           {t.scenes[config.scene.id as keyof typeof t.scenes]?.description || config.scene.description}
-        </p>
-      )}
-
-      {/* Style Selection */}
-      <Select<Style>
-        value={config.style}
-        onChange={handleStyleChange}
-        options={STYLES}
-        getLabel={getStyleName}
-        label={t.config.styleLabel}
-        placeholder={t.config.placeholder}
-      />
-      {config.style && (
-        <p className="text-xs text-gray-500 -mt-3">
-          {t.styles[config.style.id as keyof typeof t.styles]?.description || config.style.description}
         </p>
       )}
 
@@ -284,24 +312,24 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
         placeholder={t.config.placeholder}
       />
       {config.mood && (
-        <p className="text-xs text-gray-500 -mt-3">
+        <p className="text-xs text-[#999999] -mt-3">
           {t.moods[config.mood.id as keyof typeof t.moods]?.description || config.mood.description}
         </p>
       )}
 
       {/* Divider */}
-      <hr className="border-gray-200" />
+      <hr className="border-[#E5E5E3]" />
 
       {/* User Prompt Input */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700">
-            {t.config.promptLabel} <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-[#1A1A1A]">
+            {t.config.promptLabel}
           </label>
           <button
             type="button"
             onClick={handleImprovise}
-            className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md hover:bg-indigo-200 transition-colors flex items-center gap-1"
+            className="text-xs bg-[#FFF0EB] text-[#FF6B35] px-3 py-1.5 rounded-full hover:bg-[#FFE0D6] transition-all flex items-center gap-1 border border-[#FF6B35]/20"
           >
             <span>✨</span> {t.config.improvise}
           </button>
@@ -312,19 +340,19 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
           placeholder={t.config.promptPlaceholder}
           rows={3}
           maxLength={500}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none text-sm"
+          className="w-full px-4 py-3 bg-white border border-[#E5E5E3] rounded-xl text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 resize-none text-sm transition-all"
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-[#999999]">
           {t.config.promptHint}
         </p>
       </div>
 
       {/* Divider */}
-      <hr className="border-gray-200" />
+      <hr className="border-[#E5E5E3]" />
 
       {/* Technical Settings */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-700">{t.config.technicalSettings}</h3>
+        <h3 className="text-sm font-medium text-[#666666]">{t.config.technicalSettings}</h3>
 
         {/* Image Count - Full Width */}
         <Select<ImageCountOption>
@@ -358,9 +386,15 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
           />
         </div>
         {selectedAspectRatio && (
-          <p className="text-xs text-gray-500">{selectedAspectRatio.description}</p>
+          <p className="text-xs text-[#999999]">{selectedAspectRatio.description}</p>
         )}
       </div>
+
+      {/* Avatar Creator Modal */}
+      <AvatarCreatorModal
+        isOpen={showCreatorModal}
+        onClose={() => setShowCreatorModal(false)}
+      />
     </div>
   );
 }

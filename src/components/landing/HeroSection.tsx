@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { LoginModal } from '../auth/LoginModal';
+import { HeroBackground } from './HeroBackground';
+import { AnimatedSection } from '../animation/AnimatedSection';
+import { StaggerContainer, StaggerItem } from '../animation/StaggerChildren';
+import { TiltCard } from '../animation/TiltCard';
 
 const CARDS = [
   {
@@ -52,61 +57,66 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="py-14 md:py-20 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-14 md:py-20 px-4 overflow-hidden">
+        <HeroBackground />
+
+        <div className="max-w-6xl mx-auto relative z-10">
           {/* Heading */}
-          <div className="text-center mb-12">
+          <AnimatedSection className="text-center mb-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 leading-tight">
               {hero?.title || 'Everything you need for your content'}
             </h1>
             <p className="text-lg text-[#666666] max-w-2xl mx-auto">
               {hero?.subtitle || 'Three powerful AI tools in one place'}
             </p>
-          </div>
+          </AnimatedSection>
 
           {/* 3 Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" staggerDelay={0.12}>
             {CARDS.map((card) => {
               const cardData = hero?.[card.key];
               return (
-                <Link
-                  key={card.key}
-                  to={card.link}
-                  className="group bg-white border border-[#E5E5E3] rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-                >
-                  {/* Icon */}
-                  <div className={`w-14 h-14 rounded-2xl ${card.iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                    <span className={card.iconColor}>{card.icon}</span>
-                  </div>
+                <StaggerItem key={card.key}>
+                  <TiltCard className="relative h-full">
+                    <Link
+                      to={card.link}
+                      className="group block bg-white border border-[#E5E5E3] rounded-2xl p-6 h-full hover:shadow-lg transition-shadow duration-300"
+                    >
+                      {/* Icon */}
+                      <div className={`w-14 h-14 rounded-2xl ${card.iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                        <span className={card.iconColor}>{card.icon}</span>
+                      </div>
 
-                  {/* Title */}
-                  <h2 className="text-xl font-bold text-[#1A1A1A] mb-2 group-hover:text-[#FF6B35] transition-colors">
-                    {cardData?.title || card.key}
-                  </h2>
+                      {/* Title */}
+                      <h2 className="text-xl font-bold text-[#1A1A1A] mb-2 group-hover:text-[#FF6B35] transition-colors">
+                        {cardData?.title || card.key}
+                      </h2>
 
-                  {/* Description */}
-                  <p className="text-[#666666] text-sm leading-relaxed mb-4">
-                    {cardData?.description || ''}
-                  </p>
+                      {/* Description */}
+                      <p className="text-[#666666] text-sm leading-relaxed mb-4">
+                        {cardData?.description || ''}
+                      </p>
 
-                  {/* Arrow */}
-                  <div className={`flex items-center text-sm font-medium ${card.iconColor}`}>
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
+                      {/* Arrow */}
+                      <div className={`flex items-center text-sm font-medium ${card.iconColor}`}>
+                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </Link>
+                  </TiltCard>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <AnimatedSection className="flex flex-col sm:flex-row gap-4 justify-center" delay={0.4}>
             {user ? (
               <>
                 <Link
                   to="/generator"
-                  className="inline-flex items-center justify-center px-8 py-3.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md"
+                  className="shimmer-hover inline-flex items-center justify-center px-8 py-3.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md hover:shadow-[0_4px_20px_rgba(255,107,53,0.4)]"
                 >
                   {hero?.ctaCreate || 'Start Creating'}
                 </Link>
@@ -119,12 +129,14 @@ export function HeroSection() {
               </>
             ) : (
               <>
-                <button
+                <motion.button
                   onClick={() => setShowLoginModal(true)}
-                  className="inline-flex items-center justify-center px-8 py-3.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md"
+                  className="shimmer-hover inline-flex items-center justify-center px-8 py-3.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md hover:shadow-[0_4px_20px_rgba(255,107,53,0.4)]"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   {hero?.ctaSignup || 'Sign Up Free'}
-                </button>
+                </motion.button>
                 <Link
                   to="/generator"
                   className="inline-flex items-center justify-center px-8 py-3.5 bg-white border-2 border-[#E5E5E3] text-[#1A1A1A] font-semibold rounded-full hover:border-[#FF6B35] hover:text-[#FF6B35] transition-colors"
@@ -133,7 +145,7 @@ export function HeroSection() {
                 </Link>
               </>
             )}
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 

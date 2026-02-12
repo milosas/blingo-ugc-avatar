@@ -1,5 +1,6 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePostCreator } from '../hooks/usePostCreator';
+import { AnimatedSection } from '../components/animation/AnimatedSection';
 import { getPlaceholderForIndustry } from '../constants/industries';
 import { IndustrySelect } from '../components/post-creator/IndustrySelect';
 import { PostConfigPanel } from '../components/post-creator/PostConfig';
@@ -20,7 +21,7 @@ export default function PostCreator() {
   const displayImageUrl = pc.generatedImageUrl || (pc.imageSource === 'upload' ? pc.imagePreview : null);
 
   return (
-    <div className="page-enter max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">
         {p.title || 'Post Creator'}
       </h1>
@@ -30,15 +31,15 @@ export default function PostCreator() {
 
       <div className="space-y-6">
         {/* 1. Industry Select */}
-        <IndustrySelect
+        <AnimatedSection delay={0}><IndustrySelect
           value={pc.industry}
           onChange={pc.setIndustry}
           label={p.industryLabel || 'Sritis'}
           placeholder={p.industryPlaceholder || 'Pasirinkite sritį...'}
-        />
+        /></AnimatedSection>
 
         {/* 2. Topic Textarea */}
-        <div>
+        <AnimatedSection delay={0.1}><div>
           <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
             {p.topicLabel || 'Tema'}
           </label>
@@ -49,10 +50,10 @@ export default function PostCreator() {
             rows={3}
             className="w-full px-4 py-3 border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999] focus:border-[#FF6B35] focus:ring-1 focus:ring-[#FF6B35]/20 outline-none resize-none transition-colors"
           />
-        </div>
+        </div></AnimatedSection>
 
         {/* 3. Image Source */}
-        <div>
+        <AnimatedSection delay={0.2}><div>
           <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
             {p.imageLabel || 'Paveikslėlis'}
           </label>
@@ -78,10 +79,10 @@ export default function PostCreator() {
               dragDrop: p.imageDragDrop || 'Paspauskite arba vilkite paveikslėlį',
             }}
           />
-        </div>
+        </div></AnimatedSection>
 
         {/* 4. Post Config */}
-        <div>
+        <AnimatedSection delay={0.3}><div>
           <label className="block text-sm font-medium text-[#1A1A1A] mb-3">
             {p.settingsLabel || 'Nustatymai'}
           </label>
@@ -116,7 +117,7 @@ export default function PostCreator() {
               }}
             />
           </div>
-        </div>
+        </div></AnimatedSection>
 
         {/* 5. Generate Button */}
         <button

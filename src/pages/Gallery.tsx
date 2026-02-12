@@ -36,7 +36,7 @@ export default function Gallery() {
 
   if (loading) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-16">
           <div className="w-12 h-12 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
         </div>
@@ -46,7 +46,7 @@ export default function Gallery() {
 
   if (!user) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
           {t.gallery?.title || 'My Gallery'}
         </h1>
@@ -60,7 +60,7 @@ export default function Gallery() {
 
   if (error) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
           {t.gallery?.title || 'My Gallery'}
         </h1>
@@ -81,7 +81,7 @@ export default function Gallery() {
 
   if (images.length === 0) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
           {t.gallery?.title || 'My Gallery'}
         </h1>
@@ -93,7 +93,7 @@ export default function Gallery() {
   }
 
   return (
-    <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
           {t.gallery?.title || 'My Gallery'}

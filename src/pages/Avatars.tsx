@@ -1,11 +1,14 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCustomAvatars } from '../hooks/useCustomAvatars';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LoginModal } from '../components/auth/LoginModal';
 import { AvatarDescriptionEditor } from '../components/avatars/AvatarDescriptionEditor';
 import { AvatarCreatorModal } from '../components/avatars/AvatarCreatorModal';
+import { StaggerContainer, StaggerItem } from '../components/animation/StaggerChildren';
+import { TiltCard } from '../components/animation/TiltCard';
 import type { CustomAvatar } from '../types/database';
 
 export default function Avatars() {
@@ -64,7 +67,7 @@ export default function Avatars() {
 
   if (loading) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-16">
           <div className="w-12 h-12 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
         </div>
@@ -74,7 +77,7 @@ export default function Avatars() {
 
   if (!user) {
     return (
-      <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
           {t.avatarsPage?.title || 'My Avatars'}
         </h1>
@@ -102,7 +105,7 @@ export default function Avatars() {
   }
 
   return (
-    <div className="page-enter max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
         {t.avatarsPage?.title || 'My Avatars'}
       </h1>
@@ -178,17 +181,20 @@ export default function Avatars() {
 
         {/* Avatars grid */}
         {avatars.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" staggerDelay={0.06}>
             {avatars.map((avatar) => (
-              <AvatarCard
-                key={avatar.id}
-                avatar={avatar}
-                onEdit={() => setEditingAvatar(avatar)}
-                onDelete={() => handleDelete(avatar.id, avatar.storage_path)}
-                onSelect={() => handleSelectAvatar(avatar.id)}
-              />
+              <StaggerItem key={avatar.id}>
+                <TiltCard className="relative h-full">
+                  <AvatarCard
+                    avatar={avatar}
+                    onEdit={() => setEditingAvatar(avatar)}
+                    onDelete={() => handleDelete(avatar.id, avatar.storage_path)}
+                    onSelect={() => handleSelectAvatar(avatar.id)}
+                  />
+                </TiltCard>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         )}
       </div>
 
@@ -225,7 +231,7 @@ export default function Avatars() {
             <AvatarDescriptionEditor
               avatarId={editingAvatar.id}
               initialDescription={editingAvatar.description || ''}
-              isPending={editingAvatar.avatar_type === 'pending'}
+              isPending={false}
               onSave={() => {
                 refresh();
                 setEditingAvatar(null);
@@ -253,7 +259,7 @@ function AvatarCard({ avatar, onEdit, onDelete, onSelect }: AvatarCardProps) {
   const [deleting, setDeleting] = useState(false);
 
   const handleCardClick = () => {
-    if (!deleting && avatar.avatar_type !== 'pending') {
+    if (!deleting) {
       setShowMenu(true);
     }
   };
@@ -295,8 +301,6 @@ function AvatarCard({ avatar, onEdit, onDelete, onSelect }: AvatarCardProps) {
     onSelect();
   };
 
-  const isPending = avatar.avatar_type === 'pending';
-
   return (
     <div
       className={`group relative rounded-2xl overflow-hidden bg-[#F7F7F5] aspect-square cursor-pointer border border-[#E5E5E3] hover:border-[#D4D4D2] transition-all ${
@@ -310,19 +314,13 @@ function AvatarCard({ avatar, onEdit, onDelete, onSelect }: AvatarCardProps) {
         className="w-full h-full object-cover"
       />
 
-      {isPending && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white border border-[#E5E5E3] rounded-xl px-3 py-2 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
-              <span className="text-[#666666] text-sm">{t.avatarsPage?.analyzing || 'Analyzing...'}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showMenu && !isPending && (
-        <div
+      <AnimatePresence>
+      {showMenu && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-2 p-3"
           onClick={handleCloseMenu}
         >
@@ -359,10 +357,11 @@ function AvatarCard({ avatar, onEdit, onDelete, onSelect }: AvatarCardProps) {
             </svg>
             {confirming ? (t.avatarsPage?.confirmDelete || 'Confirm delete') : (t.avatarsPage?.delete || 'Delete')}
           </button>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
-      {avatar.description && !isPending && !showMenu && (
+      {avatar.description && !showMenu && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
           <p className="text-white text-sm line-clamp-2">{avatar.description}</p>
         </div>

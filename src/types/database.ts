@@ -21,7 +21,7 @@ export interface CustomAvatar {
   storage_path: string;
   image_url: string;
   description: string | null;
-  avatar_type: 'photo' | 'stylized' | 'pending' | 'generated';
+  avatar_type: 'photo' | 'stylized' | 'generated';
   created_at: string;
   updated_at: string;
 }

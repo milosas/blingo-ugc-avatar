@@ -1,5 +1,7 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import { useImageGenerator } from '../hooks/useImageGenerator';
+import { AnimatedSection } from '../components/animation/AnimatedSection';
+import { motion } from 'framer-motion';
 import { getPlaceholderForIndustry } from '../constants/industries';
 import { IndustrySelect } from '../components/post-creator/IndustrySelect';
 
@@ -11,7 +13,7 @@ export default function ImageGenerator() {
   const canGenerate = ig.industry && ig.prompt.trim().length >= 3;
 
   return (
-    <div className="page-enter max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">
         {p.title || 'Nuotraukų generatorius'}
       </h1>
@@ -21,15 +23,15 @@ export default function ImageGenerator() {
 
       <div className="space-y-6">
         {/* 1. Industry Select */}
-        <IndustrySelect
+        <AnimatedSection delay={0}><IndustrySelect
           value={ig.industry}
           onChange={ig.setIndustry}
           label={p.industryLabel || 'Sritis'}
           placeholder={p.industryPlaceholder || 'Pasirinkite sritį...'}
-        />
+        /></AnimatedSection>
 
         {/* 2. Prompt Textarea */}
-        <div>
+        <AnimatedSection delay={0.1}><div>
           <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
             {p.promptLabel || 'Aprašymas'}
           </label>
@@ -43,7 +45,7 @@ export default function ImageGenerator() {
           <p className="text-xs text-[#999] mt-1">
             {p.promptHint || 'Aprašykite norimą nuotrauką kuo detaliau'}
           </p>
-        </div>
+        </div></AnimatedSection>
 
         {/* 3. Generate Button */}
         <button
@@ -75,7 +77,11 @@ export default function ImageGenerator() {
 
         {/* 5. Result */}
         {ig.generatedImageUrl && (
-          <div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          >
             <label className="block text-sm font-medium text-[#1A1A1A] mb-2">
               {p.resultLabel || 'Sugeneruota nuotrauka'}
             </label>
@@ -110,7 +116,7 @@ export default function ImageGenerator() {
                 {p.regenerate || 'Generuoti dar kartą'}
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* 6. Save Status */}

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { AnimatedSection } from '../animation/AnimatedSection';
+import { useInView } from 'framer-motion';
 
 function CheckIcon() {
   return (
@@ -21,19 +23,44 @@ function CreditBadge({ text }: { text: string }) {
   );
 }
 
+// Count-up animation hook
+function useCountUp(target: number, duration = 2000) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!isInView || hasAnimated.current || target <= 0) return;
+    hasAnimated.current = true;
+
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress >= 1) clearInterval(timer);
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [isInView, target, duration]);
+
+  return { count, ref };
+}
+
 // Visual mockup placeholders for each section
 function ImageToImageVisual() {
   return (
     <div className="relative">
       <div className="bg-gradient-to-br from-[#FFF0EB] to-[#FFE0D4] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="flex items-center gap-4">
-          {/* Before */}
           <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md flex items-center justify-center">
             <svg className="w-10 h-10 text-[#CCCCCC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          {/* Arrow */}
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,7 +69,6 @@ function ImageToImageVisual() {
             </div>
             <span className="text-xs text-[#FF6B35] font-medium">AI</span>
           </div>
-          {/* After */}
           <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md border-2 border-[#FF6B35] flex items-center justify-center">
             <svg className="w-10 h-10 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -50,7 +76,6 @@ function ImageToImageVisual() {
           </div>
         </div>
       </div>
-      {/* Floating badge */}
       <div className="absolute -top-3 -right-3 bg-[#FF6B35] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
         AI
       </div>
@@ -63,7 +88,6 @@ function ImageGeneratorVisual() {
     <div className="relative">
       <div className="bg-gradient-to-br from-[#EBF0FF] to-[#D4E0FF] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          {/* Text prompt */}
           <div className="bg-white rounded-xl shadow-md px-4 py-3 max-w-[200px]">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />
@@ -71,13 +95,11 @@ function ImageGeneratorVisual() {
             </div>
             <div className="h-2 bg-[#E5E5E3] rounded-full w-24" />
           </div>
-          {/* Arrow down */}
           <div className="w-8 h-8 rounded-full bg-[#4A6CF7] flex items-center justify-center">
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </div>
-          {/* Generated images grid */}
           <div className="flex gap-2">
             <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-lg shadow-md border border-[#4A6CF7]/20" />
             <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-lg shadow-md border-2 border-[#4A6CF7]" />
@@ -97,7 +119,6 @@ function PostCreatorVisual() {
     <div className="relative">
       <div className="bg-gradient-to-br from-[#F0EBFF] to-[#E0D4FF] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="bg-white rounded-xl shadow-md p-4 max-w-[220px] w-full">
-          {/* Post header */}
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-full bg-[#9B6CF7]" />
             <div>
@@ -105,15 +126,12 @@ function PostCreatorVisual() {
               <div className="h-1.5 bg-[#E5E5E3] rounded-full w-14" />
             </div>
           </div>
-          {/* Post image placeholder */}
           <div className="w-full h-20 bg-gradient-to-br from-[#F0EBFF] to-[#E0D4FF] rounded-lg mb-3" />
-          {/* Post text */}
           <div className="space-y-1.5">
             <div className="h-2 bg-[#E5E5E3] rounded-full w-full" />
             <div className="h-2 bg-[#E5E5E3] rounded-full w-4/5" />
             <div className="h-2 bg-[#E5E5E3] rounded-full w-3/5" />
           </div>
-          {/* Hashtags */}
           <div className="flex gap-1 mt-2">
             <span className="text-[8px] text-[#9B6CF7] font-medium">#brand</span>
             <span className="text-[8px] text-[#9B6CF7] font-medium">#fashion</span>
@@ -156,7 +174,7 @@ function FeatureBlock({
     <div className={`py-16 md:py-24 px-4 ${bgColor}`}>
       <div className={`max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center ${reversed ? 'lg:[direction:rtl]' : ''}`}>
         {/* Text content */}
-        <div className={reversed ? 'lg:[direction:ltr]' : ''}>
+        <AnimatedSection direction={reversed ? 'right' : 'left'} className={reversed ? 'lg:[direction:ltr]' : ''}>
           <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 ${badgeColor}`}>
             {badge}
           </span>
@@ -177,7 +195,7 @@ function FeatureBlock({
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link
               to={ctaLink}
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md hover:shadow-lg"
+              className="shimmer-hover inline-flex items-center justify-center px-6 py-3 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors shadow-md hover:shadow-lg"
             >
               {cta}
               <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,11 +204,11 @@ function FeatureBlock({
             </Link>
             <CreditBadge text={creditInfo} />
           </div>
-        </div>
+        </AnimatedSection>
         {/* Visual */}
-        <div className={reversed ? 'lg:[direction:ltr]' : ''}>
+        <AnimatedSection direction="up" delay={0.15} className={reversed ? 'lg:[direction:ltr]' : ''}>
           {visual}
-        </div>
+        </AnimatedSection>
       </div>
     </div>
   );
@@ -231,6 +249,11 @@ function usePlatformStats(): PlatformStats {
   return stats;
 }
 
+function CountUpNumber({ value }: { value: number }) {
+  const { count, ref } = useCountUp(value);
+  return <span ref={ref}>{count.toLocaleString()}</span>;
+}
+
 function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: any }) {
   const hasStats = stats.images > 0 || stats.avatars > 0 || stats.posts > 0;
   if (!hasStats) return null;
@@ -242,11 +265,11 @@ function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: any
   ];
 
   return (
-    <div className="bg-[#1A1A1A] py-10 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="relative bg-[#1A1A1A] py-10 px-4 overflow-hidden">
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="grid grid-cols-3 gap-6 md:gap-12">
           {items.map((item, i) => (
-            <div key={i} className="text-center">
+            <AnimatedSection key={i} delay={i * 0.1} className="text-center">
               <div className="flex justify-center mb-2">
                 <div className="w-10 h-10 rounded-xl bg-[#FF6B35]/20 flex items-center justify-center">
                   <svg className="w-5 h-5 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -255,10 +278,10 @@ function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: any
                 </div>
               </div>
               <p className="text-2xl md:text-3xl font-bold text-white">
-                {item.value.toLocaleString()}
+                <CountUpNumber value={item.value} />
               </p>
               <p className="text-xs md:text-sm text-[#999999] mt-1">{item.label}</p>
-            </div>
+            </AnimatedSection>
           ))}
         </div>
       </div>

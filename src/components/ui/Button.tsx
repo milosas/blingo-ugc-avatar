@@ -1,8 +1,9 @@
-import { ButtonHTMLAttributes } from 'react';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   variant?: 'primary' | 'secondary' | 'ghost';
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function Button({
@@ -19,11 +20,9 @@ export function Button({
     primary: `
       bg-[#FF6B35]
       text-white
-      hover:bg-[#E55A2B]
-      hover:-translate-y-0.5
       shadow-md
-      hover:shadow-lg hover:shadow-[#FF6B35]/20
-      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-md
+      shimmer-hover
+      disabled:opacity-50 disabled:cursor-not-allowed
     `,
     secondary: `
       bg-white
@@ -42,10 +41,19 @@ export function Button({
     `
   };
 
+  const isDisabled = disabled || isLoading;
+
   return (
-    <button
+    <motion.button
       className={`${baseStyles} ${variants[variant]} ${className}`}
-      disabled={disabled || isLoading}
+      disabled={isDisabled}
+      whileHover={isDisabled ? undefined : {
+        scale: 1.02,
+        y: -1,
+        boxShadow: variant === 'primary' ? '0 6px 20px rgba(255, 107, 53, 0.35)' : undefined,
+      }}
+      whileTap={isDisabled ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.15 }}
       {...props}
     >
       {isLoading ? (
@@ -57,6 +65,6 @@ export function Button({
           <span>Loading...</span>
         </span>
       ) : children}
-    </button>
+    </motion.button>
   );
 }

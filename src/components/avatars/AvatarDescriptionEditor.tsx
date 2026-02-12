@@ -5,14 +5,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
 interface AvatarDescriptionEditorProps {
   avatarId: string;
   initialDescription: string;
-  isPending: boolean;
+  isPending?: boolean;
   onSave: () => void;
 }
 
 export function AvatarDescriptionEditor({
   avatarId,
   initialDescription,
-  isPending,
   onSave,
 }: AvatarDescriptionEditorProps) {
   const { t } = useLanguage();
@@ -54,7 +53,7 @@ export function AvatarDescriptionEditor({
   };
 
   const handleSave = async () => {
-    if (saving || !hasChanges || isPending) return;
+    if (saving || !hasChanges) return;
 
     setSaving(true);
     setError(null);
@@ -84,7 +83,7 @@ export function AvatarDescriptionEditor({
         onChange={handleInputChange}
         onPaste={handlePaste}
         maxLength={maxLength}
-        disabled={isPending || saving}
+        disabled={saving}
         className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         placeholder={t.avatarsPage?.descriptionPlaceholder || 'Describe this avatar (used for AI generation)...'}
       />
@@ -101,17 +100,10 @@ export function AvatarDescriptionEditor({
         <p className="text-sm text-red-600">{error}</p>
       )}
 
-      {/* Pending message */}
-      {isPending && (
-        <p className="text-sm text-amber-600">
-          {t.avatarsPage?.pendingMessage || 'AI is analyzing this avatar. You can edit the description after analysis completes.'}
-        </p>
-      )}
-
       {/* Save button */}
       <button
         onClick={handleSave}
-        disabled={saving || !hasChanges || isPending}
+        disabled={saving || !hasChanges}
         className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {saving ? (

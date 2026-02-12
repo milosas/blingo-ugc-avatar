@@ -131,7 +131,7 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
           storage_path: storagePath,
           image_url: signedUrlData.signedUrl,
           description: null,
-          avatar_type: 'pending'
+          avatar_type: 'photo'
         })
         .select()
         .single();
@@ -140,25 +140,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         console.error('Database insert error:', dbError);
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
-
-      // Trigger AI analysis (non-blocking - don't await)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      fetch(`${supabaseUrl}/functions/v1/analyze-avatar`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
-        },
-        body: JSON.stringify({
-          avatarId: dbData.id,
-          imageUrl: signedUrlData.signedUrl,
-        }),
-      }).catch((err) => {
-        console.error('Avatar analysis trigger failed:', err);
-        // Non-blocking: avatar is still usable without AI description
-      });
 
       // Refresh list to include new avatar
       await fetchAvatars();

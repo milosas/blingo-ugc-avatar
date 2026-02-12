@@ -4,6 +4,7 @@ import { useCustomAvatars } from '../hooks/useCustomAvatars';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useGeneration } from '../hooks/useGeneration';
 import { useLanguage } from '../contexts/LanguageContext';
+import { AnimatedSection } from '../components/animation/AnimatedSection';
 import { ImageUploader } from '../components/upload/ImageUploader';
 import { ImagePreviewGrid } from '../components/upload/ImagePreviewGrid';
 import { ConfigPanel } from '../components/config/ConfigPanel';
@@ -100,7 +101,7 @@ export default function Generator() {
   };
 
   return (
-    <div className="page-enter">
+    <div className="">
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {(state.status === 'success' || state.status === 'polling') && state.results && state.results.length > 0 ? (
@@ -124,9 +125,9 @@ export default function Generator() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6 animate-fade-in">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Column: Upload */}
-            <div className="w-full lg:w-1/2">
+            <AnimatedSection direction="left" className="w-full lg:w-1/2">
               <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-sm text-white font-bold">
@@ -151,10 +152,10 @@ export default function Generator() {
                   </p>
                 )}
               </div>
-            </div>
+            </AnimatedSection>
 
             {/* Right Column: Configuration */}
-            <div className="w-full lg:w-1/2">
+            <AnimatedSection direction="right" delay={0.1} className="w-full lg:w-1/2">
               <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm text-white font-bold">
@@ -201,7 +202,7 @@ export default function Generator() {
                   </div>
                 )}
               </div>
-            </div>
+            </AnimatedSection>
           </div>
         )}
       </div>

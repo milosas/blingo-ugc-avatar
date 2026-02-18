@@ -1,7 +1,6 @@
-import type { AspectRatioOption, ResolutionOption, ImageCountOption, Avatar, Scene, Mood, Pose } from '../types';
+import type { ImageCountOption, Avatar, Scene, QualityModeOption, GarmentPhotoTypeOption } from '../types';
 
 // Avatar options with reference images (Unsplash free photos)
-// Variety of body framings: full body, half body (waist up), face
 export const AVATARS: Avatar[] = [
   // Female avatars - Full body (3)
   {
@@ -80,214 +79,83 @@ export const AVATARS: Avatar[] = [
   }
 ];
 
-// Scene options
+// Scene / background options (reused for background post-processing)
 export const SCENES: Scene[] = [
-  {
-    id: 'minimal',
-    name: 'Minimalistinė',
-    description: 'Švarus, paprastas fonas',
-    promptDescription: 'minimal clean white background'
-  },
-  {
-    id: 'photo-studio',
-    name: 'Foto studija',
-    description: 'Profesionali studijos aplinka',
-    promptDescription: 'professional photo studio with soft lighting'
-  },
-  {
-    id: 'urban',
-    name: 'Miesto aplinka',
-    description: 'Gatvės, miesto fonas',
-    promptDescription: 'urban city street background'
-  },
-  {
-    id: 'nature',
-    name: 'Gamta',
-    description: 'Lauko, gamtos aplinka',
-    promptDescription: 'natural outdoor setting with greenery'
-  }
+  { id: 'studio', name: 'Studija', promptHint: 'clean professional photo studio with neutral white/gray background, soft studio lighting' },
+  { id: 'street', name: 'Gatvė', promptHint: 'urban city street background, modern architecture, natural daylight' },
+  { id: 'nature', name: 'Gamta', promptHint: 'beautiful natural outdoor setting, green park or garden, soft natural light' },
+  { id: 'beach', name: 'Paplūdimys', promptHint: 'tropical beach background, sand and ocean, warm golden light' },
+  { id: 'cafe', name: 'Kavinė', promptHint: 'cozy stylish cafe interior background, warm ambient lighting' },
+  { id: 'office', name: 'Biuras', promptHint: 'modern office interior background, clean professional setting' },
+  { id: 'event', name: 'Renginys', promptHint: 'elegant event venue background, red carpet or gala setting, dramatic lighting' },
 ];
 
-// Mood options
-export const MOODS: Mood[] = [
-  {
-    id: 'serious',
-    name: 'Rimtas',
-    description: 'Profesionalus, susikaupęs',
-    promptDescription: 'serious confident expression'
-  },
-  {
-    id: 'playful',
-    name: 'Žaismingas',
-    description: 'Linksmas, energingas',
-    promptDescription: 'playful happy expression'
-  },
-  {
-    id: 'relaxed',
-    name: 'Atsipalaidavęs',
-    description: 'Ramus, natūralus',
-    promptDescription: 'relaxed natural expression'
-  },
-  {
-    id: 'confident',
-    name: 'Pasitikintis',
-    description: 'Stiprus, užtikrintas',
-    promptDescription: 'confident powerful expression'
-  },
-  {
-    id: 'mysterious',
-    name: 'Paslaptingas',
-    description: 'Intriguojantis, paslaptingas',
-    promptDescription: 'mysterious intriguing expression'
-  },
-  {
-    id: 'energetic',
-    name: 'Energingas',
-    description: 'Dinamiškas, pilnas energijos',
-    promptDescription: 'energetic dynamic expression'
-  },
-  {
-    id: 'dreamy',
-    name: 'Svajingas',
-    description: 'Romantiškas, svajingas',
-    promptDescription: 'dreamy romantic expression'
-  },
-  {
-    id: 'fierce',
-    name: 'Ryžtingas',
-    description: 'Stiprus, ryžtingas',
-    promptDescription: 'fierce determined expression'
-  }
+// Quality mode options for FASHN v1.6
+export const QUALITY_MODES: QualityModeOption[] = [
+  { id: 'performance', name: 'Greita', description: 'Greičiausias rezultatas' },
+  { id: 'balanced', name: 'Subalansuota', description: 'Optimalus greičio ir kokybės balansas' },
+  { id: 'quality', name: 'Aukšta kokybė', description: 'Geriausia kokybė, ilgiau trunka' }
 ];
 
-// Pose options - body position and framing
-export const POSES: Pose[] = [
-  {
-    id: 'full-body',
-    name: 'Pilnas kūnas',
-    description: 'Viso kūno kadras, stovint',
-    promptDescription: 'full body shot, standing pose'
-  },
-  {
-    id: 'half-body',
-    name: 'Pusė kūno',
-    description: 'Nuo juosmens į viršų',
-    promptDescription: 'waist up, upper body shot'
-  },
-  {
-    id: 'portrait',
-    name: 'Portretas',
-    description: 'Galva ir pečiai',
-    promptDescription: 'portrait, head and shoulders'
-  },
-  {
-    id: 'face',
-    name: 'Veidas',
-    description: 'Veido close-up',
-    promptDescription: 'face close-up, detailed facial features'
-  },
-  {
-    id: 'from-behind',
-    name: 'Nuo nugaros',
-    description: 'Foto iš nugaros pusės',
-    promptDescription: 'shot from behind, back view'
-  }
+// Garment photo type — tells FASHN how the clothing image was taken
+export const GARMENT_PHOTO_TYPES: GarmentPhotoTypeOption[] = [
+  { id: 'auto', name: 'Automatinis', description: 'AI atpažins automatiškai' },
+  { id: 'flat-lay', name: 'Plokščia nuotrauka', description: 'Drabužis nufotografuotas plokščiai (flat-lay)' },
+  { id: 'model', name: 'Ant modelio', description: 'Drabužis nufotografuotas ant žmogaus' },
 ];
 
-// Aspect ratio options - common formats for e-commerce and marketing
-export const ASPECT_RATIOS: AspectRatioOption[] = [
-  { id: '1:1', name: 'Kvadratas 1:1', description: 'Universalus kvadratinis formatas' },
-  { id: '4:5', name: 'Portretas 4:5', description: 'Populiarus portreto formatas' },
-  { id: '9:16', name: 'Vertikalus 9:16', description: 'Pilno ekrano vertikalus formatas' },
-  { id: '4:3', name: 'Standartinis 4:3', description: 'Klasikinis foto formatas' },
-  { id: '2:3', name: 'Produktas 2:3', description: 'E-shop produktų formatas' },
-  { id: '3:4', name: 'Portretas 3:4', description: 'Aukštas portreto formatas' },
-  { id: '16:9', name: 'Platus 16:9', description: 'Horizontalus plataus ekrano formatas' }
+// Lighting preset for relighting post-processing
+export interface LightingPreset {
+  id: string;
+  name: string;
+  description: string;
+}
+
+// Lighting presets — IDs must match fal.ai Image Apps V2 Relighting `lighting_style` enum exactly
+export const LIGHTING_PRESETS: LightingPreset[] = [
+  { id: 'natural', name: 'Natūrali', description: 'Natūrali dienos šviesa' },
+  { id: 'studio', name: 'Studija', description: 'Profesionalus studijos apšvietimas' },
+  { id: 'soft', name: 'Minkšta', description: 'Minkštas tolygus apšvietimas' },
+  { id: 'dramatic', name: 'Dramatiškas', description: 'Kontrastingas dramatiškas apšvietimas' },
+  { id: 'golden_hour', name: 'Auksinė valanda', description: 'Šilta auksinė šviesa' },
+  { id: 'blue_hour', name: 'Mėlyna valanda', description: 'Šalta melsva šviesa' },
+  { id: 'sunrise', name: 'Saulėtekis', description: 'Šilta auksinė šviesa iš horizonto' },
+  { id: 'sunset', name: 'Saulėlydis', description: 'Šilta oranžinė šviesa' },
+  { id: 'neon', name: 'Neonas', description: 'Ryškus neoninių šviesų apšvietimas' },
+  { id: 'backlight', name: 'Kontražurinis', description: 'Šviesa iš nugaros pusės' },
+  { id: 'side_light', name: 'Šoninis', description: 'Dramatiška šoninė šviesa' },
+  { id: 'front_light', name: 'Priekinis', description: 'Šviesa iš priekio' },
+  { id: 'rim_light', name: 'Kontūrinis', description: 'Apšviečia objekto kontūrus' },
+  { id: 'spotlight', name: 'Prožektorius', description: 'Fokusuota prožektoriaus šviesa' },
+  { id: 'candlelight', name: 'Žvakių šviesa', description: 'Šilta mirksinti žvakių šviesa' },
+  { id: 'moonlight', name: 'Mėnulio šviesa', description: 'Šalta sidabrinė naktinė šviesa' },
+  { id: 'ambient', name: 'Aplinkos', description: 'Tolygus aplinkos apšvietimas' },
 ];
 
-// Resolution options
-export const RESOLUTIONS: ResolutionOption[] = [
-  { id: '1K', name: '1K Standartinė', description: 'Greitesnis generavimas' },
-  { id: '2K', name: '2K Aukšta', description: 'Aukščiausia kokybė' }
+// Pose presets for Kontext edit post-processing
+export interface PosePreset {
+  id: string;
+  name: string;
+  promptHint: string;
+}
+
+export const POSE_PRESETS: PosePreset[] = [
+  { id: 'arms_crossed', name: 'Sukryžiuotos rankos', promptHint: 'arms crossed confidently' },
+  { id: 'hands_in_pockets', name: 'Rankos kišenėse', promptHint: 'hands in pockets, relaxed stance' },
+  { id: 'sitting', name: 'Sėdi', promptHint: 'sitting on a chair, relaxed pose' },
+  { id: 'leaning', name: 'Atsiremiantis', promptHint: 'leaning against a wall casually' },
+  { id: 'walking', name: 'Eina', promptHint: 'walking forward naturally' },
+  { id: 'looking_away', name: 'Žiūri į šoną', promptHint: 'looking to the side, profile view' },
+  { id: 'hand_on_chin', name: 'Ranka prie smakro', promptHint: 'hand on chin, thinking pose' },
+  { id: 'waving', name: 'Mojuoja', promptHint: 'waving hand, friendly gesture' },
+  { id: 'thumbs_up', name: 'Nykštys aukštyn', promptHint: 'giving a thumbs up, smiling' },
+  { id: 'pointing', name: 'Rodo pirštu', promptHint: 'pointing forward with one hand' },
 ];
 
-// Image count options
+// Image count options (FASHN supports up to 4)
 export const IMAGE_COUNTS: ImageCountOption[] = [
   { id: 1, name: '1 nuotrauka', description: 'Greičiau, pigiau' },
   { id: 2, name: '2 nuotraukos', description: 'Daugiau pasirinkimų' },
-  { id: 3, name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
+  { id: 3, name: '3 nuotraukos', description: 'Dar daugiau variantų' },
+  { id: 4, name: '4 nuotraukos', description: 'Maksimalus pasirinkimas' }
 ];
-
-// Prompt placeholder examples - papildomi patikslinimai (be pozų - tos pasirenkamos dropdown)
-export const PROMPT_PLACEHOLDERS: string[] = [
-  // Rankų padėtis
-  'rankos sukryžiuotos',
-  'viena ranka ant klubo',
-  'rankos kišenėse',
-  'rankos už nugaros',
-  'ranka ant smakro',
-
-  // Žvilgsnio kryptis
-  'žiūri į kamerą',
-  'žiūri į šoną',
-  'žiūri žemyn',
-  'žvilgsnis į tolį',
-
-  // Išraiška
-  'lengva šypsena',
-  'rimta išraiška',
-  'natūrali išraiška',
-  'mįslinga šypsena',
-
-  // Papildomi detalės
-  'plaukai palaidi',
-  'plaukai surišti',
-  'su akiniais',
-  'su skrybėle'
-];
-
-// Get random placeholder
-export function getRandomPlaceholder(): string {
-  const index = Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length);
-  return PROMPT_PLACEHOLDERS[index];
-}
-
-// Build the prompt - combine all selections into one prompt
-export function buildPrompt(config: {
-  avatar: Avatar | null;
-  scene: Scene | null;
-  mood: Mood | null;
-  pose: Pose | null;
-  userPrompt: string;
-}): string {
-  const parts: string[] = [];
-
-  // Modelio aprašymas
-  if (config.avatar) {
-    parts.push(config.avatar.promptDescription);
-  }
-
-  // Pozos aprašymas (kūno padėtis, kadras) - prieš sceną
-  if (config.pose) {
-    parts.push(config.pose.promptDescription);
-  }
-
-  // Aplinkos aprašymas
-  if (config.scene) {
-    parts.push(config.scene.promptDescription);
-  }
-
-  // Nuotaikos aprašymas
-  if (config.mood) {
-    parts.push(config.mood.promptDescription);
-  }
-
-  // Vartotojo papildomi patikslinimai
-  if (config.userPrompt.trim()) {
-    parts.push(config.userPrompt.trim());
-  }
-
-  return parts.join(', ') || 'Professional fashion photo';
-}
-
-export const DEFAULT_USER_PROMPT = '';

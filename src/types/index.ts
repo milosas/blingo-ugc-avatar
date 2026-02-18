@@ -8,28 +8,27 @@ export interface Avatar {
   isCustom?: boolean; // true for custom avatars
 }
 
-// Scene options
-export interface Scene {
+// Clothing type (kept for backward compat with existing gallery items)
+export interface ClothingType {
   id: string;
   name: string;
   description: string;
-  promptDescription: string;
+  promptHint: string;
+  imageUrl: string;
 }
 
-// Mood options
+// Model mood/expression (kept for backward compat with existing gallery items)
 export interface Mood {
   id: string;
   name: string;
-  description: string;
-  promptDescription: string;
+  promptHint: string; // English hint for AI prompt
 }
 
-// Pose options
-export interface Pose {
+// Scene / background (reused for background post-processing)
+export interface Scene {
   id: string;
   name: string;
-  description: string;
-  promptDescription: string;
+  promptHint: string; // English hint for AI prompt
 }
 
 export interface UploadedImage {
@@ -37,26 +36,8 @@ export interface UploadedImage {
   previewUrl: string;
 }
 
-// Aspect ratio options for flux-2/pro-image-to-image
-export type AspectRatio = '1:1' | '4:3' | '3:4' | '4:5' | '16:9' | '9:16' | '3:2' | '2:3';
-
-// Resolution options
-export type Resolution = '1K' | '2K';
-
 // Image count options
-export type ImageCount = 1 | 2 | 3;
-
-export interface AspectRatioOption {
-  id: AspectRatio;
-  name: string;
-  description: string;
-}
-
-export interface ResolutionOption {
-  id: Resolution;
-  name: string;
-  description: string;
-}
+export type ImageCount = 1 | 2 | 3 | 4;
 
 export interface ImageCountOption {
   id: ImageCount;
@@ -64,16 +45,26 @@ export interface ImageCountOption {
   description: string;
 }
 
+// Quality mode for FASHN v1.6 try-on
+export type QualityMode = 'performance' | 'balanced' | 'quality';
+
+export interface QualityModeOption {
+  id: QualityMode;
+  name: string;
+  description: string;
+}
+
+// Garment photo type — how the clothing image was taken
+export type GarmentPhotoType = 'auto' | 'flat-lay' | 'model';
+
+export interface GarmentPhotoTypeOption {
+  id: GarmentPhotoType;
+  name: string;
+  description: string;
+}
+
 export interface Config {
-  // Selection fields
   avatar: Avatar | null;
-  scene: Scene | null;
-  mood: Mood | null;
-  pose: Pose | null;
-  // User's custom instruction
-  userPrompt: string;
-  // Technical settings
-  aspectRatio: AspectRatio;
-  resolution: Resolution;
+  qualityMode: QualityMode;
   imageCount: ImageCount;
 }

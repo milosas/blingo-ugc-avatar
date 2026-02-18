@@ -3,6 +3,9 @@ import { useSearchParams } from 'react-router';
 import { useCustomAvatars } from '../hooks/useCustomAvatars';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useGeneration } from '../hooks/useGeneration';
+import { usePostProcess } from '../hooks/usePostProcess';
+import { useSupabaseStorage } from '../hooks/useSupabaseStorage';
+import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AnimatedSection } from '../components/animation/AnimatedSection';
 import { ImageUploader } from '../components/upload/ImageUploader';
@@ -12,12 +15,13 @@ import { Button } from '../components/ui/Button';
 import { LoadingOverlay } from '../components/generation/LoadingOverlay';
 import { ResultsGallery } from '../components/generation/ResultsGallery';
 import { ResultsActions } from '../components/generation/ResultsActions';
+import { PostProcessToolbar } from '../components/generation/PostProcessToolbar';
 import { ErrorMessage } from '../components/generation/ErrorMessage';
-import { DEFAULT_USER_PROMPT } from '../constants/fluxOptions';
 import type { Config } from '../types';
 
 export default function Generator() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const { avatars: customAvatars } = useCustomAvatars();
 
@@ -31,20 +35,21 @@ export default function Generator() {
     hasImages
   } = useImageUpload();
 
-  // Configuration state with flux-2/pro-image-to-image defaults
+  // Configuration state
   const [config, setConfig] = useState<Config>({
     avatar: null,
-    scene: null,
-    mood: null,
-    pose: null,
-    userPrompt: DEFAULT_USER_PROMPT,
-    aspectRatio: '1:1',
-    resolution: '1K',
+    qualityMode: 'balanced',
     imageCount: 1
   });
 
   // Generation state
   const { state, generate, cancel, reset } = useGeneration();
+
+  // Post-processing state
+  const [selectedResultIndex, setSelectedResultIndex] = useState(0);
+  const postProcess = usePostProcess();
+  const [postProcessResult, setPostProcessResult] = useState<{ url: string; base64?: string } | null>(null);
+  const { saveGeneratedImage } = useSupabaseStorage();
 
   // Handle avatar selection from URL param (from Avatars page)
   useEffect(() => {
@@ -68,9 +73,8 @@ export default function Generator() {
     }
   }, [searchParams, customAvatars, setSearchParams, t]);
 
-  // Form validation
-  const isConfigValid = config.avatar !== null && config.userPrompt.trim().length >= 3;
-  const canGenerate = hasImages && isConfigValid;
+  // Form validation — need avatar + clothing image
+  const canGenerate = hasImages && config.avatar !== null;
 
   const handleGenerate = () => {
     if (!canGenerate) return;
@@ -84,14 +88,12 @@ export default function Generator() {
   const handleNewUpload = () => {
     reset();
     clearImages();
+    postProcess.reset();
+    setPostProcessResult(null);
+    setSelectedResultIndex(0);
     setConfig({
       avatar: null,
-      scene: null,
-      mood: null,
-      pose: null,
-      userPrompt: DEFAULT_USER_PROMPT,
-      aspectRatio: '1:1',
-      resolution: '1K',
+      qualityMode: 'balanced',
       imageCount: 1
     });
   };
@@ -100,29 +102,120 @@ export default function Generator() {
     reset();
   };
 
+  // Get the source image URL for post-processing
+  const getSelectedImageUrl = (): string | null => {
+    if (!state.results || state.results.length === 0) return null;
+    return state.results[selectedResultIndex]?.url || null;
+  };
+
+  const savePostProcessResult = async (result: { url: string; base64?: string }, prompt: string) => {
+    if (!user) return;
+    try {
+      await saveGeneratedImage({
+        imageUrl: result.url,
+        imageBase64: result.base64,
+        prompt,
+        config: { type: 'post-process' }
+      });
+    } catch (err) {
+      console.error('Failed to save post-processed image:', err);
+    }
+  };
+
+  const handleBackground = async (prompt: string) => {
+    const sourceUrl = getSelectedImageUrl();
+    if (!sourceUrl) return;
+    const result = await postProcess.process('background', sourceUrl, { backgroundPrompt: prompt });
+    if (result) {
+      setPostProcessResult(result);
+      await savePostProcessResult(result, `background: ${prompt}`);
+    }
+  };
+
+  const handlePose = async (prompt: string) => {
+    const sourceUrl = getSelectedImageUrl();
+    if (!sourceUrl) return;
+    const result = await postProcess.process('edit', sourceUrl, { editPrompt: prompt });
+    if (result) {
+      setPostProcessResult(result);
+      await savePostProcessResult(result, `pose: ${prompt}`);
+    }
+  };
+
+  const handleEdit = async (prompt: string) => {
+    const sourceUrl = getSelectedImageUrl();
+    if (!sourceUrl) return;
+    const result = await postProcess.process('edit', sourceUrl, { editPrompt: prompt });
+    if (result) {
+      setPostProcessResult(result);
+      await savePostProcessResult(result, `edit: ${prompt}`);
+    }
+  };
+
   return (
     <div className="">
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {(state.status === 'success' || state.status === 'polling') && state.results && state.results.length > 0 ? (
+        {state.status === 'success' && state.results && state.results.length > 0 ? (
           <div className="animate-fade-in">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-[#1A1A1A]">
                 {t.results.title}
               </h2>
-              {state.status === 'polling' && (
-                <span className="text-sm text-[#FF6B35] animate-pulse">
-                  {t.loading.generating} ({state.results.length}/3)
-                </span>
-              )}
             </div>
-            <ResultsGallery images={state.results} />
-            {state.status === 'success' && (
-              <ResultsActions
-                onRegenerate={handleRegenerate}
-                onNewUpload={handleNewUpload}
-              />
+            <ResultsGallery
+              images={state.results}
+              selectedIndex={selectedResultIndex}
+              onSelectImage={setSelectedResultIndex}
+            />
+
+            {/* Info notice */}
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <div className="flex items-start gap-2 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl px-4 py-3 flex-1">
+                <svg className="w-4 h-4 text-[#FF6B35] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <div className="text-xs text-[#666666] space-y-0.5">
+                  <p>{t.results.downloadHint}</p>
+                  <p>{t.results.selectToEdit}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Post-process result preview */}
+            {postProcessResult && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-[#1A1A1A] mb-3">
+                  {(t as Record<string, unknown>).postProcess
+                    ? ((t as Record<string, unknown>).postProcess as Record<string, string>).result || 'Post-apdorojimo rezultatas'
+                    : 'Post-apdorojimo rezultatas'}
+                </h3>
+                <div className="max-w-md">
+                  <img
+                    src={postProcessResult.url}
+                    alt="Post-processed result"
+                    className="w-full h-auto rounded-lg ring-2 ring-[#FF6B35]"
+                  />
+                </div>
+              </div>
             )}
+
+            {/* Post-processing toolbar */}
+            <PostProcessToolbar
+              isProcessing={postProcess.isProcessing}
+              onBackground={handleBackground}
+              onPose={handlePose}
+              onEdit={handleEdit}
+            />
+
+            {postProcess.error && (
+              <p className="mt-2 text-sm text-red-500">{postProcess.error}</p>
+            )}
+
+            <ResultsActions
+              onRegenerate={handleRegenerate}
+              onNewUpload={handleNewUpload}
+            />
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">
@@ -191,12 +284,6 @@ export default function Generator() {
                       <p className="text-sm text-[#999999] flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
                         {t.validation.noAvatar}
-                      </p>
-                    )}
-                    {config.userPrompt.trim().length < 3 && (
-                      <p className="text-sm text-[#999999] flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-                        {t.validation.noPrompt}
                       </p>
                     )}
                   </div>

@@ -5,13 +5,11 @@ import { API_CONFIG } from '../constants/api';
 import { generateImages } from '../services/generationService';
 import { useSupabaseStorage } from './useSupabaseStorage';
 import { useAuth } from './useAuth';
-import { buildPrompt } from '../constants/fluxOptions';
 
 const INITIAL_STATE: GenerationState = {
   status: 'idle',
   progress: 'sending',
   results: null,
-  tasks: null,
   error: null
 };
 
@@ -43,7 +41,6 @@ export function useGeneration() {
       status: 'loading',
       progress: 'sending',
       results: null,
-      tasks: null,
       error: null
     });
 
@@ -56,23 +53,30 @@ export function useGeneration() {
       timeoutSignal
     ]);
 
-    // Set up progress stage timers (generation takes ~60-120s)
+    // Set up progress stage timers based on quality mode
+    const isPerformance = config.qualityMode === 'performance';
+    const isQuality = config.qualityMode === 'quality';
+
+    const timer1Delay = isPerformance ? 5000 : isQuality ? 15000 : 10000;
+    const timer2Delay = isPerformance ? 15000 : isQuality ? 50000 : 30000;
+    const timer3Delay = isPerformance ? 30000 : isQuality ? 90000 : 60000;
+
     const timer1 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-1' } : prev);
-    }, 10000); // 10s
+    }, timer1Delay);
 
     const timer2 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-2' } : prev);
-    }, 40000); // 40s
+    }, timer2Delay);
 
     const timer3 = setTimeout(() => {
       setState(prev => prev.status === 'loading' ? { ...prev, progress: 'generating-3' } : prev);
-    }, 80000); // 80s
+    }, timer3Delay);
 
     progressTimersRef.current = [timer1, timer2, timer3];
 
     try {
-      // Call Edge Function - it handles kie.ai polling
+      // Call Edge Function - it handles fal.ai queue polling
       const data = await generateImages(config, images, combinedSignal);
 
       console.log('Generation response:', data);
@@ -87,7 +91,6 @@ export function useGeneration() {
           status: 'success',
           progress: 'complete',
           results: data.images,
-          tasks: null,
           error: null
         });
 
@@ -95,31 +98,18 @@ export function useGeneration() {
         if (user) {
           console.log('User authenticated, saving images to gallery...', { userId: user.id, imageCount: data.images?.length || 0 });
 
-          // Build the prompt that was used for generation
-          const generatedPrompt = buildPrompt({
-            avatar: config.avatar,
-            scene: config.scene,
-            mood: config.mood,
-            pose: config.pose,
-            userPrompt: config.userPrompt
-          });
-
-          // Save all generated images - await to ensure they're saved
           try {
             const savedImages = await Promise.all(
               data.images.map((image, index) => {
                 console.log(`Saving image ${index + 1}/${data.images?.length || 0}:`, image.url.substring(0, 50) + '...', 'has base64:', !!image.base64);
                 return saveGeneratedImage({
                   imageUrl: image.url,
-                  imageBase64: image.base64, // Pass base64 for CORS-free storage
-                  prompt: generatedPrompt,
+                  imageBase64: image.base64,
+                  prompt: `virtual try-on: quality=${config.qualityMode}`,
                   config: {
                     avatar: config.avatar?.id ?? null,
-                    scene: config.scene?.id ?? null,
-                    mood: config.mood?.id ?? null,
-                    pose: config.pose?.id ?? null,
-                    aspectRatio: config.aspectRatio,
-                    resolution: config.resolution
+                    qualityMode: config.qualityMode,
+                    imageCount: config.imageCount
                   }
                 });
               })
@@ -127,7 +117,6 @@ export function useGeneration() {
             console.log('All images saved to gallery successfully:', savedImages);
           } catch (err) {
             console.error('Failed to save images to gallery:', err);
-            // Don't throw - user already has the generated images displayed
           }
         } else {
           console.log('User not authenticated, skipping gallery save');
@@ -138,7 +127,6 @@ export function useGeneration() {
           status: 'error',
           progress: 'sending',
           results: null,
-          tasks: null,
           error: 'API_ERROR'
         });
       }
@@ -169,7 +157,6 @@ export function useGeneration() {
         status: 'error',
         progress: 'sending',
         results: null,
-        tasks: null,
         error: errorType
       });
     }

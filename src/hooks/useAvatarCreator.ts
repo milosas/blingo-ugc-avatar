@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt } from '../constants/avatarTraits';
+import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt, buildPosePrompt, type TraitOption } from '../constants/avatarTraits';
+import type { Language } from '../i18n/translations';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -16,35 +17,55 @@ interface UseAvatarCreatorReturn {
   setPrompt: (value: string) => void;
   setError: (error: string | null) => void;
   generateAvatar: () => Promise<void>;
+  clearImage: () => void;
   reset: () => void;
+  /** Switch to "add pose" mode: rebuild prompt using base description + pose/mood/framing only */
+  setPoseMode: (baseDescription: string, referenceUrl?: string) => void;
 }
 
-export function useAvatarCreator(): UseAvatarCreatorReturn {
+export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn {
   const [traits, setTraits] = useState<AvatarTraits>({ ...DEFAULT_TRAITS });
   const [specialFeatures, setSpecialFeatures] = useState('');
-  const [prompt, setPrompt] = useState(() => buildAvatarPrompt(DEFAULT_TRAITS, ''));
+  const [prompt, setPrompt] = useState(() => buildAvatarPrompt(DEFAULT_TRAITS, '', lang));
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // When set, prompt is built from base description + pose/mood/framing only
+  const [baseDescription, setBaseDescription] = useState<string | null>(null);
+  // Reference image URL for PuLID identity-preserving generation
+  const [referenceImageUrl, setReferenceImageUrl] = useState<string | null>(null);
+
+  const rebuildPrompt = useCallback((updatedTraits: AvatarTraits, updatedFeatures: string, base: string | null) => {
+    if (base) {
+      setPrompt(buildPosePrompt(base, updatedTraits.pose, updatedTraits.mood, updatedTraits.framing, updatedFeatures, lang));
+    } else {
+      setPrompt(buildAvatarPrompt(updatedTraits, updatedFeatures, lang));
+    }
+  }, [lang]);
 
   const setTrait = useCallback((key: keyof AvatarTraits, value: string) => {
     setTraits(prev => {
       const updated = { ...prev, [key]: value };
-      setPrompt(buildAvatarPrompt(updated, specialFeatures));
+      rebuildPrompt(updated, specialFeatures, baseDescription);
       return updated;
     });
-  }, [specialFeatures]);
+  }, [specialFeatures, baseDescription, rebuildPrompt]);
 
   const handleSetSpecialFeatures = useCallback((value: string) => {
     setSpecialFeatures(value);
-    setPrompt(buildAvatarPrompt(traits, value));
-  }, [traits]);
+    rebuildPrompt(traits, value, baseDescription);
+  }, [traits, baseDescription, rebuildPrompt]);
 
   const generateAvatar = useCallback(async () => {
     setIsGenerating(true);
     setError(null);
 
     try {
+      // Always send English prompt to fal.ai for better results
+      const englishPrompt = baseDescription
+        ? buildPosePrompt(baseDescription, traits.pose, traits.mood, traits.framing, specialFeatures, 'en')
+        : buildAvatarPrompt(traits, specialFeatures, 'en');
+
       const response = await fetch(`${supabaseUrl}/functions/v1/generate-avatar`, {
         method: 'POST',
         headers: {
@@ -52,7 +73,11 @@ export function useAvatarCreator(): UseAvatarCreatorReturn {
           'Authorization': `Bearer ${supabaseAnonKey}`,
           'apikey': supabaseAnonKey,
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt: englishPrompt,
+          aspect_ratio: traits.framing === 'headshot' ? '1:1' : traits.framing === 'full-body' ? '9:16' : '3:4',
+          ...(referenceImageUrl ? { reference_image_url: referenceImageUrl } : {}),
+        }),
       });
 
       const data = await response.json();
@@ -68,15 +93,28 @@ export function useAvatarCreator(): UseAvatarCreatorReturn {
     } finally {
       setIsGenerating(false);
     }
-  }, [prompt]);
+  }, [traits, specialFeatures, baseDescription, referenceImageUrl]);
+
+  const clearImage = useCallback(() => {
+    setGeneratedImage(null);
+    setError(null);
+  }, []);
+
+  const setPoseMode = useCallback((description: string, referenceUrl?: string) => {
+    setBaseDescription(description);
+    if (referenceUrl) setReferenceImageUrl(referenceUrl);
+    setPrompt(buildPosePrompt(description, traits.pose, traits.mood, traits.framing, specialFeatures, lang));
+  }, [traits, specialFeatures, lang]);
 
   const reset = useCallback(() => {
     setTraits({ ...DEFAULT_TRAITS });
     setSpecialFeatures('');
-    setPrompt(buildAvatarPrompt(DEFAULT_TRAITS, ''));
+    setBaseDescription(null);
+    setReferenceImageUrl(null);
+    setPrompt(buildAvatarPrompt(DEFAULT_TRAITS, '', lang));
     setGeneratedImage(null);
     setError(null);
-  }, []);
+  }, [lang]);
 
   return {
     traits,
@@ -90,6 +128,8 @@ export function useAvatarCreator(): UseAvatarCreatorReturn {
     setPrompt,
     setError,
     generateAvatar,
+    clearImage,
+    setPoseMode,
     reset,
   };
 }

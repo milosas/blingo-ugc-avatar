@@ -125,7 +125,7 @@ export function CustomAvatarCard({
           <img
             src={avatar.image_url}
             alt="Custom avatar"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             onError={handleImageError}
           />
         </div>
@@ -156,7 +156,7 @@ export function CustomAvatarCard({
               <img
                 src={avatar.image_url}
                 alt="Custom avatar"
-                className="w-full h-auto max-h-[70vh] object-contain cursor-pointer"
+                className="w-full h-auto max-h-[70vh] object-cover object-top cursor-pointer"
               />
 
               {/* Tap hint when enlarged but not showing menu */}

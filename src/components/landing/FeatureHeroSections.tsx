@@ -332,7 +332,7 @@ export function FeatureHeroSections() {
         ]}
         creditInfo={features?.imageGenerator?.creditInfo || 'From 2 credits per image'}
         cta={features?.imageGenerator?.cta || 'Start Creating'}
-        ctaLink="/generator"
+        ctaLink="/image-generator"
         reversed
         visual={<ImageGeneratorVisual />}
         bgColor="bg-[#F7F7F5]"

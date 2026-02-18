@@ -10,27 +10,16 @@ export type ErrorType = 'TIMEOUT' | 'NETWORK' | 'API_ERROR' | 'AVATAR_LOAD_FAILE
 export interface GeneratedImage {
   url: string;
   base64?: string; // Base64 data URL for CORS-free storage (from Edge Function)
-  angle: 'far' | 'medium' | 'close';
-}
-
-export interface GenerationTask {
-  taskId: string;
-  angle: 'far' | 'medium' | 'close';
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  url?: string;
 }
 
 export interface GenerationState {
-  status: 'idle' | 'loading' | 'polling' | 'success' | 'error';
+  status: 'idle' | 'loading' | 'success' | 'error';
   progress: GenerationProgress;
   results: GeneratedImage[] | null;
-  tasks: GenerationTask[] | null;
   error: ErrorType | null;
 }
 
 export interface GenerationResponse {
   success: boolean;
   images?: GeneratedImage[];
-  tasks?: GenerationTask[];
-  pollInterval?: number;
 }

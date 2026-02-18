@@ -6,15 +6,11 @@ import { downloadImage } from '../../utils/download';
 
 interface ResultsGalleryProps {
   images: GeneratedImage[];
+  selectedIndex?: number;
+  onSelectImage?: (index: number) => void;
 }
 
-const angleLabels = {
-  far: 'Toli',
-  medium: 'Arti',
-  close: 'Labai arti'
-};
-
-export function ResultsGallery({ images }: ResultsGalleryProps) {
+export function ResultsGallery({ images, selectedIndex, onSelectImage }: ResultsGalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -23,8 +19,16 @@ export function ResultsGallery({ images }: ResultsGalleryProps) {
     setLightboxOpen(true);
   };
 
-  const handleDownload = (image: GeneratedImage) => {
-    downloadImage(image.url, `rezultatas-${angleLabels[image.angle]}.jpg`);
+  const handleDownload = (image: GeneratedImage, index: number) => {
+    downloadImage(image.url, `rezultatas-${index + 1}.jpg`);
+  };
+
+  const handleClick = (index: number) => {
+    if (onSelectImage) {
+      onSelectImage(index);
+    } else {
+      openLightbox(index);
+    }
   };
 
   // Map images to lightbox slides format
@@ -39,21 +43,23 @@ export function ResultsGallery({ images }: ResultsGalleryProps) {
             {/* Image */}
             <img
               src={image.url}
-              alt={`Rezultatas - ${angleLabels[image.angle]}`}
-              className="w-full h-auto rounded-lg cursor-pointer transition-transform hover:scale-[1.02]"
-              onClick={() => openLightbox(index)}
+              alt={`Rezultatas ${index + 1}`}
+              className={`w-full h-auto rounded-lg cursor-pointer transition-all hover:scale-[1.02] ${
+                selectedIndex === index ? 'ring-3 ring-[#FF6B35] ring-offset-2' : ''
+              }`}
+              onClick={() => handleClick(index)}
             />
 
-            {/* Angle Label Overlay */}
+            {/* Label Overlay */}
             <div className="absolute bottom-2 left-2 bg-black/60 text-white px-3 py-1 rounded text-sm">
-              {angleLabels[image.angle]}
+              Rezultatas {index + 1}
             </div>
 
             {/* Download Button Overlay */}
             <button
-              onClick={() => handleDownload(image)}
+              onClick={() => handleDownload(image, index)}
               className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-800 p-2 rounded transition-colors"
-              aria-label={`Atsisiųsti ${angleLabels[image.angle]}`}
+              aria-label={`Atsisiųsti rezultatą ${index + 1}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -70,6 +76,15 @@ export function ResultsGallery({ images }: ResultsGalleryProps) {
                 />
               </svg>
             </button>
+
+            {/* Selected indicator */}
+            {selectedIndex === index && (
+              <div className="absolute top-2 left-2 bg-[#FF6B35] rounded-full p-1">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            )}
           </div>
         ))}
       </div>

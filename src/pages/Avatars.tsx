@@ -1,40 +1,56 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useCustomAvatars } from '../hooks/useCustomAvatars';
+import { useAvatarModels } from '../hooks/useAvatarModels';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LoginModal } from '../components/auth/LoginModal';
-import { AvatarDescriptionEditor } from '../components/avatars/AvatarDescriptionEditor';
 import { AvatarCreatorModal } from '../components/avatars/AvatarCreatorModal';
+import { ModelManagementCard } from '../components/avatars/ModelManagementCard';
 import { StaggerContainer, StaggerItem } from '../components/animation/StaggerChildren';
-import { TiltCard } from '../components/animation/TiltCard';
-import type { CustomAvatar } from '../types/database';
 
 export default function Avatars() {
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
-  const { avatars, loading: avatarsLoading, createAvatar, deleteAvatar, refresh } = useCustomAvatars();
-  const navigate = useNavigate();
+  const {
+    models,
+    loading: modelsLoading,
+    createModel,
+    addPhotoToModel,
+    deleteModel,
+    deletePhoto,
+    movePhoto,
+    setCover,
+    renameModel,
+    refresh,
+  } = useAvatarModels();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [editingAvatar, setEditingAvatar] = useState<CustomAvatar | null>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
+  const [creatorTargetModelId, setCreatorTargetModelId] = useState<string | undefined>();
+  const [expandedModelId, setExpandedModelId] = useState<string | null>(null);
+  const [showCreateModel, setShowCreateModel] = useState(false);
+  const [newModelName, setNewModelName] = useState('');
+  const [creatingModel, setCreatingModel] = useState(false);
+
+  // Drag-and-drop state
+  const [dragPhotoId, setDragPhotoId] = useState<string | null>(null);
+  const [dragFromModelId, setDragFromModelId] = useState<string | null>(null);
+  const [dragOverModelId, setDragOverModelId] = useState<string | null>(null);
+
+  // File input for adding photos to specific models
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [addPhotoTargetModelId, setAddPhotoTargetModelId] = useState<string | null>(null);
+  const newModelFileInputRef = useRef<HTMLInputElement>(null);
 
-  const loading = authLoading || avatarsLoading;
+  const loading = authLoading || modelsLoading;
 
-  const handleSelectAvatar = (avatarId: string) => {
-    navigate(`/?selectAvatar=${avatarId}`);
-  };
-
-  const handleAddClick = () => {
+  const handleAddPhoto = (modelId: string) => {
+    setAddPhotoTargetModelId(modelId);
     fileInputRef.current?.click();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !addPhotoTargetModelId) return;
 
     if (!['image/jpeg', 'image/png'].includes(file.type)) {
       alert(t.avatarsPage?.invalidFileType || 'Only JPEG and PNG files are allowed');
@@ -47,22 +63,84 @@ export default function Avatars() {
     }
 
     try {
-      await createAvatar(file);
+      await addPhotoToModel(addPhotoTargetModelId, file);
     } catch (error) {
-      console.error('Failed to upload avatar:', error);
+      console.error('Failed to add photo:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      alert(`${t.avatarsPage?.uploadFailed || 'Failed to upload avatar'}: ${errorMessage}`);
+      alert(`${t.avatarsPage?.uploadFailed || 'Failed to upload'}: ${errorMessage}`);
     }
 
     e.target.value = '';
+    setAddPhotoTargetModelId(null);
   };
 
-  const handleDelete = async (avatarId: string, storagePath: string) => {
+  const handleCreateModel = async () => {
+    if (!newModelName.trim()) return;
+    setCreatingModel(true);
     try {
-      await deleteAvatar(avatarId, storagePath);
+      const model = await createModel(newModelName.trim());
+      if (model) setExpandedModelId(model.id);
+      setNewModelName('');
+      setShowCreateModel(false);
     } catch (error) {
-      console.error('Failed to delete avatar:', error);
+      console.error('Failed to create model:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create model');
+    } finally {
+      setCreatingModel(false);
     }
+  };
+
+  const handleCreateModelWithFile = () => {
+    newModelFileInputRef.current?.click();
+  };
+
+  const handleNewModelFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      alert(t.avatarsPage?.invalidFileType || 'Only JPEG and PNG files are allowed');
+      return;
+    }
+
+    const name = newModelName.trim() || 'Model';
+    setCreatingModel(true);
+    try {
+      const model = await createModel(name, file);
+      if (model) setExpandedModelId(model.id);
+      setNewModelName('');
+      setShowCreateModel(false);
+    } catch (error) {
+      console.error('Failed to create model:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create model');
+    } finally {
+      setCreatingModel(false);
+    }
+    e.target.value = '';
+  };
+
+  const handleAiGenerate = (modelId: string) => {
+    setCreatorTargetModelId(modelId);
+    setShowCreatorModal(true);
+  };
+
+  // Drag-and-drop handlers
+  const handleDragStart = (photoId: string, modelId: string) => {
+    setDragPhotoId(photoId);
+    setDragFromModelId(modelId);
+  };
+
+  const handleDrop = async (targetModelId: string) => {
+    if (dragPhotoId && dragFromModelId && targetModelId !== dragFromModelId) {
+      try {
+        await movePhoto(dragPhotoId, dragFromModelId, targetModelId);
+      } catch (error) {
+        console.error('Failed to move photo:', error);
+      }
+    }
+    setDragPhotoId(null);
+    setDragFromModelId(null);
+    setDragOverModelId(null);
   };
 
   if (loading) {
@@ -110,262 +188,165 @@ export default function Avatars() {
         {t.avatarsPage?.title || 'My Avatars'}
       </h1>
       <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
-        {/* Header with add button */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-[#999999] text-sm">
-              {avatars.length > 0
-                ? `${avatars.length} ${t.avatarsPage?.avatarCount || 'avatar(s)'}`
-                : t.avatarsPage?.noAvatars || 'No avatars yet'}
+              {models.length > 0
+                ? `${models.length}/10 ${t.avatarModels?.modelsCount || 'modeliai'}`
+                : t.avatarsPage?.noAvatars || 'No models yet'}
             </p>
           </div>
           <div className="flex gap-2">
             <button
-              onClick={handleAddClick}
+              onClick={() => setShowCreateModel(!showCreateModel)}
               className="px-4 py-2 bg-[#F7F7F5] text-[#1A1A1A] border border-[#E5E5E3] rounded-full hover:bg-[#EFEFED] transition-all flex items-center gap-2 text-sm"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {t.avatarCreator?.uploadPhoto || 'Upload photo'}
-            </button>
-            <button
-              onClick={() => setShowCreatorModal(true)}
-              className="px-4 py-2 bg-[#FF6B35] text-white rounded-full hover:bg-[#E55A2B] transition-all flex items-center gap-2 text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              {t.avatarCreator?.createAvatar || 'Create avatar'}
+              {t.avatarModels?.createModel || 'Create model'}
+            </button>
+            <button
+              onClick={() => { setCreatorTargetModelId(undefined); setShowCreatorModal(true); }}
+              className="px-4 py-2 bg-[#FF6B35] text-white rounded-full hover:bg-[#E55A2B] transition-all flex items-center gap-2 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              AI {t.avatarCreator?.createAvatar || 'Create avatar'}
             </button>
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png"
-            onChange={handleFileChange}
-            className="hidden"
-          />
         </div>
 
+        {/* Inline create model form */}
+        {showCreateModel && (
+          <div className="flex gap-2 items-center mb-4">
+            <input
+              value={newModelName}
+              onChange={(e) => setNewModelName(e.target.value)}
+              placeholder={t.avatarModels?.modelName || 'Model name'}
+              className="flex-1 px-4 py-2.5 text-sm border border-[#E5E5E3] rounded-xl focus:outline-none focus:border-[#FF6B35]"
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCreateModel(); }}
+              autoFocus
+            />
+            <button
+              onClick={handleCreateModel}
+              disabled={creatingModel || !newModelName.trim()}
+              className="px-4 py-2.5 text-sm bg-[#FF6B35] text-white rounded-xl hover:bg-[#E55A2B] disabled:opacity-50 transition-colors"
+            >
+              {creatingModel ? '...' : (t.avatarModels?.createModel || 'Create')}
+            </button>
+            <button
+              onClick={handleCreateModelWithFile}
+              disabled={creatingModel}
+              className="px-4 py-2.5 text-sm border border-[#E5E5E3] rounded-xl hover:bg-[#F7F7F5] transition-colors flex items-center gap-2"
+              title={t.avatarModels?.addPhoto || 'With photo'}
+            >
+              <svg className="w-4 h-4 text-[#999999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {t.avatarModels?.addPhoto || 'With photo'}
+            </button>
+            <button
+              onClick={() => { setShowCreateModel(false); setNewModelName(''); }}
+              className="px-3 py-2.5 text-sm text-[#999999] hover:text-[#1A1A1A] transition-colors"
+            >
+              {t.customAvatars?.cancel || 'Cancel'}
+            </button>
+          </div>
+        )}
+
         {/* Empty state */}
-        {avatars.length === 0 && (
+        {models.length === 0 && !showCreateModel && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-[#FFF0EB] flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-[#FF6B35]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
             <p className="text-[#1A1A1A] mb-2">
-              {t.avatarsPage?.emptyTitle || 'No custom avatars yet'}
+              {t.avatarsPage?.emptyTitle || 'No models yet'}
             </p>
             <p className="text-[#999999] text-sm mb-4">
-              {t.avatarsPage?.emptyHint || 'Upload your photos or artwork to use as avatars in generation'}
+              {t.avatarsPage?.emptyHint || 'Create a model and add photos to use in generation'}
             </p>
             <div className="flex gap-3">
               <button
-                onClick={handleAddClick}
+                onClick={() => setShowCreateModel(true)}
                 className="px-4 py-2 bg-[#F7F7F5] text-[#1A1A1A] border border-[#E5E5E3] rounded-full hover:bg-[#EFEFED] transition-all text-sm"
               >
-                {t.avatarCreator?.uploadPhoto || 'Upload photo'}
+                {t.avatarModels?.createModel || 'Create model'}
               </button>
               <button
-                onClick={() => setShowCreatorModal(true)}
+                onClick={() => { setCreatorTargetModelId(undefined); setShowCreatorModal(true); }}
                 className="px-4 py-2 bg-[#FF6B35] text-white rounded-full hover:bg-[#E55A2B] transition-all text-sm"
               >
-                {t.avatarCreator?.createAvatar || 'Create avatar'}
+                AI {t.avatarCreator?.createAvatar || 'Create avatar'}
               </button>
             </div>
           </div>
         )}
 
-        {/* Avatars grid */}
-        {avatars.length > 0 && (
-          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" staggerDelay={0.06}>
-            {avatars.map((avatar) => (
-              <StaggerItem key={avatar.id}>
-                <TiltCard className="relative h-full">
-                  <AvatarCard
-                    avatar={avatar}
-                    onEdit={() => setEditingAvatar(avatar)}
-                    onDelete={() => handleDelete(avatar.id, avatar.storage_path)}
-                    onSelect={() => handleSelectAvatar(avatar.id)}
-                  />
-                </TiltCard>
+        {/* Models grid */}
+        {models.length > 0 && (
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4" staggerDelay={0.06}>
+            {models.map((model) => (
+              <StaggerItem key={model.id}>
+                <ModelManagementCard
+                  model={model}
+                  allModels={models}
+                  isExpanded={expandedModelId === model.id}
+                  onToggleExpand={() => setExpandedModelId(expandedModelId === model.id ? null : model.id)}
+                  onRename={renameModel}
+                  onDeleteModel={deleteModel}
+                  onDeletePhoto={deletePhoto}
+                  onSetCover={setCover}
+                  onMovePhoto={movePhoto}
+                  onAddPhoto={handleAddPhoto}
+                  onAiGenerate={handleAiGenerate}
+                  onDragStart={handleDragStart}
+                  onDragEnter={(id) => setDragOverModelId(id)}
+                  onDragEnd={() => { setDragPhotoId(null); setDragFromModelId(null); setDragOverModelId(null); }}
+                  onDrop={handleDrop}
+                  isDragOver={dragOverModelId === model.id && dragFromModelId !== model.id}
+                />
               </StaggerItem>
             ))}
           </StaggerContainer>
         )}
+
+        {/* Drag hint */}
+        {models.length > 1 && (
+          <p className="text-xs text-[#999999] text-center mt-4">
+            {t.avatarModels?.dragToMove || 'Drag photos between models to reorganize'}
+          </p>
+        )}
       </div>
+
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <input
+        ref={newModelFileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        onChange={handleNewModelFileChange}
+        className="hidden"
+      />
 
       {/* Avatar creator modal */}
       <AvatarCreatorModal
         isOpen={showCreatorModal}
         onClose={() => setShowCreatorModal(false)}
+        targetModelId={creatorTargetModelId}
+        onSaved={refresh}
       />
-
-      {/* Description editor modal */}
-      {editingAvatar && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white border border-[#E5E5E3] rounded-2xl max-w-md w-full mx-4 p-6 animate-slide-up shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-[#1A1A1A]">
-                {t.avatarsPage?.editDescription || 'Edit Description'}
-              </h3>
-              <button
-                onClick={() => setEditingAvatar(null)}
-                className="p-1 hover:bg-[#F7F7F5] rounded-full transition-colors"
-              >
-                <svg className="w-5 h-5 text-[#999999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="mb-4">
-              <img
-                src={editingAvatar.image_url}
-                alt="Avatar"
-                className="w-32 h-32 object-cover rounded-xl mx-auto"
-              />
-            </div>
-            <AvatarDescriptionEditor
-              avatarId={editingAvatar.id}
-              initialDescription={editingAvatar.description || ''}
-              isPending={false}
-              onSave={() => {
-                refresh();
-                setEditingAvatar(null);
-              }}
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Avatar card component
-interface AvatarCardProps {
-  avatar: CustomAvatar;
-  onEdit: () => void;
-  onDelete: () => Promise<void>;
-  onSelect: () => void;
-}
-
-function AvatarCard({ avatar, onEdit, onDelete, onSelect }: AvatarCardProps) {
-  const { t } = useLanguage();
-  const [showMenu, setShowMenu] = useState(false);
-  const [confirming, setConfirming] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const handleCardClick = () => {
-    if (!deleting) {
-      setShowMenu(true);
-    }
-  };
-
-  const handleCloseMenu = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(false);
-    setConfirming(false);
-  };
-
-  const handleDeleteClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!confirming) {
-      setConfirming(true);
-      setTimeout(() => setConfirming(false), 3000);
-      return;
-    }
-
-    setDeleting(true);
-    setShowMenu(false);
-    try {
-      await onDelete();
-    } catch {
-      setDeleting(false);
-      setConfirming(false);
-    }
-  };
-
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(false);
-    onEdit();
-  };
-
-  const handleSelectClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(false);
-    onSelect();
-  };
-
-  return (
-    <div
-      className={`group relative rounded-2xl overflow-hidden bg-[#F7F7F5] aspect-square cursor-pointer border border-[#E5E5E3] hover:border-[#D4D4D2] transition-all ${
-        deleting ? 'animate-pulse opacity-50' : ''
-      }`}
-      onClick={handleCardClick}
-    >
-      <img
-        src={avatar.image_url}
-        alt="Custom avatar"
-        className="w-full h-full object-cover"
-      />
-
-      <AnimatePresence>
-      {showMenu && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-2 p-3"
-          onClick={handleCloseMenu}
-        >
-          <button
-            onClick={handleSelectClick}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#FF6B35] rounded-xl hover:bg-[#E55A2B] transition-all text-white text-sm font-medium min-h-[44px]"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            {t.avatarsPage?.selectForGenerator || 'Use in generator'}
-          </button>
-
-          <button
-            onClick={handleEditClick}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white/20 rounded-xl hover:bg-white/30 transition-all text-white text-sm font-medium min-h-[44px]"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            {t.avatarsPage?.edit || 'Edit'}
-          </button>
-
-          <button
-            onClick={handleDeleteClick}
-            className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all text-sm font-medium min-h-[44px] ${
-              confirming
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-white/20 hover:bg-red-500/50 text-white'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            {confirming ? (t.avatarsPage?.confirmDelete || 'Confirm delete') : (t.avatarsPage?.delete || 'Delete')}
-          </button>
-        </motion.div>
-      )}
-      </AnimatePresence>
-
-      {avatar.description && !showMenu && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <p className="text-white text-sm line-clamp-2">{avatar.description}</p>
-        </div>
-      )}
     </div>
   );
 }

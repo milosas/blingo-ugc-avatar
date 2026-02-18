@@ -1,9 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
 
-const KIE_API_KEY = Deno.env.get('KIE_API_KEY')
-const KIE_CREATE_TASK_URL = 'https://api.kie.ai/api/v1/jobs/createTask'
-const KIE_POLL_URL = 'https://api.kie.ai/api/v1/jobs/recordInfo'
+const FAL_KEY = Deno.env.get('FAL_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +10,8 @@ const corsHeaders = {
 
 interface GenerateAvatarRequest {
   prompt: string
+  reference_image_url?: string // If provided, uses InstantID for identity-preserving generation
+  aspect_ratio?: string // '9:16' full body, '3:4' half body, '1:1' headshot
 }
 
 // Download generated image and convert to base64
@@ -26,88 +26,26 @@ async function downloadImageAsBase64(imageUrl: string): Promise<string> {
   return `data:${contentType};base64,${base64}`
 }
 
-// Create text-to-image generation task
-async function createTask(prompt: string): Promise<string> {
-  const response = await fetch(KIE_CREATE_TASK_URL, {
+// Synchronous fal.ai call (waits for result)
+async function falRun(endpoint: string, body: Record<string, unknown>): Promise<unknown> {
+  const url = `https://fal.run/${endpoint}`
+
+  console.log('Calling fal.run:', endpoint)
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
+      'Authorization': `Key ${FAL_KEY}`,
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${KIE_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: 'seedream/4.5-text-to-image',
-      input: {
-        prompt,
-        aspect_ratio: '1:1',
-        quality: 'high',
-      },
-    }),
+    body: JSON.stringify(body),
   })
 
   if (!response.ok) {
-    const errorBody = await response.text()
-    console.error('Create task error response:', response.status, errorBody)
-    throw new Error(`Create task failed: ${response.status} - ${errorBody}`)
+    const errorText = await response.text()
+    throw new Error(`Fal request failed: ${response.status} - ${errorText}`)
   }
 
-  const data = await response.json()
-  console.log('Create task response:', JSON.stringify(data))
-  const taskId = data.data?.taskId
-
-  if (!taskId) {
-    throw new Error(`No taskId in response: ${JSON.stringify(data)}`)
-  }
-
-  return taskId
-}
-
-// Poll for task completion
-async function pollTask(taskId: string): Promise<string> {
-  const maxPolls = 8
-  const pollInterval = 15000
-
-  for (let i = 0; i < maxPolls; i++) {
-    await new Promise(resolve => setTimeout(resolve, pollInterval))
-
-    const response = await fetch(`${KIE_POLL_URL}?taskId=${taskId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${KIE_API_KEY}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorBody = await response.text()
-      console.error('Poll error response:', response.status, errorBody)
-      throw new Error(`Poll failed: ${response.status} - ${errorBody}`)
-    }
-
-    const data = await response.json()
-    const state = data.data?.state
-    console.log(`Poll attempt ${i + 1}/${maxPolls}: state=${state}`)
-
-    if (state === 'success') {
-      const resultJson = data.data?.resultJson
-      if (resultJson) {
-        try {
-          const result = JSON.parse(resultJson)
-          if (result.resultUrls && result.resultUrls.length > 0) {
-            const base64 = await downloadImageAsBase64(result.resultUrls[0])
-            return base64
-          }
-        } catch (e) {
-          throw new Error('Failed to parse result')
-        }
-      }
-      throw new Error('No result URLs in response')
-    }
-
-    if (state === 'fail') {
-      throw new Error(data.data?.failMsg || 'Generation failed')
-    }
-  }
-
-  throw new Error('Generation timed out')
+  return await response.json()
 }
 
 serve(async (req) => {
@@ -116,8 +54,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!KIE_API_KEY) {
-      throw new Error('KIE_API_KEY not configured')
+    if (!FAL_KEY) {
+      throw new Error('FAL_KEY not configured')
     }
 
     const body: GenerateAvatarRequest = await req.json()
@@ -128,10 +66,55 @@ serve(async (req) => {
 
     console.log('Generating avatar with prompt:', body.prompt.substring(0, 100))
 
-    const taskId = await createTask(body.prompt)
-    console.log('Task created:', taskId)
+    let imageUrl: string
 
-    const base64Image = await pollTask(taskId)
+    if (body.reference_image_url) {
+      // PuLID FLUX: identity-preserving generation (same person, different pose)
+      // Uses FLUX.1 dev backbone — much higher quality than InstantID (SDXL)
+      // PuLID uses image_size enum, not aspect_ratio
+      const imageSizeMap: Record<string, string> = {
+        '9:16': 'portrait_16_9',
+        '3:4': 'portrait_4_3',
+        '1:1': 'square_hd',
+      }
+      const imageSize = imageSizeMap[body.aspect_ratio || '1:1'] || 'square_hd'
+      console.log('Using PuLID FLUX with face reference, image_size:', imageSize)
+      const pulidResult = await falRun('fal-ai/flux-pulid', {
+        prompt: body.prompt,
+        reference_image_url: body.reference_image_url,
+        image_size: imageSize,
+        num_inference_steps: 25,
+        guidance_scale: 4,
+        id_weight: 0.9,
+        true_cfg: 1.5,
+        max_sequence_length: '256',
+      }) as { images?: Array<{ url: string }> }
+
+      if (!pulidResult.images || pulidResult.images.length === 0) {
+        throw new Error('No images in PuLID response')
+      }
+      imageUrl = pulidResult.images[0].url
+    } else {
+      // FLUX Pro v1.1 Ultra uses aspect_ratio param (not image_size)
+      // Valid: 21:9, 16:9, 4:3, 3:2, 1:1, 2:3, 3:4, 9:16, 9:21
+      const aspectRatio = body.aspect_ratio || '1:1'
+      console.log('Using aspect_ratio:', aspectRatio)
+      const fluxResult = await falRun('fal-ai/flux-pro/v1.1-ultra', {
+        prompt: body.prompt,
+        aspect_ratio: aspectRatio,
+        num_images: 1,
+        safety_tolerance: '2',
+      }) as { images?: Array<{ url: string }> }
+
+      if (!fluxResult.images || fluxResult.images.length === 0) {
+        throw new Error('No images in fal response')
+      }
+
+      imageUrl = fluxResult.images[0].url
+    }
+    console.log('Avatar generated, downloading for base64 conversion...')
+
+    const base64Image = await downloadImageAsBase64(imageUrl)
     console.log('Avatar generated successfully')
 
     return new Response(JSON.stringify({

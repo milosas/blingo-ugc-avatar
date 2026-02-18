@@ -21,9 +21,21 @@ export interface CustomAvatar {
   storage_path: string;
   image_url: string;
   description: string | null;
-  avatar_type: 'photo' | 'stylized' | 'generated';
+  avatar_type: 'photo' | 'stylized' | 'pending';
+  model_id: string | null;
+  display_order: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface AvatarModel {
+  id: string;
+  user_id: string;
+  name: string;
+  cover_photo_id: string | null;
+  created_at: string;
+  updated_at: string;
+  photos?: CustomAvatar[];
 }
 
 export interface GeneratedImage {
@@ -39,12 +51,15 @@ export interface GeneratedImage {
 }
 
 export interface GenerationConfig {
-  avatar?: string;
-  scene?: string;
-  style?: string;
-  mood?: string;
-  aspectRatio?: string;
-  resolution?: string;
+  avatar?: string | null;
+  garmentPhotoType?: string | null;
+  qualityMode?: string | null;
+  imageCount?: number;
+  // Legacy fields kept for backward compat with existing gallery items
+  clothingType?: string | null;
+  mood?: string | null;
+  scene?: string | null;
+  customPrompt?: string | null;
 }
 
 export interface PostConfig {

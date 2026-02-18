@@ -1,10 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
 
-const KIE_API_KEY = Deno.env.get('KIE_API_KEY')
-const KIE_UPLOAD_URL = 'https://kieai.redpandaai.co/api/file-base64-upload'
-const KIE_CREATE_TASK_URL = 'https://api.kie.ai/api/v1/jobs/createTask'
-const KIE_POLL_URL = 'https://api.kie.ai/api/v1/jobs/recordInfo'
+const FAL_KEY = Deno.env.get('FAL_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,20 +9,24 @@ const corsHeaders = {
 }
 
 interface GenerateRequest {
-  prompt: string
-  aspect_ratio: string
-  resolution: string
+  mode: 'tryon' | 'background' | 'relight' | 'edit'
+  // tryon fields:
+  qualityMode: 'performance' | 'balanced' | 'quality'
   imageCount: number
-  images: string[] // base64 data URLs (clothing)
-  avatarId?: string
-  avatarImageUrl?: string // Avatar reference image URL (for preset avatars)
-  avatarImageBase64?: string // Avatar reference image as base64 (for custom avatars)
+  images: string[]           // base64 clothing
+  avatarImageUrl?: string
+  avatarImageBase64?: string
   avatarIsCustom?: boolean
+  // post-processing fields:
+  sourceImageUrl?: string    // try-on result to post-process
+  backgroundPrompt?: string  // for background mode
+  lightingStyle?: string     // for relight mode
+  editPrompt?: string        // for edit mode
 }
 
 interface GeneratedImage {
   url: string
-  base64?: string // Base64 data URL for CORS-free frontend handling
+  base64?: string
 }
 
 interface GenerateResponse {
@@ -35,36 +36,58 @@ interface GenerateResponse {
   error?: string
 }
 
-// Upload base64 image to kie.ai file service
-async function uploadImage(base64Data: string): Promise<string> {
-  const response = await fetch(KIE_UPLOAD_URL, {
-    method: 'POST',
+// Map quality mode to FASHN mode parameter
+function mapQualityToMode(qualityMode: string): string {
+  switch (qualityMode) {
+    case 'performance': return 'performance'
+    case 'balanced': return 'balanced'
+    case 'quality': return 'quality'
+    default: return 'balanced'
+  }
+}
+
+// Upload base64 image data to fal.ai storage, returns URL
+async function uploadToFalStorage(base64Data: string): Promise<string> {
+  // Strip data URL prefix if present
+  let rawBase64 = base64Data
+  if (rawBase64.includes(',')) {
+    rawBase64 = rawBase64.split(',')[1]
+  }
+
+  // Decode base64 to binary
+  const binaryStr = atob(rawBase64)
+  const bytes = new Uint8Array(binaryStr.length)
+  for (let i = 0; i < binaryStr.length; i++) {
+    bytes[i] = binaryStr.charCodeAt(i)
+  }
+
+  // Determine content type from data URL prefix
+  let contentType = 'image/jpeg'
+  if (base64Data.startsWith('data:image/png')) {
+    contentType = 'image/png'
+  } else if (base64Data.startsWith('data:image/webp')) {
+    contentType = 'image/webp'
+  }
+
+  const response = await fetch('https://fal.run/fal-ai/fal-file-storage/upload', {
+    method: 'PUT',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${KIE_API_KEY}`,
+      'Authorization': `Key ${FAL_KEY}`,
+      'Content-Type': contentType,
     },
-    body: JSON.stringify({
-      base64Data,
-      uploadPath: 'ugc',
-      fileName: `img${Date.now()}.jpg`,
-    }),
+    body: bytes,
   })
 
   if (!response.ok) {
-    throw new Error(`Upload failed: ${response.status}`)
+    const errorText = await response.text()
+    throw new Error(`Fal storage upload failed: ${response.status} - ${errorText}`)
   }
 
   const data = await response.json()
-  const downloadUrl = data.data?.downloadUrl
-
-  if (!downloadUrl) {
-    throw new Error('Upload failed - no URL returned')
-  }
-
-  return downloadUrl
+  return data.url
 }
 
-// Fetch and convert URL image to base64 (using Deno std library for large files)
+// Fetch and convert URL image to base64
 async function fetchImageAsBase64(imageUrl: string): Promise<string> {
   const response = await fetch(imageUrl)
   if (!response.ok) {
@@ -78,224 +101,329 @@ async function fetchImageAsBase64(imageUrl: string): Promise<string> {
 
 // Download generated image and convert to base64 for CORS-free frontend handling
 async function downloadImageAsBase64(imageUrl: string): Promise<string> {
-  try {
-    console.log('Downloading image for base64 conversion:', imageUrl.substring(0, 50) + '...')
-    const response = await fetch(imageUrl)
-    if (!response.ok) {
-      console.error('Failed to download image:', response.status)
-      throw new Error(`Download failed: ${response.status}`)
-    }
-    const arrayBuffer = await response.arrayBuffer()
-    // Use Deno std library for proper base64 encoding of large files
-    const base64 = base64Encode(new Uint8Array(arrayBuffer))
-    const contentType = response.headers.get('content-type') || 'image/png'
-    console.log('Image downloaded, size:', arrayBuffer.byteLength, 'bytes')
-    return `data:${contentType};base64,${base64}`
-  } catch (err) {
-    console.error('Error downloading image:', err)
-    throw err
+  console.log('Downloading image for base64 conversion:', imageUrl.substring(0, 50) + '...')
+  const response = await fetch(imageUrl)
+  if (!response.ok) {
+    throw new Error(`Download failed: ${response.status}`)
   }
+  const arrayBuffer = await response.arrayBuffer()
+  const base64 = base64Encode(new Uint8Array(arrayBuffer))
+  const contentType = response.headers.get('content-type') || 'image/png'
+  console.log('Image downloaded, size:', arrayBuffer.byteLength, 'bytes')
+  return `data:${contentType};base64,${base64}`
 }
 
-// Create generation task
-async function createTask(
-  clothingUrl: string,
-  prompt: string,
-  aspectRatio: string,
-  resolution: string,
-  avatarUrl?: string
-): Promise<string> {
-  // Build input URLs array - avatar first (person), clothing second (outfit)
-  // Per kie.ai docs: "Change the man into the outfit shown in picture two"
-  const inputUrls = avatarUrl
-    ? [avatarUrl, clothingUrl]  // Avatar first, clothing second
-    : [clothingUrl]             // Just clothing if no avatar
+// Generic fal.ai queue submit + poll utility
+async function falQueueSubmitAndPoll(endpoint: string, body: Record<string, unknown>): Promise<unknown> {
+  const queueUrl = `https://queue.fal.run/${endpoint}`
 
-  const response = await fetch(KIE_CREATE_TASK_URL, {
+  // Submit to queue
+  console.log('Submitting to fal queue:', endpoint)
+  const submitResponse = await fetch(queueUrl, {
     method: 'POST',
     headers: {
+      'Authorization': `Key ${FAL_KEY}`,
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${KIE_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: 'flux-2/pro-image-to-image',
-      input: {
-        input_urls: inputUrls,
-        prompt,
-        aspect_ratio: aspectRatio,
-        resolution,
-      },
-    }),
+    body: JSON.stringify(body),
   })
 
-  if (!response.ok) {
-    throw new Error(`Create task failed: ${response.status}`)
+  if (!submitResponse.ok) {
+    const errorText = await submitResponse.text()
+    throw new Error(`Fal queue submit failed: ${submitResponse.status} - ${errorText}`)
   }
 
-  const data = await response.json()
-  const taskId = data.data?.taskId
-
-  if (!taskId) {
-    throw new Error('No taskId in response')
+  const submitData = await submitResponse.json()
+  const requestId = submitData.request_id
+  if (!requestId) {
+    throw new Error('No request_id in fal queue response')
   }
+  console.log('Fal request submitted:', requestId)
 
-  return taskId
-}
-
-// Poll for task completion
-async function pollTask(taskId: string): Promise<GeneratedImage[]> {
-  const maxPolls = 8 // 8 polls * 15s = 120s max
-  const pollInterval = 15000 // 15 seconds
+  // Poll for completion
+  const statusUrl = `${queueUrl}/requests/${requestId}/status`
+  const resultUrl = `${queueUrl}/requests/${requestId}`
+  const maxPolls = 60 // up to 5 minutes
+  const pollInterval = 5000
 
   for (let i = 0; i < maxPolls; i++) {
-    // Wait before polling (except first poll has initial delay)
-    if (i > 0) {
-      await new Promise(resolve => setTimeout(resolve, pollInterval))
-    } else {
-      // Initial delay before first poll
-      await new Promise(resolve => setTimeout(resolve, pollInterval))
-    }
+    await new Promise(resolve => setTimeout(resolve, pollInterval))
 
-    const response = await fetch(`${KIE_POLL_URL}?taskId=${taskId}`, {
-      method: 'GET',
+    const statusResponse = await fetch(statusUrl, {
       headers: {
-        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Authorization': `Key ${FAL_KEY}`,
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`Poll failed: ${response.status}`)
+    if (!statusResponse.ok) {
+      console.error('Fal status poll failed:', statusResponse.status)
+      continue
     }
 
-    const data = await response.json()
-    const state = data.data?.state
+    const statusData = await statusResponse.json()
+    console.log('Fal status:', statusData.status, `(poll ${i + 1}/${maxPolls})`)
 
-    if (state === 'success') {
-      const resultJson = data.data?.resultJson
-      if (resultJson) {
-        try {
-          const result = JSON.parse(resultJson)
-          if (result.resultUrls && result.resultUrls.length > 0) {
-            // Download each image and convert to base64 for CORS-free frontend handling
-            const images: GeneratedImage[] = await Promise.all(
-              result.resultUrls.map(async (url: string) => {
-                try {
-                  const base64 = await downloadImageAsBase64(url)
-                  return { url, base64 }
-                } catch (downloadErr) {
-                  console.error('Failed to download image, returning URL only:', downloadErr)
-                  return { url } // Fallback: return URL only if download fails
-                }
-              })
-            )
-            return images
-          }
-        } catch (e) {
-          throw new Error('Failed to parse result')
-        }
+    if (statusData.status === 'COMPLETED') {
+      // Fetch result
+      const resultResponse = await fetch(resultUrl, {
+        headers: {
+          'Authorization': `Key ${FAL_KEY}`,
+        },
+      })
+
+      if (!resultResponse.ok) {
+        throw new Error(`Fal result fetch failed: ${resultResponse.status}`)
       }
-      throw new Error('No result URLs in response')
+
+      return await resultResponse.json()
     }
 
-    if (state === 'fail') {
-      throw new Error(data.data?.failMsg || 'Generation failed')
+    if (statusData.status === 'FAILED') {
+      throw new Error(statusData.error || 'Fal generation failed')
     }
-
-    // state is 'pending' or 'processing', continue polling
   }
 
-  throw new Error('Generation timed out')
+  throw new Error('Fal generation timed out')
+}
+
+// Handle try-on via FASHN v1.6
+async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
+  if (!body.images || body.images.length === 0) {
+    throw new Error('No clothing images provided')
+  }
+
+  // Upload clothing image to fal storage
+  console.log('Uploading clothing image to fal storage...')
+  const garmentUrl = await uploadToFalStorage(body.images[0])
+  console.log('Clothing image uploaded:', garmentUrl)
+
+  // Upload/prepare avatar image
+  let modelImageUrl: string
+
+  if (body.avatarImageBase64) {
+    console.log('Uploading custom avatar (base64) to fal storage...')
+    try {
+      modelImageUrl = await uploadToFalStorage(body.avatarImageBase64)
+      console.log('Custom avatar uploaded:', modelImageUrl)
+    } catch (avatarError) {
+      console.error('Failed to upload custom avatar:', avatarError.message)
+      throw new Error('AVATAR_UPLOAD_FAILED: Could not process custom avatar image')
+    }
+  } else if (body.avatarImageUrl) {
+    console.log('Processing preset avatar image...')
+    try {
+      const avatarBase64 = await fetchImageAsBase64(body.avatarImageUrl)
+      modelImageUrl = await uploadToFalStorage(avatarBase64)
+      console.log('Preset avatar uploaded:', modelImageUrl)
+    } catch (avatarError) {
+      console.error('Failed to upload preset avatar:', avatarError.message)
+      throw new Error('AVATAR_UPLOAD_FAILED: Could not process avatar image')
+    }
+  } else {
+    throw new Error('No avatar image provided')
+  }
+
+  const mode = mapQualityToMode(body.qualityMode || 'balanced')
+  const numSamples = body.imageCount || 1
+
+  console.log(`FASHN try-on: mode=${mode}, samples=${numSamples}`)
+
+  // Call FASHN v1.6 via fal queue
+  // category & garment_photo_type default to 'auto' — FASHN auto-detects both
+  const result = await falQueueSubmitAndPoll('fal-ai/fashn/tryon/v1.6', {
+    model_image: modelImageUrl,
+    garment_image: garmentUrl,
+    mode,
+    num_samples: numSamples,
+    output_format: 'png',
+  }) as { images?: Array<{ url: string }> }
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error('No images returned from FASHN')
+  }
+
+  console.log('FASHN returned', result.images.length, 'images')
+
+  // Download images as base64 for CORS-free frontend handling
+  const images: GeneratedImage[] = await Promise.all(
+    result.images.map(async (img: { url: string }) => {
+      try {
+        const base64 = await downloadImageAsBase64(img.url)
+        return { url: img.url, base64 }
+      } catch (downloadErr) {
+        console.error('Failed to download image, returning URL only:', downloadErr)
+        return { url: img.url }
+      }
+    })
+  )
+
+  return {
+    success: true,
+    images,
+    message: `Generated ${images.length} image(s)!`,
+  }
+}
+
+// Upload source image URL to fal storage (needed for post-processing — some fal.ai models only accept fal storage URLs)
+async function ensureFalStorageUrl(imageUrl: string): Promise<string> {
+  // If already a fal storage URL, use as-is
+  if (imageUrl.includes('fal.media') || imageUrl.includes('fal-cdn') || imageUrl.includes('fal.run')) {
+    return imageUrl
+  }
+  console.log('Uploading source image to fal storage...')
+  const base64 = await fetchImageAsBase64(imageUrl)
+  const falUrl = await uploadToFalStorage(base64)
+  console.log('Source image uploaded to fal storage:', falUrl)
+  return falUrl
+}
+
+// Handle background replacement via Bria
+async function handleBackgroundReplace(body: GenerateRequest): Promise<GenerateResponse> {
+  if (!body.sourceImageUrl) {
+    throw new Error('No source image URL provided')
+  }
+  if (!body.backgroundPrompt) {
+    throw new Error('No background prompt provided')
+  }
+
+  console.log('Background replace:', body.backgroundPrompt)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+
+  const result = await falQueueSubmitAndPoll('fal-ai/bria/background/replace', {
+    image_url: sourceUrl,
+    prompt: body.backgroundPrompt,
+  }) as { images?: Array<{ url: string }> }
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error('No images returned from background replace')
+  }
+
+  const images: GeneratedImage[] = await Promise.all(
+    result.images.map(async (img: { url: string }) => {
+      try {
+        const base64 = await downloadImageAsBase64(img.url)
+        return { url: img.url, base64 }
+      } catch {
+        return { url: img.url }
+      }
+    })
+  )
+
+  return {
+    success: true,
+    images,
+    message: 'Background replaced!',
+  }
+}
+
+// Handle relighting via Image Apps V2
+async function handleRelight(body: GenerateRequest): Promise<GenerateResponse> {
+  if (!body.sourceImageUrl) {
+    throw new Error('No source image URL provided')
+  }
+  if (!body.lightingStyle) {
+    throw new Error('No lighting style provided')
+  }
+
+  console.log('Relighting:', body.lightingStyle)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+
+  const result = await falQueueSubmitAndPoll('fal-ai/image-apps-v2/relighting', {
+    image_url: sourceUrl,
+    lighting_style: body.lightingStyle,
+  }) as { images?: Array<{ url: string }> }
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error('No images returned from relighting')
+  }
+
+  const images: GeneratedImage[] = await Promise.all(
+    result.images.map(async (img: { url: string }) => {
+      try {
+        const base64 = await downloadImageAsBase64(img.url)
+        return { url: img.url, base64 }
+      } catch {
+        return { url: img.url }
+      }
+    })
+  )
+
+  return {
+    success: true,
+    images,
+    message: 'Relighting applied!',
+  }
+}
+
+// Handle Kontext edit via FLUX Kontext Pro
+async function handleKontextEdit(body: GenerateRequest): Promise<GenerateResponse> {
+  if (!body.sourceImageUrl) {
+    throw new Error('No source image URL provided')
+  }
+  if (!body.editPrompt) {
+    throw new Error('No edit prompt provided')
+  }
+
+  console.log('Kontext edit:', body.editPrompt)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+
+  const result = await falQueueSubmitAndPoll('fal-ai/flux-pro/kontext', {
+    image_url: sourceUrl,
+    prompt: body.editPrompt,
+  }) as { images?: Array<{ url: string }> }
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error('No images returned from Kontext edit')
+  }
+
+  const images: GeneratedImage[] = await Promise.all(
+    result.images.map(async (img: { url: string }) => {
+      try {
+        const base64 = await downloadImageAsBase64(img.url)
+        return { url: img.url, base64 }
+      } catch {
+        return { url: img.url }
+      }
+    })
+  )
+
+  return {
+    success: true,
+    images,
+    message: 'Edit applied!',
+  }
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Validate API key is configured
-    if (!KIE_API_KEY) {
-      throw new Error('KIE_API_KEY not configured')
+    if (!FAL_KEY) {
+      throw new Error('FAL_KEY not configured')
     }
 
     const body: GenerateRequest = await req.json()
+    const mode = body.mode || 'tryon'
 
-    // Validate request
-    if (!body.images || body.images.length === 0) {
-      throw new Error('No images provided')
-    }
+    let response: GenerateResponse
 
-    if (!body.prompt) {
-      throw new Error('No prompt provided')
-    }
-
-    // Use first image (matching n8n behavior)
-    const base64Image = body.images[0]
-
-    // Step 1: Upload clothing image
-    console.log('Uploading clothing image...')
-    const clothingImageUrl = await uploadImage(base64Image)
-    console.log('Clothing image uploaded:', clothingImageUrl)
-
-    // Step 2: Upload avatar image (if provided) for identity reference
-    let avatarUploadedUrl: string | undefined
-
-    // Priority: base64 (custom avatars) > URL (preset avatars)
-    // CRITICAL: If avatar is provided, it MUST be uploaded - do NOT continue without it
-    if (body.avatarImageBase64) {
-      // Custom avatar: already have base64, upload directly
-      console.log('Uploading custom avatar (base64)...')
-      try {
-        avatarUploadedUrl = await uploadImage(body.avatarImageBase64)
-        console.log('Custom avatar uploaded:', avatarUploadedUrl)
-      } catch (avatarError) {
-        // CRITICAL: Do NOT continue without avatar - user expects their avatar to be used
-        console.error('Failed to upload custom avatar:', avatarError.message)
-        throw new Error('AVATAR_UPLOAD_FAILED: Could not process custom avatar image')
-      }
-    } else if (body.avatarImageUrl) {
-      // Preset avatar: fetch URL and convert to base64
-      console.log('Processing preset avatar image...')
-      try {
-        const avatarBase64 = await fetchImageAsBase64(body.avatarImageUrl)
-        avatarUploadedUrl = await uploadImage(avatarBase64)
-        console.log('Preset avatar uploaded:', avatarUploadedUrl)
-      } catch (avatarError) {
-        // CRITICAL: Do NOT continue without avatar - user expects their avatar to be used
-        console.error('Failed to upload preset avatar:', avatarError.message)
-        throw new Error('AVATAR_UPLOAD_FAILED: Could not process avatar image')
-      }
-    }
-
-    // Step 3: Build prompt - reference picture two for clothing when avatar is present
-    let finalPrompt = body.prompt
-    if (avatarUploadedUrl) {
-      // When avatar image is provided, tell the model to use outfit from picture two
-      // STRICT: Do not add or modify any clothing elements - use EXACTLY as shown
-      finalPrompt = `${body.prompt}, wearing EXACTLY the clothing shown in picture two. IMPORTANT: Do not add sleeves, pockets, buttons, patterns or any elements not visible in the reference clothing image. Preserve the exact design, length, and style of the garment as photographed.`
-    }
-
-    // Step 4: Create generation task with both images
-    console.log('Creating task with prompt:', finalPrompt)
-    const taskId = await createTask(
-      clothingImageUrl,
-      finalPrompt,
-      body.aspect_ratio || '2:3',
-      body.resolution || '1K',
-      avatarUploadedUrl
-    )
-    console.log('Task created:', taskId)
-
-    // Step 5: Poll for completion
-    console.log('Polling for result...')
-    const images = await pollTask(taskId)
-    console.log('Generation complete:', images.length, 'images')
-
-    const response: GenerateResponse = {
-      success: true,
-      images,
-      message: `Generated ${images.length} image(s)!`,
+    switch (mode) {
+      case 'tryon':
+        response = await handleTryOn(body)
+        break
+      case 'background':
+        response = await handleBackgroundReplace(body)
+        break
+      case 'relight':
+        response = await handleRelight(body)
+        break
+      case 'edit':
+        response = await handleKontextEdit(body)
+        break
+      default:
+        throw new Error(`Unknown mode: ${mode}`)
     }
 
     return new Response(JSON.stringify(response), {

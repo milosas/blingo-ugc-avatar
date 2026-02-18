@@ -32,7 +32,7 @@ const CARDS = [
     color: 'bg-[#4A6CF7]',
     iconBg: 'bg-[#EBF0FF]',
     iconColor: 'text-[#4A6CF7]',
-    link: '/generator',
+    link: '/image-generator',
   },
   {
     key: 'card3' as const,

@@ -1,5 +1,4 @@
 import { API_CONFIG } from '../constants/api';
-import { buildPrompt } from '../constants/fluxOptions';
 import type { Config, UploadedImage } from '../types';
 import type { GenerationResponse } from '../types/generation';
 
@@ -46,11 +45,8 @@ async function urlToBase64(imageUrl: string): Promise<string> {
 }
 
 /**
- * Send generation request to Supabase Edge Function
- * Uses flux-2/pro-image-to-image model via kie.ai
- *
- * Combines user selections (avatar, scene, style, mood) with user's custom prompt
- * to create the full generation prompt
+ * Send try-on generation request to Supabase Edge Function
+ * Uses FASHN v1.6 via fal.ai
  */
 export async function generateImages(
   config: Config,
@@ -62,17 +58,6 @@ export async function generateImages(
     images.map(img => imageToBase64(img.file))
   );
 
-  // Build the full prompt from config
-  const fullPrompt = buildPrompt({
-    avatar: config.avatar,
-    scene: config.scene,
-    mood: config.mood,
-    pose: config.pose,
-    userPrompt: config.userPrompt
-  });
-
-  console.log('Generated prompt:', fullPrompt);
-
   // For custom avatars, convert image URL to base64 (Edge Function can't access signed URLs)
   // For preset avatars, send URL directly (Unsplash URLs are publicly accessible)
   let avatarImageBase64: string | null = null;
@@ -80,41 +65,29 @@ export async function generateImages(
 
   if (config.avatar?.imageUrl) {
     if (config.avatar.isCustom) {
-      // Custom avatar: convert to base64 for Edge Function
-      // CRITICAL: If this fails, we must throw error - user explicitly selected this avatar
       console.log('Converting custom avatar to base64...');
       try {
         avatarImageBase64 = await urlToBase64(config.avatar.imageUrl);
         console.log('Custom avatar converted to base64, length:', avatarImageBase64.length);
       } catch (err) {
         console.error('CRITICAL: Failed to convert custom avatar to base64:', err);
-        // DON'T continue without avatar - throw error so user knows
         throw new Error('AVATAR_LOAD_FAILED');
       }
     } else {
-      // Preset avatar: URL is publicly accessible
       avatarImageUrl = config.avatar.imageUrl;
     }
   }
 
-  // Build request body for flux-2/pro-image-to-image model
   const requestBody = {
-    // Full constructed prompt
-    prompt: fullPrompt,
-    // Technical settings
-    aspect_ratio: config.aspectRatio,
-    resolution: config.resolution,
+    mode: 'tryon' as const,
+    qualityMode: config.qualityMode,
     imageCount: config.imageCount,
-    // Clothing images
     images: base64Images,
-    // Avatar info for identity preservation
-    avatarId: config.avatar?.id || null,
     avatarImageUrl: avatarImageUrl,
     avatarImageBase64: avatarImageBase64,
     avatarIsCustom: config.avatar?.isCustom || false
   };
 
-  // POST to Supabase Edge Function
   const response = await fetch(API_CONFIG.generateUrl, {
     method: 'POST',
     headers: {
@@ -127,7 +100,6 @@ export async function generateImages(
   });
 
   if (!response.ok) {
-    // Try to parse error response for specific error types
     try {
       const errorData = await response.json();
       if (errorData.error?.includes('AVATAR_UPLOAD_FAILED')) {
@@ -140,5 +112,53 @@ export async function generateImages(
   }
 
   const data: GenerationResponse = await response.json();
+  return data;
+}
+
+/**
+ * Send post-processing request to Supabase Edge Function
+ */
+export async function postProcessImage(
+  action: 'background' | 'relight' | 'edit',
+  sourceImageUrl: string,
+  params: {
+    backgroundPrompt?: string;
+    lightingStyle?: string;
+    editPrompt?: string;
+  },
+  signal: AbortSignal
+): Promise<GenerationResponse> {
+  const requestBody = {
+    mode: action,
+    sourceImageUrl,
+    ...params
+  };
+
+  const response = await fetch(API_CONFIG.generateUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_CONFIG.supabaseAnonKey}`,
+      'apikey': API_CONFIG.supabaseAnonKey
+    },
+    body: JSON.stringify(requestBody),
+    signal
+  });
+
+  if (!response.ok) {
+    let errorMsg = 'API_ERROR';
+    try {
+      const errData = await response.json();
+      errorMsg = errData.message || errData.error || `API error (${response.status})`;
+    } catch {
+      errorMsg = `API error (${response.status})`;
+    }
+    throw new Error(errorMsg);
+  }
+
+  const data: GenerationResponse = await response.json();
+  if (!data.success) {
+    throw new Error(data.message || 'Post-processing failed');
+  }
   return data;
 }

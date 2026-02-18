@@ -9,9 +9,10 @@ interface ImageCardProps {
   image: GeneratedImage;
   onDelete: (imageId: string, storagePath: string) => Promise<void>;
   onClick: () => void;
+  onEdit?: () => void;
 }
 
-export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
+export function ImageCard({ image, onDelete, onClick, onEdit }: ImageCardProps) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showNoteOverlay, setShowNoteOverlay] = useState(false);
@@ -67,7 +68,7 @@ export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
 
   return (
     <div
-      className={`card-hover group relative rounded-lg overflow-hidden bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-shadow ${
+      className={`card-hover group relative rounded-lg overflow-hidden bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all ${
         deleting ? 'animate-fade-out' : ''
       }`}
       onClick={onClick}
@@ -82,6 +83,29 @@ export function ImageCard({ image, onDelete, onClick }: ImageCardProps) {
 
       {/* Hover overlay with actions */}
       <div className="card-actions absolute inset-0 bg-black/40 flex items-center justify-center gap-3">
+        {/* Edit button */}
+        {onEdit && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            className="p-2 bg-[#FF6B35] rounded-full hover:bg-[#E55A2B] transition-colors"
+            title="Edit image"
+          >
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </button>
+        )}
+
         {/* Download button */}
         <button
           onClick={handleDownload}

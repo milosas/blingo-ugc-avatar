@@ -17,7 +17,7 @@ export const translations = {
   lt: {
     header: {
       title: 'Re Edit Me',
-      subtitle: 'Įkelkite nuotrauką ir sukurkite profesionalias nuotraukas su AI'
+      subtitle: 'Produktų nuotraukos ir turinys su AI — be fotografo, be studijos'
     },
     upload: {
       title: 'Įkelti nuotrauką',
@@ -29,9 +29,9 @@ export const translations = {
     config: {
       title: 'Generavimo nustatymai',
       modelLabel: 'Modelis',
-      sceneLabel: 'Aplinka',
+      sceneLabel: 'Scena / Fonas',
       styleLabel: 'Stilius',
-      moodLabel: 'Nuotaika',
+      moodLabel: 'Nuotaika / Išraiška',
       poseLabel: 'Poza',
       placeholder: 'Pasirinkite...',
       promptLabel: 'Papildomi patikslinimai',
@@ -41,7 +41,10 @@ export const translations = {
       technicalSettings: 'Techniniai nustatymai',
       imageCount: 'Nuotraukų kiekis',
       format: 'Formatas',
-      quality: 'Kokybė'
+      quality: 'Kokybė',
+      clothingTypeLabel: 'Drabužio tipas',
+      customPromptLabel: 'Papildomi nurodymai',
+      customPromptPlaceholder: 'Pvz.: pakelta ranka, sėdi ant suoliuko, žiūri į šoną...'
     },
     actions: {
       generate: 'Generuoti',
@@ -51,12 +54,16 @@ export const translations = {
       newUpload: 'Nauja nuotrauka'
     },
     results: {
-      title: 'Sugeneruotos nuotraukos'
+      title: 'Sugeneruotos nuotraukos',
+      savedNotice: 'Nuotraukos automatiškai išsaugotos jūsų galerijoje.',
+      downloadHint: 'Spauskite atsisiuntimo mygtuką ant nuotraukos, kad parsisiųstumėte.',
+      selectToEdit: 'Pasirinkite nuotrauką, kurią norite redaguoti toliau.'
     },
     validation: {
       noImages: 'Įkelkite nuotrauką',
       noAvatar: 'Pasirinkite modelį',
-      noPrompt: 'Įrašykite instrukcijas (min. 3 simboliai)'
+      noPrompt: 'Įrašykite instrukcijas (min. 3 simboliai)',
+      noClothingType: 'Pasirinkite drabužio tipą'
     },
     loading: {
       sending: 'Siunčiama...',
@@ -65,12 +72,12 @@ export const translations = {
       complete: 'Baigta!'
     },
     tips: [
-      'Patarimas: Aiškios nuotraukos duoda geriausius rezultatus',
-      'Patarimas: Geras apšvietimas labai pagerina kokybę',
-      'Patarimas: Detalizuotos instrukcijos = geresni rezultatai',
-      'Patarimas: Naudokite aukštą raišką originalui',
-      'Patarimas: Išvenkite susiliečusių nuotraukų',
-      'Patarimas: Išbandykite skirtingas pozas įvairesniam rezultatui'
+      'Aiški, ryški nuotrauka — geresnis rezultatas',
+      'Kuo geresnis apšvietimas — tuo tikroviškesnė nuotrauka',
+      'Pasirinkite foną, atitinkantį drabužio stilių',
+      'Naudokite aukštos raiškos originalą',
+      'Išbandykite skirtingus modelius — rezultatai stebina',
+      'Pasirinkite nuotaiką, kad nuotrauka atrodytų gyvai'
     ],
     errors: {
       timeout: 'Užtruko per ilgai. Bandykite dar kartą.',
@@ -82,7 +89,7 @@ export const translations = {
     footer: 'Re Edit Me',
     privacyPolicy: 'Privatumo politika',
     footerSection: {
-      tagline: 'AI turinio kūrimo platforma',
+      tagline: 'Produktų nuotraukos ir turinys su AI',
       navigation: 'Navigacija'
     },
     // Custom avatars section
@@ -112,9 +119,8 @@ export const translations = {
       gender: 'Lytis',
       age: 'Amžius',
       ethnicity: 'Tautybė',
-      skinTone: 'Odos spalva',
-      hairColor: 'Plaukų spalva',
       hairLength: 'Plaukų ilgis',
+      hairColor: 'Plaukų spalva',
       specialFeatures: 'Papildomi požymiai',
       specialFeaturesPlaceholder: 'pvz. tatuiruotės, akiniai, barzda...',
       prompt: 'Prompt (redaguojamas)',
@@ -124,8 +130,32 @@ export const translations = {
       save: 'Išsaugoti',
       saving: 'Saugoma...',
       cancel: 'Atšaukti',
-      bodyType: 'Kūno tipas',
       framing: 'Kadravimas',
+    },
+    avatarModels: {
+      myModels: 'Mano modeliai',
+      createModel: 'Sukurti modelį',
+      modelName: 'Modelio pavadinimas',
+      addPhoto: 'Pridėti nuotrauką',
+      movePhoto: 'Perkelti į...',
+      setCover: 'Nustatyti kaip viršelį',
+      deleteModel: 'Ištrinti modelį',
+      renameModel: 'Pervadinti',
+      photosCount: 'nuotraukos',
+      modelsCount: 'modeliai',
+      modelLimit: 'Maksimalus modelių skaičius: 10',
+      photoLimit: 'Maksimalus nuotraukų skaičius: 5',
+      dragToMove: 'Vilkite nuotraukas tarp modelių',
+      generateAnother: 'Kita poza',
+      selectModel: 'Išsaugoti į modelį',
+      createNewModel: '+ Naujas modelis',
+      pose: 'Poza',
+      savedPhotos: 'Modelio nuotraukos',
+      editTraits: 'Keisti bruožus',
+      saveAndNext: 'Išsaugoti ir kita poza',
+      done: 'Baigti',
+      mood: 'Nuotaika',
+      addPose: 'Pridėti pozą',
     },
     // Options
     avatars: {
@@ -141,20 +171,33 @@ export const translations = {
       'stylish-man-half': { name: 'Stilingas vyras', description: 'Pusė kūno, madinga išvaizda' }
     },
     scenes: {
-      'minimal': { name: 'Minimalistinė', description: 'Švarus, paprastas fonas' },
-      'photo-studio': { name: 'Foto studija', description: 'Profesionali studijos aplinka' },
-      'urban': { name: 'Miesto aplinka', description: 'Gatvės, miesto fonas' },
-      'nature': { name: 'Gamta', description: 'Lauko, gamtos aplinka' }
+      'studio': { name: 'Studija', description: 'Profesionali foto studija' },
+      'street': { name: 'Gatvė', description: 'Miesto gatvė, šiuolaikinė architektūra' },
+      'nature': { name: 'Gamta', description: 'Gamtos aplinka, parkas ar sodas' },
+      'beach': { name: 'Paplūdimys', description: 'Tropinis paplūdimys, smėlis ir vandenynas' },
+      'cafe': { name: 'Kavinė', description: 'Jauki, stilinga kavinė' },
+      'office': { name: 'Biuras', description: 'Modernus biuro interjeras' },
+      'event': { name: 'Renginys', description: 'Elegantiškas renginio vieta' },
+      'autumn': { name: 'Ruduo', description: 'Rudeninis parkas, auksiniai lapai' }
+    },
+    clothingTypes: {
+      'dress': { name: 'Suknelė', description: 'Suknelės, sarafanai' },
+      'top': { name: 'Marškinėliai / Palaidinė', description: 'Marškinėliai, palaidinės, megztiniai' },
+      'jacket': { name: 'Striukė / Švarkas', description: 'Striukės, švarkai, paltai' },
+      'pants': { name: 'Kelnės / Sijonas', description: 'Kelnės, džinsai, sijonai' },
+      'suit': { name: 'Kostiumas', description: 'Dalykinis kostiumas, komplektas' },
+      'sportswear': { name: 'Sportinė apranga', description: 'Sportiniai drabužiai, athleisure' },
+      'accessory': { name: 'Aksesuaras', description: 'Kepurės, šalikai, akiniai, rankinės' }
     },
     moods: {
-      'serious': { name: 'Rimtas', description: 'Profesionalus, susikaupęs' },
-      'playful': { name: 'Žaismingas', description: 'Linksmas, energingas' },
-      'relaxed': { name: 'Atsipalaidavęs', description: 'Ramus, natūralus' },
-      'confident': { name: 'Pasitikintis', description: 'Stiprus, užtikrintas' },
-      'mysterious': { name: 'Paslaptingas', description: 'Intriguojantis, paslaptingas' },
-      'energetic': { name: 'Energingas', description: 'Dinamiškas, pilnas energijos' },
-      'dreamy': { name: 'Svajingas', description: 'Romantiškas, svajingas' },
-      'fierce': { name: 'Ryžtingas', description: 'Stiprus, ryžtingas' }
+      'natural': { name: 'Natūrali', description: 'Rami, natūrali išraiška' },
+      'confident': { name: 'Pasitikėjusi', description: 'Stipri, užtikrinta' },
+      'happy': { name: 'Laiminga', description: 'Linksma, šypsanti' },
+      'serious': { name: 'Rimta', description: 'Profesionali, susikaupusi' },
+      'mysterious': { name: 'Paslaptinga', description: 'Intriguojanti, paslaptinga' },
+      'playful': { name: 'Žaisminga', description: 'Linksma, energinga' },
+      'elegant': { name: 'Elegantiška', description: 'Subtili, rafinuota' },
+      'fierce': { name: 'Ryžtinga', description: 'Stipri, drąsi' }
     },
     poses: {
       'full-body': { name: 'Pilnas kūnas', description: 'Viso kūno kadras, stovint' },
@@ -170,7 +213,47 @@ export const translations = {
     imageCounts: {
       1: { name: '1 nuotrauka', description: 'Greičiau, pigiau' },
       2: { name: '2 nuotraukos', description: 'Daugiau pasirinkimų' },
-      3: { name: '3 nuotraukos', description: 'Maksimalus pasirinkimas' }
+      3: { name: '3 nuotraukos', description: 'Dar daugiau variantų' },
+      4: { name: '4 nuotraukos', description: 'Maksimalus pasirinkimas' }
+    },
+    garmentPhotoTypeLabel: 'Nuotraukos tipas',
+    garmentPhotoTypeHint: 'Kaip buvo nufotografuotas drabužis',
+    garmentPhotoTypes: {
+      auto: { name: 'Automatinis', description: 'AI atpažins automatiškai' },
+      'flat-lay': { name: 'Plokščia nuotrauka', description: 'Drabužis nufotografuotas plokščiai' },
+      model: { name: 'Ant modelio', description: 'Drabužis nufotografuotas ant žmogaus' }
+    },
+    qualityModeLabel: 'Kokybės režimas',
+    qualityModes: {
+      performance: { name: 'Greita', description: 'Greičiausias rezultatas' },
+      balanced: { name: 'Subalansuota', description: 'Optimalus greičio ir kokybės balansas' },
+      quality: { name: 'Aukšta kokybė', description: 'Geriausia kokybė, ilgiau trunka' }
+    },
+    postProcess: {
+      title: 'Redaguoti nuotrauką',
+      subtitle: 'Pasirinkite vieną iš sugeneruotų nuotraukų aukščiau ir pritaikykite papildomus pakeitimus.',
+      background: 'Pakeisti foną',
+      backgroundDesc: 'AI pakeis nuotraukos foną į pasirinktą sceną, išlaikant žmogų.',
+      pose: 'Pakeisti pozą',
+      poseDesc: 'AI pakeis modelio pozą nuotraukoje.',
+      additionalInstructions: 'Laisvas redagavimas',
+      additionalInstructionsDesc: 'Aprašykite ką norite pakeisti — AI redaguos nuotrauką pagal jūsų tekstą.',
+      editPlaceholder: 'Pvz.: rankos sukryžiuotos, sėdi ant kėdės, žiūri į šoną...',
+      apply: 'Taikyti',
+      processing: 'Apdorojama...',
+      result: 'Redaguota nuotrauka'
+    },
+    posePresets: {
+      arms_crossed: { name: 'Sukryžiuotos rankos' },
+      hands_in_pockets: { name: 'Rankos kišenėse' },
+      sitting: { name: 'Sėdi' },
+      leaning: { name: 'Atsiremiantis' },
+      walking: { name: 'Eina' },
+      looking_away: { name: 'Žiūri į šoną' },
+      hand_on_chin: { name: 'Ranka prie smakro' },
+      waving: { name: 'Mojuoja' },
+      thumbs_up: { name: 'Nykštys aukštyn' },
+      pointing: { name: 'Rodo pirštu' },
     },
     auth: {
       // Login/Signup modal
@@ -217,25 +300,29 @@ export const translations = {
       credits: 'Kreditai'
     },
     gallery: {
-      title: 'Mano Galerija',
+      title: 'Mano galerija',
       empty: {
-        title: 'Dar nera nuotrauku',
-        subtitle: 'Sugeneruokite pirma nuotrauka ir pradekite savo galerija',
-        cta: 'Generuoti nuotrauka'
+        title: 'Galerija tuščia',
+        subtitle: 'Sukurkite pirmą nuotrauką ir ji atsiras čia',
+        cta: 'Kurti nuotrauką'
       },
       guest: {
-        title: 'Prisijunkite, kad matytumete galerija',
-        subtitle: 'Sukurkite paskyra, kad galetumete issaugoti ir valdyti sugeneruotas nuotraukas',
+        title: 'Prisijunkite, kad matytumėte galeriją',
+        subtitle: 'Sukurkite paskyrą ir visos jūsų sugeneruotos nuotraukos bus išsaugotos čia',
         cta: 'Prisijungti'
       },
+      selectedPhoto: 'Pasirinkta nuotrauka',
+      selectAction: 'Ką norite daryti?',
+      viewFull: 'Peržiūrėti',
+      backToActions: 'Grįžti',
       actions: {
-        download: 'Atsisiusti',
-        delete: 'Istrinti',
+        download: 'Atsisiųsti',
+        delete: 'Ištrinti',
         confirm: 'Patvirtinti',
-        back: 'Grizti i generatoriu'
+        back: 'Grįžti į generatorių'
       },
       loading: 'Kraunama galerija...',
-      error: 'Nepavyko ikelti galerijos'
+      error: 'Nepavyko įkelti galerijos'
     },
     nav: {
       home: 'Pradinis',
@@ -245,8 +332,8 @@ export const translations = {
       dashboard: 'Tavo kūryba',
       pricing: 'Kainos',
       contact: 'Kontaktai',
-      imageGenerator: 'Nuotraukų generatorius',
-      imageGeneratorDesc: 'Text to image su AI',
+      imageGenerator: 'Paveikslėlių generatorius',
+      imageGeneratorDesc: 'Marketingo vizualai pagal aprašymą',
       modelPhotos: 'Nuotraukos su modeliais',
       modelPhotosDesc: 'Produkto nuotraukos ant modelių',
       postCreator: 'Įrašų kūrėjas',
@@ -281,11 +368,11 @@ export const translations = {
       selectForGenerator: 'Naudoti generatoriuje'
     },
     dashboard: {
-      title: 'Tavo kūryba',
+      title: 'Mano kūryba',
       backToHome: 'Grįžti į pradžią',
       welcome: 'Sveiki sugrįžę',
-      guestTitle: 'Prisijunkite, kad matytumėte savo skydelį',
-      guestDescription: 'Sekite savo generacijas, valdykite avatarus ir peržiūrėkite kreditus',
+      guestTitle: 'Prisijunkite, kad matytumėte savo kūrybą',
+      guestDescription: 'Visos jūsų nuotraukos, avatarai ir kreditai — vienoje vietoje',
       signIn: 'Prisijungti',
       stats: {
         generations: 'Sukurta nuotraukų',
@@ -329,59 +416,59 @@ export const translations = {
     },
     landing: {
       hero: {
-        title: 'Viskas, ko reikia jūsų turiniui',
-        subtitle: 'Trys galingi AI įrankiai vienoje vietoje — kurkite profesionalų turinį greičiau nei bet kada',
-        ctaSignup: 'Registruotis nemokamai',
-        ctaTry: 'Išbandyti be paskyros',
-        ctaCreate: 'Pradėti kurti',
-        ctaDashboard: 'Nustatymai',
+        title: 'Jūsų produktas — ant modelio per 60 sekundžių',
+        subtitle: 'Įkelkite drabužio nuotrauką, pasirinkite modelį ir gaukite paruoštą marketingo nuotrauką. Be fotografo, be studijos.',
+        ctaSignup: 'Pradėti nemokamai',
+        ctaTry: 'Pabandyti be registracijos',
+        ctaCreate: 'Kurti nuotrauką',
+        ctaDashboard: 'Mano kūryba',
         card1: {
           title: 'Nuotraukos su modeliais',
-          description: 'Įkelkite produkto nuotrauką — AI uždės ant pasirinkto modelio ir sukurs profesionalų rezultatą'
+          description: 'Užmaukite savo drabužį ant modelio — AI sukurs tikrovišką rezultatą per minutę'
         },
         card2: {
-          title: 'AI nuotraukų generatorius',
-          description: 'Sukurkite unikalias produktų nuotraukas nuo nulio — be fotografo ir be studijos'
+          title: 'Paveikslėlių generatorius',
+          description: 'Pasirinkite sritį, aprašykite norimą paveikslėlį — AI sukurs jį per kelias sekundes'
         },
         card3: {
           title: 'Įrašų kūrėjas',
-          description: 'Kurkite socialinių tinklų įrašus su AI — tekstas, nuotraukos arba abu kartu'
+          description: 'AI parašys tekstą ir sukurs paveikslėlį socialiniams tinklams. Jums tereikia paspausti „Generuoti"'
         }
       },
       pricing: {
-        title: 'Paprastos, skaidrios kainos',
-        subtitle: 'Pasirinkite planą, kuris tinka jūsų poreikiams',
+        title: 'Kainos be staigmenų',
+        subtitle: 'Vienas kreditas = viena nuotrauka. Mokėkite tik už tai, ką naudojate.',
         comingSoon: 'Netrukus',
         perMonth: '/mėn',
         getStarted: 'Pradėti',
-        getPlan: 'Pasirinkti',
+        getPlan: 'Pasirinkti planą',
         mostPopular: 'Populiariausias',
         plans: {
           starter: {
             badge: 'Pradinis',
             name: 'Pradinis',
-            subtitle: 'Puikus pradžiai',
+            subtitle: 'Norintiems išbandyti',
             price: '€9',
-            features: ['30 kreditų/mėn', 'Visi AI modeliai', 'Galerijos saugykla', 'El. pašto palaikymas']
+            features: ['30 kreditų per mėnesį', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Palaikymas el. paštu']
           },
           pro: {
             badge: 'Populiariausias',
             name: 'Pro',
-            subtitle: 'Kūrėjams ir influenceriams',
+            subtitle: 'Reguliariai kuriantiems turinį',
             price: '€19',
-            features: ['70 kreditų/mėn', 'Visi AI modeliai', 'Galerijos saugykla', 'El. pašto palaikymas']
+            features: ['70 kreditų per mėnesį', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Prioritetinis palaikymas']
           },
           unlimited: {
             badge: 'Neribota',
             name: 'Neribota',
-            subtitle: 'Aktyviems naudotojams',
+            subtitle: 'Kurkite be apribojimų',
             price: '€49',
-            features: ['Neriboti kreditai', 'Visi AI modeliai', 'Galerijos saugykla', 'El. pašto palaikymas']
+            features: ['Neriboti kreditai', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Prioritetinis palaikymas']
           }
         },
         credits: {
           title: 'Reikia daugiau kreditų?',
-          subtitle: 'Pirkite papildomų kreditų bet kada. Prenumerata nereikalinga.',
+          subtitle: 'Papildykite bet kada — prenumerata nereikalinga.',
           buyNow: 'Pirkti',
           save: 'Sutaupyk',
           packs: [
@@ -392,79 +479,79 @@ export const translations = {
         }
       },
       faq: {
-        title: 'Dažniausiai užduodami klausimai',
-        subtitle: 'Turite klausimų? Mes turime atsakymus',
+        title: 'Klausimai ir atsakymai',
+        subtitle: 'Dažniausiai klausiama prieš pradedant',
         items: {
           whatIsTool: {
             question: 'Kas yra Re Edit Me?',
-            answer: 'Re Edit Me yra AI įrankis, kuris paverčia jūsų nuotraukas profesionaliais UGC (vartotojų sukurto turinio) marketingo paveikslėliais. Tiesiog įkelkite nuotrauką ir mūsų AI sugeneruos nuostabias variacijas pagal jūsų pasirinktą stilių, sceną ir nuotaiką.'
+            answer: 'Re Edit Me — tai AI platforma, kuri padeda kurti profesionalias produktų nuotraukas ir socialinių tinklų turinį. Įkeliate drabužio ar produkto nuotrauką, pasirenkate modelį, foną ir nuotaiką — AI sugeneruoja paruoštą marketingo paveikslėlį per 30–60 sekundžių.'
           },
           howGeneration: {
             question: 'Kaip veikia nuotraukų generavimas?',
-            answer: 'Mūsų AI analizuoja jūsų įkeltą nuotrauką ir sujungia ją su jūsų pasirinktais avataro, scenos ir stiliaus nustatymais. Generavimo procesas trunka apie 30-60 sekundžių ir sukuria aukštos kokybės paveikslėlius, tinkamus marketingui ir socialiniams tinklams.'
+            answer: 'Procesas paprastas: 1) įkeliate drabužio nuotrauką, 2) pasirenkate modelį ir nustatymus, 3) AI sugeneruoja rezultatą per 30–60 sekundžių. Gautas paveikslėlis atrodo kaip tikra fotosesijos nuotrauka — tinkama e-parduotuvei ir socialiniams tinklams.'
           },
           whatAreCredits: {
-            question: 'Kas yra kreditai ir kaip jie veikia?',
-            answer: 'Kreditai naudojami nuotraukoms generuoti. Kiekvienas generavimas naudoja tam tikrą kreditų skaičių, priklausomai nuo pasirinktos kokybės ir raiškos. Kreditus galite įsigyti arba užsidirbti per mūsų prenumeratos planus.'
+            question: 'Kas yra kreditai?',
+            answer: 'Vienas kreditas = vienas generavimas. Pasirinkite mėnesinį planą arba nusipirkite kreditų paketus be prenumeratos. Nepanaudoti kreditai perkeliami į kitą mėnesį.'
           },
           howUploadAvatars: {
-            question: 'Kaip įkelti savus avatarus?',
-            answer: 'Eikite į Avatarų skiltį iš pagrindinio meniu. Galite įkelti savo nuotraukas ar meno kūrinius, kuriuos naudosite kaip referencinius paveikslėlius generavimui. Savi avatarai leidžia išlaikyti nuoseklų prekės ženklo įvaizdį visuose jūsų turiniuose.'
+            question: 'Ar galiu naudoti savo modelio nuotrauką?',
+            answer: 'Taip. Atidarykite Avatarų skiltį ir įkelkite savo nuotrauką. AI naudos ją kaip modelį visiems tolimesniems generavimams — taip galite išlaikyti nuoseklų prekės ženklo veidą visose nuotraukose.'
           },
           isDataSafe: {
-            question: 'Ar mano duomenys saugūs?',
-            answer: 'Absoliučiai. Mes naudojame pramonės standarto šifravimą ir saugumo praktikas. Jūsų įkelti paveikslėliai saugomi saugiai ir prieinami tik jums. Mes niekada nedalinamės jūsų duomenimis su trečiosiomis šalimis. Skaitykite mūsų Privatumo politiką daugiau informacijos.'
+            question: 'Ar mano nuotraukos saugios?',
+            answer: 'Taip. Visos nuotraukos saugomos šifruotai ir prieinamos tik jums. Mes niekada nedalinamės jūsų duomenimis su trečiosiomis šalimis. Daugiau informacijos rasite mūsų Privatumo politikoje.'
           },
           howContact: {
             question: 'Kaip susisiekti su palaikymu?',
-            answer: 'Galite susisiekti su mūsų palaikymo komanda el. paštu support@reeditme.com. Paprastai atsakome per 24 valandas darbo dienomis.'
+            answer: 'Rašykite mums support@reeditme.com — atsakome per 24 valandas darbo dienomis.'
           }
         }
       },
       features: {
         imageToImage: {
           badge: 'Populiariausia',
-          title: 'Produkto nuotraukos ant tikrų modelių',
-          subtitle: 'Įkelkite drabužio ar produkto nuotrauką — dirbtinis intelektas uždės ją ant pasirinkto modelio ir sukurs profesionalią marketingo nuotrauką vos per kelias minutes.',
-          feature1: 'Pasirinkite iš 10+ profesionalių modelių arba įkelkite savo avatarą',
-          feature2: 'Keiskite aplinkas, pozas, stilius ir nuotaikas vienu paspaudimu',
-          feature3: 'Gaukite studijinės kokybės nuotraukas, paruoštas socialiniams tinklams ir e-parduotuvei',
+          title: 'Jūsų drabužis — ant modelio per minutę',
+          subtitle: 'Įkelkite drabužio nuotrauką, pasirinkite modelį — AI sukurs realistišką rezultatą, kurį galite iškart naudoti e-parduotuvėje ar socialiniuose tinkluose.',
+          feature1: '10+ modelių šablonų arba įkelkite savo nuotrauką',
+          feature2: 'Keiskite foną, nuotaiką ir aplinką vienu paspaudimu',
+          feature3: 'Rezultatas paruoštas socialiniams tinklams ir e-parduotuvei',
           cta: 'Išbandyti dabar',
-          creditInfo: 'Nuo 1 kredito už nuotrauką'
+          creditInfo: '1 kreditas = 1 nuotrauka'
         },
         imageGenerator: {
           badge: 'Naujiena',
-          title: 'AI nuotraukų generatorius',
-          subtitle: 'Sukurkite visiškai naujas, unikalias produktų nuotraukas nuo nulio su dirbtinio intelekto pagalba — be fotografo, be studijos, be modelio.',
-          feature1: 'Aprašykite norimą nuotrauką ir AI ją sukurs per sekundes',
-          feature2: 'Pasirinkite stilių, kompoziciją ir nuotaiką pagal jūsų prekės ženklą',
-          feature3: 'Eksportuokite aukštos raiškos formatu, paruoštu spaudai ir internetui',
-          cta: 'Pradėti kurti',
-          creditInfo: 'Nuo 2 kreditų už nuotrauką'
+          title: 'Paveikslėlis jūsų verslui — per kelias sekundes',
+          subtitle: 'Pasirinkite savo veiklos sritį, aprašykite norimą paveikslėlį — AI sugeneruos profesionalų marketingo vizualą, pritaikytą socialiniams tinklams ir reklamai.',
+          feature1: '20+ verslo sričių: grožis, medicina, nekilnojamasis turtas, HoReCa ir kt.',
+          feature2: 'Aprašykite savo žodžiais — AI sugeneruos pagal jūsų sritį ir temą',
+          feature3: 'Atsisiųskite aukštos kokybės paveikslėlį, paruoštą socialiniams tinklams',
+          cta: 'Sukurti paveikslėlį',
+          creditInfo: '2 kreditai = 1 paveikslėlis'
         },
         postCreator: {
           badge: 'Viskas viename',
-          title: 'Socialinių tinklų įrašų kūrėjas',
-          subtitle: 'Kurkite profesionalius marketingo įrašus vos keliais paspaudimais — AI sugeneruos patrauklų tekstą, pritaikytą jūsų auditorijai ir platformai.',
-          feature1: 'AI rašo tekstą, pritaikytą jūsų prekės ženklo tonui ir auditorijai',
-          feature2: 'Kurkite įrašus su nuotraukomis arba tik tekstinius — jūsų pasirinkimas',
-          feature3: 'Optimizuota Instagram, Facebook, TikTok ir kitoms platformoms',
+          title: 'Įrašas socialiniams tinklams — per 30 sekundžių',
+          subtitle: 'Pasirinkite temą — AI parašys tekstą ir sukurs paveikslėlį. Jums tereikia nukopijuoti ir paskelbti.',
+          feature1: 'AI rašo tekstą jūsų prekės ženklo tonu',
+          feature2: 'Tekstas su paveikslėliu arba tik tekstas — kaip norite',
+          feature3: 'Pritaikyta Instagram, Facebook ir TikTok formatams',
           cta: 'Kurti įrašą',
-          creditInfo: 'Nuo 1 kredito už įrašą'
+          creditInfo: '1 kreditas = 1 įrašas'
         }
       },
       footer: {
         contact: 'Kontaktai'
       },
       platformStats: {
-        imagesCreated: 'Sukurta paveikslėlių',
-        imagesEdited: 'Redaguota paveikslėlių',
+        imagesCreated: 'Sugeneruota nuotraukų',
+        imagesEdited: 'Redaguota nuotraukų',
         postsCreated: 'Sukurta įrašų',
       }
     },
     postCreatorPage: {
       title: 'Įrašų kūrėjas',
-      subtitle: 'Sukurkite profesionalius socialinių tinklų įrašus su AI',
+      subtitle: 'Pasirinkite temą — AI sukurs tekstą ir paveikslėlį',
       industryLabel: 'Sritis',
       industryPlaceholder: 'Pasirinkite sritį...',
       topicLabel: 'Tema',
@@ -508,12 +595,12 @@ export const translations = {
       errorTimeout: 'Užtruko per ilgai. Bandykite dar kartą.'
     },
     imageGeneratorPage: {
-      title: 'Nuotraukų generatorius',
-      subtitle: 'Sukurkite nuotraukas su AI pagal jūsų aprašymą',
-      industryLabel: 'Sritis',
+      title: 'Paveikslėlių generatorius',
+      subtitle: 'Pasirinkite sritį, aprašykite norimą paveikslėlį — AI sugeneruos per kelias sekundes',
+      industryLabel: 'Veiklos sritis',
       industryPlaceholder: 'Pasirinkite sritį...',
-      promptLabel: 'Aprašymas',
-      promptHint: 'Aprašykite norimą nuotrauką kuo detaliau',
+      promptLabel: 'Paveikslėlio aprašymas',
+      promptHint: 'Aprašykite, ką norite matyti paveikslėlyje',
       generate: 'Generuoti nuotrauką',
       generating: 'Generuojama...',
       resultLabel: 'Sugeneruota nuotrauka',
@@ -526,7 +613,7 @@ export const translations = {
   lv: {
     header: {
       title: 'Re Edit Me',
-      subtitle: 'Augšupielādējiet attēlu un izveidojiet profesionālus attēlus ar AI'
+      subtitle: 'Produktu fotogrāfijas un saturs ar AI — bez fotogrāfa, bez studijas'
     },
     upload: {
       title: 'Augšupielādēt attēlu',
@@ -538,9 +625,9 @@ export const translations = {
     config: {
       title: 'Ģenerēšanas iestatījumi',
       modelLabel: 'Modelis',
-      sceneLabel: 'Vide',
+      sceneLabel: 'Aina / Fons',
       styleLabel: 'Stils',
-      moodLabel: 'Noskaņojums',
+      moodLabel: 'Noskaņojums / Izteiksme',
       poseLabel: 'Poza',
       placeholder: 'Izvēlieties...',
       promptLabel: 'Papildu norādes',
@@ -550,7 +637,10 @@ export const translations = {
       technicalSettings: 'Tehniskie iestatījumi',
       imageCount: 'Attēlu skaits',
       format: 'Formāts',
-      quality: 'Kvalitāte'
+      quality: 'Kvalitāte',
+      clothingTypeLabel: 'Apģērba veids',
+      customPromptLabel: 'Papildu norādes',
+      customPromptPlaceholder: 'Piem.: pacelta roka, sēž uz soliņa, skatās uz sāniem...'
     },
     actions: {
       generate: 'Ģenerēt',
@@ -560,12 +650,16 @@ export const translations = {
       newUpload: 'Jauns attēls'
     },
     results: {
-      title: 'Ģenerētie attēli'
+      title: 'Ģenerētie attēli',
+      savedNotice: 'Fotogrāfijas automātiski saglabātas jūsu galerijā.',
+      downloadHint: 'Nospiediet lejupielādes pogu uz fotogrāfijas, lai to saglabātu.',
+      selectToEdit: 'Izvēlieties fotogrāfiju, kuru vēlaties rediģēt tālāk.'
     },
     validation: {
       noImages: 'Augšupielādējiet attēlu',
       noAvatar: 'Izvēlieties modeli',
-      noPrompt: 'Ievadiet instrukcijas (min. 3 simboli)'
+      noPrompt: 'Ievadiet instrukcijas (min. 3 simboli)',
+      noClothingType: 'Izvēlieties apģērba veidu'
     },
     loading: {
       sending: 'Sūta...',
@@ -574,12 +668,12 @@ export const translations = {
       complete: 'Pabeigts!'
     },
     tips: [
-      'Padoms: Skaidri attēli dod labākos rezultātus',
-      'Padoms: Labs apgaismojums ļoti uzlabo kvalitāti',
-      'Padoms: Detalizētas instrukcijas = labāki rezultāti',
-      'Padoms: Izmantojiet augstu izšķirtspēju oriģinālam',
-      'Padoms: Izvairieties no izplūdušiem attēliem',
-      'Padoms: Izmēģiniet dažādas pozas daudzveidīgākiem rezultātiem'
+      'Skaidrs, spilgts attēls — labāks rezultāts',
+      'Jo labāks apgaismojums — jo reālistiskāka fotogrāfija',
+      'Izvēlieties fonu, kas atbilst apģērba stilam',
+      'Izmantojiet augstas izšķirtspējas oriģinālu',
+      'Izmēģiniet dažādus modeļus — rezultāti pārsteidz',
+      'Izvēlieties noskaņojumu, lai fotogrāfija izskatītos dzīva'
     ],
     errors: {
       timeout: 'Pārāk ilgi. Mēģiniet vēlreiz.',
@@ -591,7 +685,7 @@ export const translations = {
     footer: 'Re Edit Me',
     privacyPolicy: 'Privātuma politika',
     footerSection: {
-      tagline: 'AI satura veidošanas platforma',
+      tagline: 'Produktu fotogrāfijas un saturs ar AI',
       navigation: 'Navigācija'
     },
     customAvatars: {
@@ -620,9 +714,8 @@ export const translations = {
       gender: 'Dzimums',
       age: 'Vecums',
       ethnicity: 'Tautība',
-      skinTone: 'Ādas tonis',
-      hairColor: 'Matu krāsa',
       hairLength: 'Matu garums',
+      hairColor: 'Matu krāsa',
       specialFeatures: 'Papildu iezīmes',
       specialFeaturesPlaceholder: 'piem. tetovējumi, brilles, bārda...',
       prompt: 'Prompt (rediģējams)',
@@ -632,8 +725,32 @@ export const translations = {
       save: 'Saglabāt',
       saving: 'Saglabā...',
       cancel: 'Atcelt',
-      bodyType: 'Ķermeņa tips',
       framing: 'Kadrējums',
+    },
+    avatarModels: {
+      myModels: 'Mani modeļi',
+      createModel: 'Izveidot modeli',
+      modelName: 'Modeļa nosaukums',
+      addPhoto: 'Pievienot foto',
+      movePhoto: 'Pārvietot uz...',
+      setCover: 'Iestatīt kā vāku',
+      deleteModel: 'Dzēst modeli',
+      renameModel: 'Pārdēvēt',
+      photosCount: 'fotogrāfijas',
+      modelsCount: 'modeļi',
+      modelLimit: 'Maksimālais modeļu skaits: 10',
+      photoLimit: 'Maksimālais foto skaits: 5',
+      dragToMove: 'Velciet fotogrāfijas starp modeļiem',
+      generateAnother: 'Cita poza',
+      selectModel: 'Saglabāt modelī',
+      createNewModel: '+ Jauns modelis',
+      pose: 'Poza',
+      savedPhotos: 'Modeļa fotogrāfijas',
+      editTraits: 'Mainīt iezīmes',
+      saveAndNext: 'Saglabāt un nākamā poza',
+      done: 'Gatavs',
+      mood: 'Noskaņojums',
+      addPose: 'Pievienot pozu',
     },
     avatars: {
       'fashion-woman-full': { name: 'Modes modelis', description: 'Pilna auguma, stilīga poza' },
@@ -648,20 +765,33 @@ export const translations = {
       'stylish-man-half': { name: 'Stilīgs vīrietis', description: 'Puse ķermeņa, moderns izskats' }
     },
     scenes: {
-      'minimal': { name: 'Minimālistisks', description: 'Tīrs, vienkāršs fons' },
-      'photo-studio': { name: 'Foto studija', description: 'Profesionāla studijas vide' },
-      'urban': { name: 'Pilsētas vide', description: 'Ielas, pilsētas fons' },
-      'nature': { name: 'Daba', description: 'Āra, dabas vide' }
+      'studio': { name: 'Studija', description: 'Profesionāla foto studija' },
+      'street': { name: 'Iela', description: 'Pilsētas iela, moderna arhitektūra' },
+      'nature': { name: 'Daba', description: 'Dabas vide, parks vai dārzs' },
+      'beach': { name: 'Pludmale', description: 'Tropiskā pludmale, smiltis un okeāns' },
+      'cafe': { name: 'Kafejnīca', description: 'Mājīga, stilīga kafejnīca' },
+      'office': { name: 'Birojs', description: 'Moderns biroja interjers' },
+      'event': { name: 'Pasākums', description: 'Elegants pasākuma vieta' },
+      'autumn': { name: 'Rudens', description: 'Rudens parks, zelta lapas' }
+    },
+    clothingTypes: {
+      'dress': { name: 'Kleita', description: 'Kleitas, sarafāni' },
+      'top': { name: 'Tops / Blūze', description: 'T-krekli, blūzes, džemperi' },
+      'jacket': { name: 'Jaka / Žakete', description: 'Jakas, žaketes, mēteļi' },
+      'pants': { name: 'Bikses / Svārki', description: 'Bikses, džinsi, svārki' },
+      'suit': { name: 'Uzvalks', description: 'Lietišķs uzvalks, komplekts' },
+      'sportswear': { name: 'Sporta apģērbs', description: 'Sporta apģērbs, athleisure' },
+      'accessory': { name: 'Aksesuārs', description: 'Cepures, šalles, saulesbrilles, somas' }
     },
     moods: {
-      'serious': { name: 'Nopietns', description: 'Profesionāls, koncentrēts' },
-      'playful': { name: 'Rotaļīgs', description: 'Jautrs, enerģisks' },
-      'relaxed': { name: 'Atslābināts', description: 'Mierīgs, dabisks' },
-      'confident': { name: 'Pārliecināts', description: 'Spēcīgs, drošs' },
-      'mysterious': { name: 'Noslēpumains', description: 'Intriģējošs, noslēpumains' },
-      'energetic': { name: 'Enerģisks', description: 'Dinamisks, pilns enerģijas' },
-      'dreamy': { name: 'Sapņains', description: 'Romantisks, sapņains' },
-      'fierce': { name: 'Apņēmīgs', description: 'Spēcīgs, apņēmīgs' }
+      'natural': { name: 'Dabiska', description: 'Mierīga, dabiska izteiksme' },
+      'confident': { name: 'Pārliecināta', description: 'Spēcīga, droša' },
+      'happy': { name: 'Laimīga', description: 'Priecīga, smaidoša' },
+      'serious': { name: 'Nopietna', description: 'Profesionāla, koncentrēta' },
+      'mysterious': { name: 'Noslēpumaina', description: 'Intriģējoša, noslēpumaina' },
+      'playful': { name: 'Rotaļīga', description: 'Jautra, enerģiska' },
+      'elegant': { name: 'Eleganta', description: 'Smalka, izsmalcināta' },
+      'fierce': { name: 'Apņēmīga', description: 'Spēcīga, drosmīga' }
     },
     poses: {
       'full-body': { name: 'Pilna auguma', description: 'Visa ķermeņa kadrs, stāvot' },
@@ -677,7 +807,47 @@ export const translations = {
     imageCounts: {
       1: { name: '1 attēls', description: 'Ātrāk, lētāk' },
       2: { name: '2 attēli', description: 'Vairāk izvēļu' },
-      3: { name: '3 attēli', description: 'Maksimāla izvēle' }
+      3: { name: '3 attēli', description: 'Vēl vairāk variantu' },
+      4: { name: '4 attēli', description: 'Maksimāla izvēle' }
+    },
+    garmentPhotoTypeLabel: 'Fotoattēla tips',
+    garmentPhotoTypeHint: 'Kā apģērbs tika fotografēts',
+    garmentPhotoTypes: {
+      auto: { name: 'Automātisks', description: 'AI noteiks automātiski' },
+      'flat-lay': { name: 'Plakans foto', description: 'Apģērbs fotografēts plakaniski' },
+      model: { name: 'Uz modeļa', description: 'Apģērbs fotografēts uz cilvēka' }
+    },
+    qualityModeLabel: 'Kvalitātes režīms',
+    qualityModes: {
+      performance: { name: 'Ātra', description: 'Ātrākais rezultāts' },
+      balanced: { name: 'Līdzsvarota', description: 'Optimāls ātruma un kvalitātes līdzsvars' },
+      quality: { name: 'Augsta kvalitāte', description: 'Labākā kvalitāte, ilgāk' }
+    },
+    postProcess: {
+      title: 'Rediģēt fotogrāfiju',
+      subtitle: 'Izvēlieties vienu no augstāk ģenerētajām fotogrāfijām un piemērojiet papildu izmaiņas.',
+      background: 'Mainīt fonu',
+      backgroundDesc: 'AI nomainīs fotogrāfijas fonu uz izvēlēto ainu, saglabājot cilvēku.',
+      pose: 'Mainīt pozu',
+      poseDesc: 'AI mainīs modeļa pozu fotogrāfijā.',
+      additionalInstructions: 'Brīva rediģēšana',
+      additionalInstructionsDesc: 'Aprakstiet, ko vēlaties mainīt — AI rediģēs fotogrāfiju pēc jūsu teksta.',
+      editPlaceholder: 'Piem.: rokas sakrustotas, sēž uz krēsla, skatās uz sāniem...',
+      apply: 'Piemērot',
+      processing: 'Apstrādā...',
+      result: 'Rediģēta fotogrāfija'
+    },
+    posePresets: {
+      arms_crossed: { name: 'Sakrustotas rokas' },
+      hands_in_pockets: { name: 'Rokas kabatās' },
+      sitting: { name: 'Sēž' },
+      leaning: { name: 'Atspiedies' },
+      walking: { name: 'Iet' },
+      looking_away: { name: 'Skatās uz sāniem' },
+      hand_on_chin: { name: 'Roka pie zoda' },
+      waving: { name: 'Māj ar roku' },
+      thumbs_up: { name: 'Īkšķis uz augšu' },
+      pointing: { name: 'Rāda ar pirkstu' },
     },
     auth: {
       // Login/Signup modal
@@ -724,17 +894,21 @@ export const translations = {
       credits: 'Kredīti'
     },
     gallery: {
-      title: 'Mana Galerija',
+      title: 'Mana galerija',
       empty: {
-        title: 'Vel nav attelu',
-        subtitle: 'Generejiet pirmo attelu, lai sāktu savu galeriju',
-        cta: 'Generēt attēlu'
+        title: 'Galerija ir tukša',
+        subtitle: 'Izveidojiet pirmo fotogrāfiju un tā parādīsies šeit',
+        cta: 'Izveidot fotogrāfiju'
       },
       guest: {
         title: 'Pieslēdzieties, lai redzētu galeriju',
-        subtitle: 'Izveidojiet kontu, lai saglabātu un pārvaldītu ģenerētos attēlus',
+        subtitle: 'Izveidojiet kontu un visi jūsu ģenerētie attēli tiks saglabāti šeit',
         cta: 'Pieslēgties'
       },
+      selectedPhoto: 'Izvēlēta fotogrāfija',
+      selectAction: 'Ko vēlaties darīt?',
+      viewFull: 'Apskatīt',
+      backToActions: 'Atpakaļ',
       actions: {
         download: 'Lejupielādēt',
         delete: 'Dzēst',
@@ -753,7 +927,7 @@ export const translations = {
       pricing: 'Cenas',
       contact: 'Kontakti',
       imageGenerator: 'Attēlu ģenerators',
-      imageGeneratorDesc: 'Text to image ar AI',
+      imageGeneratorDesc: 'Mārketinga vizuāli pēc apraksta',
       modelPhotos: 'Foto ar modeļiem',
       modelPhotosDesc: 'Produktu foto uz modeļiem',
       postCreator: 'Ierakstu veidotājs',
@@ -788,11 +962,11 @@ export const translations = {
       selectForGenerator: 'Izmantot ģeneratorā'
     },
     dashboard: {
-      title: 'Tava jaunrade',
+      title: 'Mana jaunrade',
       backToHome: 'Atpakaļ uz sākumu',
       welcome: 'Laipni lūgti atpakaļ',
-      guestTitle: 'Pieslēdzieties, lai redzētu savu paneli',
-      guestDescription: 'Sekojiet savām ģenerācijām, pārvaldiet avatārus un skatiet kredītus',
+      guestTitle: 'Pieslēdzieties, lai redzētu savu jaunradi',
+      guestDescription: 'Visas jūsu fotogrāfijas, avatāri un kredīti — vienuviet',
       signIn: 'Pieslēgties',
       stats: {
         generations: 'Izveidoti attēli',
@@ -836,59 +1010,59 @@ export const translations = {
     },
     landing: {
       hero: {
-        title: 'Viss, kas nepieciešams jūsu saturam',
-        subtitle: 'Trīs jaudīgi AI rīki vienuviet — veidojiet profesionālu saturu ātrāk nekā jebkad',
-        ctaSignup: 'Reģistrēties bez maksas',
-        ctaTry: 'Izmēģināt bez konta',
-        ctaCreate: 'Sākt veidot',
-        ctaDashboard: 'Iestatījumi',
+        title: 'Jūsu produkts — uz modeļa 60 sekundēs',
+        subtitle: 'Augšupielādējiet apģērba fotogrāfiju, izvēlieties modeli un saņemiet gatavu mārketinga attēlu. Bez fotogrāfa, bez studijas.',
+        ctaSignup: 'Sākt bez maksas',
+        ctaTry: 'Izmēģināt bez reģistrācijas',
+        ctaCreate: 'Izveidot fotogrāfiju',
+        ctaDashboard: 'Mana jaunrade',
         card1: {
           title: 'Fotogrāfijas ar modeļiem',
-          description: 'Augšupielādējiet produkta foto — AI uzliks uz izvēlētā modeļa un izveidos profesionālu rezultātu'
+          description: 'Uzvelciet savu apģērbu modelim — AI izveidos reālistisku rezultātu minūtes laikā'
         },
         card2: {
-          title: 'AI attēlu ģenerators',
-          description: 'Izveidojiet unikālus produktu attēlus no nulles — bez fotogrāfa un bez studijas'
+          title: 'Attēlu ģenerators',
+          description: 'Izvēlieties nozari, aprakstiet vēlamo attēlu — AI to izveidos dažu sekunžu laikā'
         },
         card3: {
           title: 'Ierakstu veidotājs',
-          description: 'Veidojiet sociālo tīklu ierakstus ar AI — teksts, attēli vai abi kopā'
+          description: 'AI uzrakstīs tekstu un izveidos attēlu sociālajiem tīkliem. Jums tikai jānospiež „Ģenerēt"'
         }
       },
       pricing: {
-        title: 'Vienkāršas, caurspīdīgas cenas',
-        subtitle: 'Izvēlieties plānu, kas atbilst jūsu vajadzībām',
+        title: 'Cenas bez pārsteigumiem',
+        subtitle: 'Viens kredīts = viena fotogrāfija. Maksājiet tikai par to, ko izmantojat.',
         comingSoon: 'Drīzumā',
         perMonth: '/mēn',
         getStarted: 'Sākt',
-        getPlan: 'Izvēlēties',
+        getPlan: 'Izvēlēties plānu',
         mostPopular: 'Populārākais',
         plans: {
           starter: {
             badge: 'Sākuma',
             name: 'Sākuma',
-            subtitle: 'Lieliski sākumam',
+            subtitle: 'Tiem, kas vēlas izmēģināt',
             price: '€9',
-            features: ['30 kredīti/mēn', 'Visi AI modeļi', 'Galerijas krātuve', 'E-pasta atbalsts']
+            features: ['30 kredīti mēnesī', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Atbalsts pa e-pastu']
           },
           pro: {
             badge: 'Populārākais',
             name: 'Pro',
-            subtitle: 'Satura veidotājiem',
+            subtitle: 'Regulāri satura veidotāji',
             price: '€19',
-            features: ['70 kredīti/mēn', 'Visi AI modeļi', 'Galerijas krātuve', 'E-pasta atbalsts']
+            features: ['70 kredīti mēnesī', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Prioritārs atbalsts']
           },
           unlimited: {
             badge: 'Neierobežots',
             name: 'Neierobežots',
-            subtitle: 'Aktīviem lietotājiem',
+            subtitle: 'Veidojiet bez ierobežojumiem',
             price: '€49',
-            features: ['Neierobežoti kredīti', 'Visi AI modeļi', 'Galerijas krātuve', 'E-pasta atbalsts']
+            features: ['Neierobežoti kredīti', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Prioritārs atbalsts']
           }
         },
         credits: {
           title: 'Nepieciešami vairāk kredītu?',
-          subtitle: 'Iegādājieties papildu kredītus jebkurā laikā. Abonements nav nepieciešams.',
+          subtitle: 'Papildiniet jebkurā laikā — abonements nav nepieciešams.',
           buyNow: 'Pirkt',
           save: 'Ietaupiet',
           packs: [
@@ -899,79 +1073,79 @@ export const translations = {
         }
       },
       faq: {
-        title: 'Biežāk uzdotie jautājumi',
-        subtitle: 'Ir jautājumi? Mums ir atbildes',
+        title: 'Jautājumi un atbildes',
+        subtitle: 'Biežāk uzdotie jautājumi pirms sākšanas',
         items: {
           whatIsTool: {
             question: 'Kas ir Re Edit Me?',
-            answer: 'Re Edit Me ir AI rīks, kas pārveido jūsu fotogrāfijas profesionālos UGC (lietotāju veidota satura) mārketinga attēlos. Vienkārši augšupielādējiet fotogrāfiju un mūsu AI ģenerēs pārsteidzošas variācijas, pamatojoties uz jūsu izvēlēto stilu, ainu un noskaņojumu.'
+            answer: 'Re Edit Me — AI platforma, kas palīdz veidot profesionālas produktu fotogrāfijas un sociālo tīklu saturu. Augšupielādējiet apģērba fotogrāfiju, izvēlieties modeli, fonu un noskaņojumu — AI izveidos gatavu mārketinga attēlu 30–60 sekundēs.'
           },
           howGeneration: {
             question: 'Kā darbojas attēlu ģenerēšana?',
-            answer: 'Mūsu AI analizē jūsu augšupielādēto fotogrāfiju un apvieno to ar jūsu izvēlētajiem avatāra, ainas un stila iestatījumiem. Ģenerēšanas process ilgst aptuveni 30-60 sekundes un rada augstas kvalitātes attēlus, kas piemēroti mārketingam un sociālajiem tīkliem.'
+            answer: 'Process ir vienkāršs: 1) augšupielādējiet apģērba fotogrāfiju, 2) izvēlieties modeli un iestatījumus, 3) AI izveidos rezultātu 30–60 sekundēs. Rezultāts izskatās kā īsta fotosesijas fotogrāfija — piemērota e-veikalam un sociālajiem tīkliem.'
           },
           whatAreCredits: {
-            question: 'Kas ir kredīti un kā tie darbojas?',
-            answer: 'Kredīti tiek izmantoti attēlu ģenerēšanai. Katra ģenerēšana izmanto noteiktu kredītu skaitu atkarībā no izvēlētās kvalitātes un izšķirtspējas. Kredītus var iegādāties vai nopelnīt ar mūsu abonēšanas plāniem.'
+            question: 'Kas ir kredīti?',
+            answer: 'Viens kredīts = viena ģenerēšana. Izvēlieties mēneša plānu vai iegādājieties kredītu paketes bez abonementa. Neizmantotie kredīti tiek pārcelti uz nākamo mēnesi.'
           },
           howUploadAvatars: {
-            question: 'Kā augšupielādēt pielāgotus avatārus?',
-            answer: 'Dodieties uz Avatāru sadaļu no galvenās izvēlnes. Jūs varat augšupielādēt savas fotogrāfijas vai mākslas darbus, ko izmantot kā atsauces attēlus ģenerēšanai. Pielāgoti avatāri ļauj saglabāt konsekventu zīmola tēlu visos jūsu saturos.'
+            question: 'Vai varu izmantot savu modeļa fotogrāfiju?',
+            answer: 'Jā. Atveriet Avatāru sadaļu un augšupielādējiet savu fotogrāfiju. AI to izmantos kā modeli visām turpmākajām ģenerēšanām — tā varat saglabāt konsekventu zīmola seju visās fotogrāfijās.'
           },
           isDataSafe: {
-            question: 'Vai mani dati ir droši?',
-            answer: 'Absolūti. Mēs izmantojam nozares standarta šifrēšanu un drošības praksi. Jūsu augšupielādētie attēli tiek droši glabāti un ir pieejami tikai jums. Mēs nekad nedalāmies ar jūsu datiem ar trešajām pusēm. Lasiet mūsu Privātuma politiku, lai uzzinātu vairāk.'
+            question: 'Vai manas fotogrāfijas ir drošībā?',
+            answer: 'Jā. Visas fotogrāfijas tiek glabātas šifrēti un ir pieejamas tikai jums. Mēs nekad nedalāmies ar jūsu datiem ar trešajām pusēm. Vairāk informācijas mūsu Privātuma politikā.'
           },
           howContact: {
             question: 'Kā sazināties ar atbalstu?',
-            answer: 'Jūs varat sazināties ar mūsu atbalsta komandu pa e-pastu support@reeditme.com. Mēs parasti atbildam 24 stundu laikā darba dienās.'
+            answer: 'Rakstiet mums support@reeditme.com — atbildam 24 stundu laikā darba dienās.'
           }
         }
       },
       features: {
         imageToImage: {
           badge: 'Populārākais',
-          title: 'Produktu fotogrāfijas uz īstiem modeļiem',
-          subtitle: 'Augšupielādējiet apģērba vai produkta fotogrāfiju — AI to uzliks uz izvēlētā modeļa un izveidos profesionālu mārketinga attēlu dažu minūšu laikā.',
-          feature1: 'Izvēlieties no 10+ profesionāliem modeļiem vai augšupielādējiet savu avatāru',
-          feature2: 'Mainiet vidi, pozas, stilus un noskaņojumus ar vienu klikšķi',
-          feature3: 'Iegūstiet studijas kvalitātes fotogrāfijas, gatavas sociālajiem tīkliem un e-veikalam',
+          title: 'Jūsu apģērbs — uz modeļa minūtes laikā',
+          subtitle: 'Augšupielādējiet apģērba fotogrāfiju, izvēlieties modeli — AI izveidos reālistisku rezultātu, ko uzreiz var izmantot e-veikalā vai sociālajos tīklos.',
+          feature1: '10+ modeļu šablonu vai augšupielādējiet savu fotogrāfiju',
+          feature2: 'Mainiet fonu, noskaņojumu un vidi ar vienu klikšķi',
+          feature3: 'Rezultāts gatavs sociālajiem tīkliem un e-veikalam',
           cta: 'Izmēģināt tagad',
-          creditInfo: 'No 1 kredīta par fotogrāfiju'
+          creditInfo: '1 kredīts = 1 fotogrāfija'
         },
         imageGenerator: {
           badge: 'Jaunums',
-          title: 'AI attēlu ģenerators',
-          subtitle: 'Izveidojiet pilnīgi jaunus, unikālus produktu attēlus no nulles ar AI palīdzību — bez fotogrāfa, bez studijas, bez modeļa.',
-          feature1: 'Aprakstiet vēlamo attēlu un AI to izveidos dažu sekunžu laikā',
-          feature2: 'Izvēlieties stilu, kompozīciju un noskaņojumu atbilstoši jūsu zīmolam',
-          feature3: 'Eksportējiet augstas izšķirtspējas formātā, gatavu drukāšanai un tīmeklim',
-          cta: 'Sākt veidot',
-          creditInfo: 'No 2 kredītiem par attēlu'
+          title: 'Attēls jūsu biznesam — dažu sekunžu laikā',
+          subtitle: 'Izvēlieties savu darbības nozari, aprakstiet vēlamo attēlu — AI ģenerēs profesionālu mārketinga vizuālu, piemērotu sociālajiem tīkliem un reklāmai.',
+          feature1: '20+ biznesa nozares: skaistumkopšana, medicīna, nekustamais īpašums, HoReCa u.c.',
+          feature2: 'Aprakstiet saviem vārdiem — AI ģenerēs atbilstoši jūsu nozarei un tēmai',
+          feature3: 'Lejupielādējiet augstas kvalitātes attēlu, gatavu sociālajiem tīkliem',
+          cta: 'Izveidot attēlu',
+          creditInfo: '2 kredīti = 1 attēls'
         },
         postCreator: {
           badge: 'Viss vienā',
-          title: 'Sociālo tīklu ierakstu veidotājs',
-          subtitle: 'Veidojiet profesionālus mārketinga ierakstus dažu klikšķu laikā — AI ģenerēs saistošu tekstu, pielāgotu jūsu auditorijai un platformai.',
-          feature1: 'AI raksta tekstu, pielāgotu jūsu zīmola tonim un auditorijai',
-          feature2: 'Veidojiet ierakstus ar attēliem vai tikai tekstu — jūsu izvēle',
-          feature3: 'Optimizēts Instagram, Facebook, TikTok un citām platformām',
+          title: 'Ieraksts sociālajiem tīkliem — 30 sekundēs',
+          subtitle: 'Izvēlieties tēmu — AI uzrakstīs tekstu un izveidos attēlu. Jums tikai jākopē un jāpublicē.',
+          feature1: 'AI raksta tekstu jūsu zīmola tonī',
+          feature2: 'Teksts ar attēlu vai tikai teksts — kā vēlaties',
+          feature3: 'Pielāgots Instagram, Facebook un TikTok formātiem',
           cta: 'Veidot ierakstu',
-          creditInfo: 'No 1 kredīta par ierakstu'
+          creditInfo: '1 kredīts = 1 ieraksts'
         }
       },
       footer: {
         contact: 'Kontakti'
       },
       platformStats: {
-        imagesCreated: 'Izveidoti attēli',
+        imagesCreated: 'Ģenerētas fotogrāfijas',
         imagesEdited: 'Rediģēti attēli',
         postsCreated: 'Izveidoti ieraksti',
       }
     },
     postCreatorPage: {
       title: 'Ierakstu veidotājs',
-      subtitle: 'Izveidojiet profesionālus sociālo tīklu ierakstus ar AI',
+      subtitle: 'Izvēlieties tēmu — AI izveidos tekstu un attēlu',
       industryLabel: 'Nozare',
       industryPlaceholder: 'Izvēlieties nozari...',
       topicLabel: 'Tēma',
@@ -1016,11 +1190,11 @@ export const translations = {
     },
     imageGeneratorPage: {
       title: 'Attēlu ģenerators',
-      subtitle: 'Izveidojiet attēlus ar AI pēc jūsu apraksta',
-      industryLabel: 'Nozare',
+      subtitle: 'Izvēlieties nozari, aprakstiet vēlamo attēlu — AI ģenerēs dažu sekunžu laikā',
+      industryLabel: 'Darbības nozare',
       industryPlaceholder: 'Izvēlieties nozari...',
-      promptLabel: 'Apraksts',
-      promptHint: 'Aprakstiet vēlamo attēlu pēc iespējas detalizētāk',
+      promptLabel: 'Attēla apraksts',
+      promptHint: 'Aprakstiet, kādu attēlu vēlaties — AI ģenerēs atbilstoši jūsu nozarei',
       generate: 'Ģenerēt attēlu',
       generating: 'Ģenerē...',
       resultLabel: 'Ģenerētais attēls',
@@ -1033,7 +1207,7 @@ export const translations = {
   ee: {
     header: {
       title: 'Re Edit Me',
-      subtitle: 'Laadige pilt üles ja looge professionaalseid pilte AI-ga'
+      subtitle: 'Tootefotod ja sisu AI-ga — ilma fotograafita, ilma stuudiota'
     },
     upload: {
       title: 'Laadi pilt üles',
@@ -1045,9 +1219,9 @@ export const translations = {
     config: {
       title: 'Genereerimise seaded',
       modelLabel: 'Mudel',
-      sceneLabel: 'Keskkond',
+      sceneLabel: 'Stseen / Taust',
       styleLabel: 'Stiil',
-      moodLabel: 'Meeleolu',
+      moodLabel: 'Meeleolu / Ilme',
       poseLabel: 'Poos',
       placeholder: 'Valige...',
       promptLabel: 'Lisajuhised',
@@ -1057,7 +1231,10 @@ export const translations = {
       technicalSettings: 'Tehnilised seaded',
       imageCount: 'Piltide arv',
       format: 'Formaat',
-      quality: 'Kvaliteet'
+      quality: 'Kvaliteet',
+      clothingTypeLabel: 'Rõivatüüp',
+      customPromptLabel: 'Lisajuhised',
+      customPromptPlaceholder: 'Nt.: tõstetud käsi, istub pingil, vaatab kõrvale...'
     },
     actions: {
       generate: 'Genereeri',
@@ -1067,12 +1244,16 @@ export const translations = {
       newUpload: 'Uus pilt'
     },
     results: {
-      title: 'Genereeritud pildid'
+      title: 'Genereeritud pildid',
+      savedNotice: 'Fotod salvestati automaatselt teie galeriisse.',
+      downloadHint: 'Klõpsake foto allalaadimise nuppu, et see oma seadmesse salvestada.',
+      selectToEdit: 'Valige foto, mida soovite edasi redigeerida.'
     },
     validation: {
       noImages: 'Laadige pilt üles',
       noAvatar: 'Valige mudel',
-      noPrompt: 'Sisestage juhised (min. 3 sümbolit)'
+      noPrompt: 'Sisestage juhised (min. 3 sümbolit)',
+      noClothingType: 'Valige rõivatüüp'
     },
     loading: {
       sending: 'Saadan...',
@@ -1081,12 +1262,12 @@ export const translations = {
       complete: 'Valmis!'
     },
     tips: [
-      'Nõuanne: Selged pildid annavad parimaid tulemusi',
-      'Nõuanne: Hea valgustus parandab kvaliteeti oluliselt',
-      'Nõuanne: Üksikasjalikud juhised = paremad tulemused',
-      'Nõuanne: Kasutage originaali jaoks kõrget eraldusvõimet',
-      'Nõuanne: Vältige uduseid pilte',
-      'Nõuanne: Proovige erinevaid poose mitmekesisemate tulemuste saamiseks'
+      'Selge, ere pilt — parem tulemus',
+      'Mida parem valgustus — seda realistlikum foto',
+      'Valige taust, mis sobib rõiva stiiliga',
+      'Kasutage kõrge eraldusvõimega originaali',
+      'Proovige erinevaid mudeleid — tulemused üllatavad',
+      'Valige meeleolu, et foto näeks elav välja'
     ],
     errors: {
       timeout: 'Võttis liiga kaua. Proovige uuesti.',
@@ -1098,7 +1279,7 @@ export const translations = {
     footer: 'Re Edit Me',
     privacyPolicy: 'Privaatsuspoliitika',
     footerSection: {
-      tagline: 'AI sisuloome platvorm',
+      tagline: 'Tootefotod ja sisu AI-ga',
       navigation: 'Navigatsioon'
     },
     customAvatars: {
@@ -1127,9 +1308,8 @@ export const translations = {
       gender: 'Sugu',
       age: 'Vanus',
       ethnicity: 'Rahvus',
-      skinTone: 'Nahatoon',
-      hairColor: 'Juuste värv',
       hairLength: 'Juuste pikkus',
+      hairColor: 'Juuste värv',
       specialFeatures: 'Lisatunnused',
       specialFeaturesPlaceholder: 'nt. tätoveeringud, prillid, habe...',
       prompt: 'Prompt (muudetav)',
@@ -1139,8 +1319,32 @@ export const translations = {
       save: 'Salvesta',
       saving: 'Salvestamine...',
       cancel: 'Tühista',
-      bodyType: 'Kehatüüp',
       framing: 'Kadreerimine',
+    },
+    avatarModels: {
+      myModels: 'Minu mudelid',
+      createModel: 'Loo mudel',
+      modelName: 'Mudeli nimi',
+      addPhoto: 'Lisa foto',
+      movePhoto: 'Teisalda...',
+      setCover: 'Määra kaaneks',
+      deleteModel: 'Kustuta mudel',
+      renameModel: 'Nimeta ümber',
+      photosCount: 'fotod',
+      modelsCount: 'mudelid',
+      modelLimit: 'Maksimaalne mudelite arv: 10',
+      photoLimit: 'Maksimaalne fotode arv: 5',
+      dragToMove: 'Lohistage fotosid mudelite vahel',
+      generateAnother: 'Teine poos',
+      selectModel: 'Salvesta mudelisse',
+      createNewModel: '+ Uus mudel',
+      pose: 'Poos',
+      savedPhotos: 'Mudeli fotod',
+      editTraits: 'Muuda tunnuseid',
+      saveAndNext: 'Salvesta ja järgmine poos',
+      done: 'Valmis',
+      mood: 'Meeleolu',
+      addPose: 'Lisa poos',
     },
     avatars: {
       'fashion-woman-full': { name: 'Moemodell', description: 'Täispikkus, stiilne poos' },
@@ -1155,20 +1359,33 @@ export const translations = {
       'stylish-man-half': { name: 'Stiilne mees', description: 'Poolpikkus, moodne välimus' }
     },
     scenes: {
-      'minimal': { name: 'Minimalistlik', description: 'Puhas, lihtne taust' },
-      'photo-studio': { name: 'Fotostuudio', description: 'Professionaalne stuudiokeskkond' },
-      'urban': { name: 'Linnakeskkond', description: 'Tänav, linna taust' },
-      'nature': { name: 'Loodus', description: 'Väli, looduskeskkond' }
+      'studio': { name: 'Stuudio', description: 'Professionaalne fotostuudio' },
+      'street': { name: 'Tänav', description: 'Linnatänav, kaasaegne arhitektuur' },
+      'nature': { name: 'Loodus', description: 'Looduskeskkond, park või aed' },
+      'beach': { name: 'Rand', description: 'Troopiline rand, liiv ja ookean' },
+      'cafe': { name: 'Kohvik', description: 'Hubane, stiilne kohvik' },
+      'office': { name: 'Kontor', description: 'Kaasaegne kontori interjöör' },
+      'event': { name: 'Üritus', description: 'Elegantne ürituse koht' },
+      'autumn': { name: 'Sügis', description: 'Sügispark, kuldsed lehed' }
+    },
+    clothingTypes: {
+      'dress': { name: 'Kleit', description: 'Kleidid, sundressid' },
+      'top': { name: 'Pluus / Särk', description: 'T-särgid, pluusid, kampsunid' },
+      'jacket': { name: 'Jakk / Mantel', description: 'Jakid, mantlid, üleriided' },
+      'pants': { name: 'Püksid / Seelik', description: 'Püksid, teksad, seelikud' },
+      'suit': { name: 'Ülikond', description: 'Ametlik ülikond, komplekt' },
+      'sportswear': { name: 'Spordirõivad', description: 'Spordiriided, athleisure' },
+      'accessory': { name: 'Aksessuaar', description: 'Mütsid, sallid, päikeseprillid, kotid' }
     },
     moods: {
-      'serious': { name: 'Tõsine', description: 'Professionaalne, keskendunud' },
-      'playful': { name: 'Mänguline', description: 'Lõbus, energiline' },
-      'relaxed': { name: 'Lõõgastunud', description: 'Rahulik, loomulik' },
+      'natural': { name: 'Loomulik', description: 'Rahulik, loomulik ilme' },
       'confident': { name: 'Enesekindel', description: 'Tugev, kindel' },
+      'happy': { name: 'Õnnelik', description: 'Rõõmus, naeratav' },
+      'serious': { name: 'Tõsine', description: 'Professionaalne, keskendunud' },
       'mysterious': { name: 'Salapärane', description: 'Intrigeeriv, salapärane' },
-      'energetic': { name: 'Energiline', description: 'Dünaamiline, energiat täis' },
-      'dreamy': { name: 'Unistav', description: 'Romantiline, unistav' },
-      'fierce': { name: 'Kindlameelne', description: 'Tugev, kindlameelne' }
+      'playful': { name: 'Mänguline', description: 'Lõbus, energiline' },
+      'elegant': { name: 'Elegantne', description: 'Peen, rafineeritud' },
+      'fierce': { name: 'Otsustav', description: 'Tugev, julge' }
     },
     poses: {
       'full-body': { name: 'Täispikkus', description: 'Kogu keha kaader, seistes' },
@@ -1184,7 +1401,47 @@ export const translations = {
     imageCounts: {
       1: { name: '1 pilt', description: 'Kiirem, odavam' },
       2: { name: '2 pilti', description: 'Rohkem valikuid' },
-      3: { name: '3 pilti', description: 'Maksimaalne valik' }
+      3: { name: '3 pilti', description: 'Veelgi rohkem variante' },
+      4: { name: '4 pilti', description: 'Maksimaalne valik' }
+    },
+    garmentPhotoTypeLabel: 'Foto tüüp',
+    garmentPhotoTypeHint: 'Kuidas rõivas oli pildistatud',
+    garmentPhotoTypes: {
+      auto: { name: 'Automaatne', description: 'AI tuvastab automaatselt' },
+      'flat-lay': { name: 'Lame foto', description: 'Rõivas pildistatud lamedalt' },
+      model: { name: 'Modellil', description: 'Rõivas pildistatud inimesel' }
+    },
+    qualityModeLabel: 'Kvaliteedirežiim',
+    qualityModes: {
+      performance: { name: 'Kiire', description: 'Kiireim tulemus' },
+      balanced: { name: 'Tasakaalustatud', description: 'Optimaalne kiiruse ja kvaliteedi tasakaal' },
+      quality: { name: 'Kõrge kvaliteet', description: 'Parim kvaliteet, kauem aega' }
+    },
+    postProcess: {
+      title: 'Redigeeri fotot',
+      subtitle: 'Valige üks ülal genereeritud fotodest ja rakendage lisamuudatusi.',
+      background: 'Muuda tausta',
+      backgroundDesc: 'AI asendab foto tausta valitud stseeniga, säilitades inimese.',
+      pose: 'Muuda poosi',
+      poseDesc: 'AI muudab modelli poosi fotol.',
+      additionalInstructions: 'Vaba redigeerimine',
+      additionalInstructionsDesc: 'Kirjeldage, mida soovite muuta — AI redigeerib fotot teie teksti põhjal.',
+      editPlaceholder: 'Nt.: käed risti, istub toolil, vaatab kõrvale...',
+      apply: 'Rakenda',
+      processing: 'Töötleb...',
+      result: 'Redigeeritud foto'
+    },
+    posePresets: {
+      arms_crossed: { name: 'Ristatud käed' },
+      hands_in_pockets: { name: 'Käed taskutes' },
+      sitting: { name: 'Istub' },
+      leaning: { name: 'Toetub' },
+      walking: { name: 'Kõnnib' },
+      looking_away: { name: 'Vaatab kõrvale' },
+      hand_on_chin: { name: 'Käsi lõual' },
+      waving: { name: 'Lehvitab' },
+      thumbs_up: { name: 'Pöial üles' },
+      pointing: { name: 'Osutab sõrmega' },
     },
     auth: {
       // Login/Signup modal
@@ -1231,17 +1488,21 @@ export const translations = {
       credits: 'Krediidid'
     },
     gallery: {
-      title: 'Minu Galerii',
+      title: 'Minu galerii',
       empty: {
-        title: 'Pilte pole veel',
-        subtitle: 'Genereerige esimene pilt, et alustada oma galeriid',
-        cta: 'Genereeri pilt'
+        title: 'Galerii on tühi',
+        subtitle: 'Looge esimene foto ja see ilmub siia',
+        cta: 'Loo foto'
       },
       guest: {
         title: 'Logi sisse, et näha galeriid',
-        subtitle: 'Loo konto, et salvestada ja hallata genereeritud pilte',
+        subtitle: 'Loo konto ja kõik sinu genereeritud pildid salvestatakse siia',
         cta: 'Logi sisse'
       },
+      selectedPhoto: 'Valitud foto',
+      selectAction: 'Mida soovite teha?',
+      viewFull: 'Vaata',
+      backToActions: 'Tagasi',
       actions: {
         download: 'Laadi alla',
         delete: 'Kustuta',
@@ -1260,7 +1521,7 @@ export const translations = {
       pricing: 'Hinnad',
       contact: 'Kontakt',
       imageGenerator: 'Piltide generaator',
-      imageGeneratorDesc: 'Text to image AI-ga',
+      imageGeneratorDesc: 'Turundusvisuaalid kirjelduse järgi',
       modelPhotos: 'Fotod modellidega',
       modelPhotosDesc: 'Tootefotod modellidel',
       postCreator: 'Postituste looja',
@@ -1295,11 +1556,11 @@ export const translations = {
       selectForGenerator: 'Kasuta generaatoris'
     },
     dashboard: {
-      title: 'Sinu looming',
+      title: 'Minu looming',
       backToHome: 'Tagasi avalehele',
       welcome: 'Tere tulemast tagasi',
-      guestTitle: 'Logi sisse, et näha oma paneeli',
-      guestDescription: 'Jälgi oma genereerimisi, halda avatare ja vaata krediite',
+      guestTitle: 'Logi sisse, et näha oma loomingut',
+      guestDescription: 'Kõik sinu fotod, avatarid ja krediidid — ühes kohas',
       signIn: 'Logi sisse',
       stats: {
         generations: 'Loodud pilte',
@@ -1343,59 +1604,59 @@ export const translations = {
     },
     landing: {
       hero: {
-        title: 'Kõik, mida vajate oma sisu jaoks',
-        subtitle: 'Kolm võimsat AI tööriista ühes kohas — looge professionaalset sisu kiiremini kui kunagi varem',
-        ctaSignup: 'Registreeru tasuta',
-        ctaTry: 'Proovi ilma kontota',
-        ctaCreate: 'Alusta loomist',
-        ctaDashboard: 'Seaded',
+        title: 'Teie toode — modelli seljas 60 sekundiga',
+        subtitle: 'Laadige üles rõivafoto, valige mudel ja saage valmis turundusfoto. Ilma fotograafita, ilma stuudiota.',
+        ctaSignup: 'Alusta tasuta',
+        ctaTry: 'Proovi ilma registreerimata',
+        ctaCreate: 'Loo foto',
+        ctaDashboard: 'Minu looming',
         card1: {
           title: 'Fotod modellide peal',
-          description: 'Laadige üles toote foto — AI paneb selle valitud modellile ja loob professionaalse tulemuse'
+          description: 'Tõmmake oma rõivas modellile selga — AI loob realistliku tulemuse minutiga'
         },
         card2: {
-          title: 'AI piltide generaator',
-          description: 'Looge unikaalseid tootepilte nullist — ilma fotograafita ja ilma stuudiota'
+          title: 'Piltide generaator',
+          description: 'Valige valdkond, kirjeldage soovitud pilti — AI loob selle mõne sekundiga'
         },
         card3: {
           title: 'Postituste looja',
-          description: 'Looge sotsiaalmeedia postitusi AI-ga — tekst, pildid või mõlemad koos'
+          description: 'AI kirjutab teksti ja loob pildi sotsiaalmeedia jaoks. Teil tuleb vaid vajutada „Genereeri"'
         }
       },
       pricing: {
-        title: 'Lihtsad, läbipaistvad hinnad',
-        subtitle: 'Valige plaan, mis sobib teie vajadustega',
+        title: 'Hinnad ilma üllatusteta',
+        subtitle: 'Üks krediit = üks foto. Makske ainult selle eest, mida kasutate.',
         comingSoon: 'Varsti',
         perMonth: '/kuu',
         getStarted: 'Alusta',
-        getPlan: 'Vali',
+        getPlan: 'Vali plaan',
         mostPopular: 'Populaarseim',
         plans: {
           starter: {
             badge: 'Alustaja',
             name: 'Alustaja',
-            subtitle: 'Suurepärane alguseks',
+            subtitle: 'Neile, kes soovivad proovida',
             price: '€9',
-            features: ['30 krediiti/kuu', 'Kõik AI mudelid', 'Galerii salvestusruum', 'E-posti tugi']
+            features: ['30 krediiti kuus', 'Kõik AI funktsioonid', 'Fotogalerii', 'E-posti tugi']
           },
           pro: {
             badge: 'Populaarseim',
             name: 'Pro',
-            subtitle: 'Sisuloojatele',
+            subtitle: 'Regulaarselt sisu loovatele',
             price: '€19',
-            features: ['70 krediiti/kuu', 'Kõik AI mudelid', 'Galerii salvestusruum', 'E-posti tugi']
+            features: ['70 krediiti kuus', 'Kõik AI funktsioonid', 'Fotogalerii', 'Prioriteetne tugi']
           },
           unlimited: {
             badge: 'Piiramatu',
             name: 'Piiramatu',
-            subtitle: 'Aktiivsetele kasutajatele',
+            subtitle: 'Looge ilma piiranguteta',
             price: '€49',
-            features: ['Piiramatult krediite', 'Kõik AI mudelid', 'Galerii salvestusruum', 'E-posti tugi']
+            features: ['Piiramatult krediite', 'Kõik AI funktsioonid', 'Fotogalerii', 'Prioriteetne tugi']
           }
         },
         credits: {
           title: 'Vajad rohkem krediite?',
-          subtitle: 'Osta lisakrediite igal ajal. Tellimust pole vaja.',
+          subtitle: 'Täienda igal ajal — tellimust pole vaja.',
           buyNow: 'Osta',
           save: 'Säästa',
           packs: [
@@ -1406,79 +1667,79 @@ export const translations = {
         }
       },
       faq: {
-        title: 'Korduma kippuvad küsimused',
-        subtitle: 'On küsimusi? Meil on vastused',
+        title: 'Küsimused ja vastused',
+        subtitle: 'Kõige sagedamini küsitav enne alustamist',
         items: {
           whatIsTool: {
             question: 'Mis on Re Edit Me?',
-            answer: 'Re Edit Me on AI tööriist, mis muudab teie fotod professionaalseteks UGC (kasutajate loodud sisu) turunduspiltideks. Laadige lihtsalt foto üles ja meie AI genereerib hämmastavaid variatsioone vastavalt teie valitud stiilile, stseenile ja meeleolule.'
+            answer: 'Re Edit Me — AI platvorm, mis aitab luua professionaalseid tootefotosid ja sotsiaalmeedia sisu. Laadige üles rõivafoto, valige mudel, taust ja meeleolu — AI loob valmis turundusfoto 30–60 sekundiga.'
           },
           howGeneration: {
             question: 'Kuidas piltide genereerimine töötab?',
-            answer: 'Meie AI analüüsib teie üleslaaditud fotot ja ühendab selle teie valitud avatari, stseeni ja stiili sätetega. Genereerimisprotsess võtab umbes 30-60 sekundit ja loob kõrgekvaliteedilisi pilte, mis sobivad turunduseks ja sotsiaalmeediasse.'
+            answer: 'Protsess on lihtne: 1) laadige üles rõivafoto, 2) valige mudel ja sätted, 3) AI loob tulemuse 30–60 sekundiga. Tulemus näeb välja nagu päris fotosessiooni foto — sobib e-poele ja sotsiaalmeediasse.'
           },
           whatAreCredits: {
-            question: 'Mis on krediidid ja kuidas need töötavad?',
-            answer: 'Krediite kasutatakse piltide genereerimiseks. Iga genereerimine kasutab teatud arvu krediite sõltuvalt valitud kvaliteedist ja resolutsioonist. Krediite saab osta või teenida meie tellimisplaanidega.'
+            question: 'Mis on krediidid?',
+            answer: 'Üks krediit = üks genereerimine. Valige kuuplaan või ostke krediidipakette ilma tellimuseta. Kasutamata krediidid kantakse üle järgmisesse kuusse.'
           },
           howUploadAvatars: {
-            question: 'Kuidas üles laadida kohandatud avatare?',
-            answer: 'Minge Avataride sektsiooni peamenüüst. Saate üles laadida oma fotosid või kunstiteoseid, mida kasutada viitepiltidena genereerimisel. Kohandatud avatarid võimaldavad säilitada järjepideva brändikujundi kogu teie sisus.'
+            question: 'Kas saan kasutada oma mudeli fotot?',
+            answer: 'Jah. Avage Avataride sektsioon ja laadige üles oma foto. AI kasutab seda mudelina kõigi edasiste genereerimiste jaoks — nii saate hoida järjepidevat brändikujundit kõigil fotodel.'
           },
           isDataSafe: {
-            question: 'Kas minu andmed on turvalised?',
-            answer: 'Absoluutselt. Me kasutame tööstusstandardi krüpteerimist ja turvapraktikaid. Teie üleslaaditud pildid on turvaliselt salvestatud ja ligipääsetavad ainult teile. Me ei jaga kunagi teie andmeid kolmandate osapooltega. Lugege meie Privaatsuspoliitikat lisateabe saamiseks.'
+            question: 'Kas minu fotod on kaitstud?',
+            answer: 'Jah. Kõik fotod on krüpteeritult salvestatud ja ligipääsetavad ainult teile. Me ei jaga kunagi teie andmeid kolmandate osapooltega. Lisateavet leiate meie Privaatsuspoliitikast.'
           },
           howContact: {
             question: 'Kuidas võtta ühendust toega?',
-            answer: 'Saate võtta ühendust meie tugimeeskonnaga e-posti teel support@reeditme.com. Tavaliselt vastame 24 tunni jooksul tööpäevadel.'
+            answer: 'Kirjutage meile support@reeditme.com — vastame 24 tunni jooksul tööpäevadel.'
           }
         }
       },
       features: {
         imageToImage: {
           badge: 'Populaarseim',
-          title: 'Tootefotod päris modellide peal',
-          subtitle: 'Laadige üles rõiva või toote foto — AI paneb selle valitud modellile selga ja loob professionaalse turunduspildi vaid mõne minutiga.',
-          feature1: 'Valige 10+ professionaalse mudeli hulgast või laadige üles oma avatar',
-          feature2: 'Muutke keskkonda, poose, stiile ja meeleolusid ühe klõpsuga',
-          feature3: 'Saage stuudiokvaliteediga fotod, valmis sotsiaalmeediaks ja e-poeks',
+          title: 'Teie rõivas — modelli seljas minutiga',
+          subtitle: 'Laadige üles rõivafoto, valige mudel — AI loob realistliku tulemuse, mida saate kohe kasutada e-poes või sotsiaalmeedias.',
+          feature1: '10+ mudeli malli või laadige üles oma foto',
+          feature2: 'Muutke tausta, meeleolu ja keskkonda ühe klõpsuga',
+          feature3: 'Tulemus valmis sotsiaalmeediaks ja e-poeks',
           cta: 'Proovi kohe',
-          creditInfo: 'Alates 1 krediidist foto kohta'
+          creditInfo: '1 krediit = 1 foto'
         },
         imageGenerator: {
           badge: 'Uus',
-          title: 'AI piltide generaator',
-          subtitle: 'Looge täiesti uusi, unikaalseid tootepilte nullist AI abiga — ilma fotograafita, ilma stuudiota, ilma modellita.',
-          feature1: 'Kirjeldage soovitud pilti ja AI loob selle sekunditega',
-          feature2: 'Valige stiil, kompositsioon ja meeleolu vastavalt oma brändile',
-          feature3: 'Eksportige kõrge eraldusvõimega formaadis, valmis trükiks ja veebi',
-          cta: 'Alusta loomist',
-          creditInfo: 'Alates 2 krediidist pildi kohta'
+          title: 'Pilt teie ärile — mõne sekundiga',
+          subtitle: 'Valige oma tegevusvaldkond, kirjeldage soovitud pilti — AI genereerib professionaalse turundusvisuaali, sobiva sotsiaalmeediaks ja reklaamiks.',
+          feature1: '20+ ärivaldkonda: iluteenused, meditsiin, kinnisvara, HoReCa jne.',
+          feature2: 'Kirjeldage oma sõnadega — AI genereerib vastavalt teie valdkonnale ja teemale',
+          feature3: 'Laadige alla kõrge kvaliteediga pilt, valmis sotsiaalmeediaks',
+          cta: 'Loo pilt',
+          creditInfo: '2 krediiti = 1 pilt'
         },
         postCreator: {
           badge: 'Kõik ühes',
-          title: 'Sotsiaalmeedia postituste looja',
-          subtitle: 'Looge professionaalseid turunduspostitusi vaid mõne klõpsuga — AI genereerib kaasahaarava teksti, kohandatud teie publikule ja platvormile.',
-          feature1: 'AI kirjutab teksti, kohandatud teie brändi toonile ja publikule',
-          feature2: 'Looge postitusi piltidega või ainult tekstiga — teie valik',
-          feature3: 'Optimeeritud Instagram, Facebook, TikTok ja teistele platvormidele',
+          title: 'Postitus sotsiaalmeediasse — 30 sekundiga',
+          subtitle: 'Valige teema — AI kirjutab teksti ja loob pildi. Teil tuleb vaid kopeerida ja avaldada.',
+          feature1: 'AI kirjutab teksti teie brändi toonis',
+          feature2: 'Tekst pildiga või ainult tekst — kuidas soovite',
+          feature3: 'Kohandatud Instagram, Facebook ja TikTok formaatidele',
           cta: 'Loo postitus',
-          creditInfo: 'Alates 1 krediidist postituse kohta'
+          creditInfo: '1 krediit = 1 postitus'
         }
       },
       footer: {
         contact: 'Kontakt'
       },
       platformStats: {
-        imagesCreated: 'Loodud pilte',
+        imagesCreated: 'Genereeritud fotosid',
         imagesEdited: 'Redigeeritud pilte',
         postsCreated: 'Loodud postitusi',
       }
     },
     postCreatorPage: {
       title: 'Postituste looja',
-      subtitle: 'Looge professionaalseid sotsiaalmeedia postitusi AI-ga',
+      subtitle: 'Valige teema — AI loob teksti ja pildi',
       industryLabel: 'Valdkond',
       industryPlaceholder: 'Valige valdkond...',
       topicLabel: 'Teema',
@@ -1523,11 +1784,11 @@ export const translations = {
     },
     imageGeneratorPage: {
       title: 'Piltide generaator',
-      subtitle: 'Looge pilte AI-ga oma kirjelduse järgi',
-      industryLabel: 'Valdkond',
+      subtitle: 'Valige valdkond, kirjeldage soovitud pilti — AI genereerib mõne sekundiga',
+      industryLabel: 'Tegevusvaldkond',
       industryPlaceholder: 'Valige valdkond...',
-      promptLabel: 'Kirjeldus',
-      promptHint: 'Kirjeldage soovitud pilti võimalikult detailselt',
+      promptLabel: 'Pildi kirjeldus',
+      promptHint: 'Kirjeldage, millist pilti soovite — AI genereerib vastavalt teie valdkonnale',
       generate: 'Genereeri pilt',
       generating: 'Genereerimine...',
       resultLabel: 'Genereeritud pilt',
@@ -1574,7 +1835,10 @@ export const translations = {
       newUpload: 'New photo'
     },
     results: {
-      title: 'Generated photos'
+      title: 'Generated photos',
+      savedNotice: 'Photos are automatically saved to your gallery.',
+      downloadHint: 'Click the download button on a photo to save it to your device.',
+      selectToEdit: 'Select a photo to edit it further.'
     },
     validation: {
       noImages: 'Upload a photo',
@@ -1634,9 +1898,8 @@ export const translations = {
       gender: 'Gender',
       age: 'Age',
       ethnicity: 'Ethnicity',
-      skinTone: 'Skin tone',
-      hairColor: 'Hair color',
       hairLength: 'Hair length',
+      hairColor: 'Hair color',
       specialFeatures: 'Special features',
       specialFeaturesPlaceholder: 'e.g. tattoos, glasses, beard...',
       prompt: 'Prompt (editable)',
@@ -1646,8 +1909,32 @@ export const translations = {
       save: 'Save',
       saving: 'Saving...',
       cancel: 'Cancel',
-      bodyType: 'Body type',
       framing: 'Framing',
+    },
+    avatarModels: {
+      myModels: 'My models',
+      createModel: 'Create model',
+      modelName: 'Model name',
+      addPhoto: 'Add photo',
+      movePhoto: 'Move to...',
+      setCover: 'Set as cover',
+      deleteModel: 'Delete model',
+      renameModel: 'Rename',
+      photosCount: 'photos',
+      modelsCount: 'models',
+      modelLimit: 'Maximum models: 10',
+      photoLimit: 'Maximum photos: 5',
+      dragToMove: 'Drag photos between models to reorganize',
+      generateAnother: 'Another pose',
+      selectModel: 'Save to model',
+      createNewModel: '+ New model',
+      pose: 'Pose',
+      savedPhotos: 'Model photos',
+      editTraits: 'Edit traits',
+      saveAndNext: 'Save & next pose',
+      done: 'Done',
+      mood: 'Mood',
+      addPose: 'Add pose',
     },
     avatars: {
       'fashion-woman-full': { name: 'Fashion model', description: 'Full body, stylish pose' },
@@ -1662,10 +1949,14 @@ export const translations = {
       'stylish-man-half': { name: 'Stylish man', description: 'Half body, fashionable look' }
     },
     scenes: {
-      'minimal': { name: 'Minimalist', description: 'Clean, simple background' },
-      'photo-studio': { name: 'Photo studio', description: 'Professional studio environment' },
-      'urban': { name: 'Urban', description: 'Street, city background' },
-      'nature': { name: 'Nature', description: 'Outdoor, natural setting' }
+      'studio': { name: 'Studio', description: 'Professional photo studio' },
+      'street': { name: 'Street', description: 'Urban city street, modern architecture' },
+      'nature': { name: 'Nature', description: 'Natural outdoor setting, park or garden' },
+      'beach': { name: 'Beach', description: 'Tropical beach, sand and ocean' },
+      'cafe': { name: 'Café', description: 'Cozy, stylish café' },
+      'office': { name: 'Office', description: 'Modern office interior' },
+      'event': { name: 'Event', description: 'Elegant event venue' },
+      'autumn': { name: 'Autumn', description: 'Autumn park, golden leaves' }
     },
     moods: {
       'serious': { name: 'Serious', description: 'Professional, focused' },
@@ -1691,7 +1982,47 @@ export const translations = {
     imageCounts: {
       1: { name: '1 photo', description: 'Faster, cheaper' },
       2: { name: '2 photos', description: 'More choices' },
-      3: { name: '3 photos', description: 'Maximum selection' }
+      3: { name: '3 photos', description: 'Even more options' },
+      4: { name: '4 photos', description: 'Maximum selection' }
+    },
+    garmentPhotoTypeLabel: 'Photo type',
+    garmentPhotoTypeHint: 'How the garment was photographed',
+    garmentPhotoTypes: {
+      auto: { name: 'Automatic', description: 'AI will detect automatically' },
+      'flat-lay': { name: 'Flat lay', description: 'Garment photographed flat' },
+      model: { name: 'On model', description: 'Garment photographed on a person' }
+    },
+    qualityModeLabel: 'Quality mode',
+    qualityModes: {
+      performance: { name: 'Fast', description: 'Fastest result' },
+      balanced: { name: 'Balanced', description: 'Optimal speed and quality balance' },
+      quality: { name: 'High quality', description: 'Best quality, takes longer' }
+    },
+    postProcess: {
+      title: 'Edit photo',
+      subtitle: 'Select one of the generated photos above and apply additional changes.',
+      background: 'Change background',
+      backgroundDesc: 'AI will replace the photo background with the selected scene, keeping the person.',
+      pose: 'Change pose',
+      poseDesc: 'AI will change the model pose in the photo.',
+      additionalInstructions: 'Free editing',
+      additionalInstructionsDesc: 'Describe what you want to change — AI will edit the photo based on your text.',
+      editPlaceholder: 'E.g.: arms crossed, sitting on a chair, looking sideways...',
+      apply: 'Apply',
+      processing: 'Processing...',
+      result: 'Edited photo'
+    },
+    posePresets: {
+      arms_crossed: { name: 'Arms crossed' },
+      hands_in_pockets: { name: 'Hands in pockets' },
+      sitting: { name: 'Sitting' },
+      leaning: { name: 'Leaning' },
+      walking: { name: 'Walking' },
+      looking_away: { name: 'Looking away' },
+      hand_on_chin: { name: 'Hand on chin' },
+      waving: { name: 'Waving' },
+      thumbs_up: { name: 'Thumbs up' },
+      pointing: { name: 'Pointing' },
     },
     auth: {
       // Login/Signup modal
@@ -1749,6 +2080,10 @@ export const translations = {
         subtitle: 'Create an account to save and manage your generated images',
         cta: 'Sign In'
       },
+      selectedPhoto: 'Selected photo',
+      selectAction: 'What would you like to do?',
+      viewFull: 'View',
+      backToActions: 'Back',
       actions: {
         download: 'Download',
         delete: 'Delete',

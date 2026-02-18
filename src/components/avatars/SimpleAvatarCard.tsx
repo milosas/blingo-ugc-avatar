@@ -43,7 +43,7 @@ export function SimpleAvatarCard({
         <img
           src={avatar.image_url}
           alt="Custom avatar"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
           onError={handleImageError}
         />
       </div>

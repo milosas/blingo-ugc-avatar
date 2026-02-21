@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CustomAvatar } from '../../types/database';
+import type { AvatarMetadata } from '../../hooks/useCustomAvatars';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { AvatarMetadataEditor } from './AvatarMetadataEditor';
 
 interface CustomAvatarCardProps {
   avatar: CustomAvatar;
@@ -8,6 +10,7 @@ interface CustomAvatarCardProps {
   onSelect: () => void;
   onDelete: () => Promise<void>;
   onEditDescription?: (description: string) => Promise<void>;
+  onSaveMetadata?: (metadata: AvatarMetadata) => Promise<void>;
 }
 
 type LightboxState = 'closed' | 'enlarged' | 'menu';
@@ -17,13 +20,12 @@ export function CustomAvatarCard({
   isSelected,
   onSelect,
   onDelete,
-  onEditDescription,
+  onSaveMetadata,
 }: CustomAvatarCardProps) {
   const { t } = useLanguage();
   const [lightboxState, setLightboxState] = useState<LightboxState>('closed');
   const [deleting, setDeleting] = useState(false);
-  const [editingDescription, setEditingDescription] = useState(false);
-  const [description, setDescription] = useState(avatar.description || '');
+  const [editingMetadata, setEditingMetadata] = useState(false);
   const lightboxRef = useRef<HTMLDivElement>(null);
 
   // Close on escape key
@@ -31,7 +33,7 @@ export function CustomAvatarCard({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setLightboxState('closed');
-        setEditingDescription(false);
+        setEditingMetadata(false);
       }
     };
 
@@ -62,7 +64,7 @@ export function CustomAvatarCard({
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === lightboxRef.current) {
       setLightboxState('closed');
-      setEditingDescription(false);
+      setEditingMetadata(false);
     }
   };
 
@@ -83,15 +85,11 @@ export function CustomAvatarCard({
     }
   };
 
-  // Handle description save
-  const handleSaveDescription = async () => {
-    if (onEditDescription) {
-      try {
-        await onEditDescription(description);
-        setEditingDescription(false);
-      } catch (error) {
-        console.error('Failed to save description:', error);
-      }
+  // Handle metadata save
+  const handleSaveMetadata = async (metadata: AvatarMetadata) => {
+    if (onSaveMetadata) {
+      await onSaveMetadata(metadata);
+      setEditingMetadata(false);
     }
   };
 
@@ -189,49 +187,31 @@ export function CustomAvatarCard({
                   </span>
                 </button>
 
-                {/* Description/Notes section */}
+                {/* Metadata Editor section */}
                 <div className="border-t border-[#E5E5E3] pt-3">
-                  <label className="block text-sm font-medium text-[#666666] mb-1">
-                    {t.customAvatars?.notes || 'Notes'}
-                  </label>
-                  {editingDescription ? (
+                  {editingMetadata ? (
                     <div className="space-y-2">
-                      <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder={t.customAvatars?.descriptionPlaceholder || 'Describe this avatar...'}
-                        className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-lg focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] text-[#1A1A1A] placeholder-[#999999] text-sm resize-none"
-                        rows={3}
-                        maxLength={200}
+                      <AvatarMetadataEditor
+                        avatar={avatar}
+                        onSave={handleSaveMetadata}
                       />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleSaveDescription}
-                          className="flex-1 px-3 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium hover:bg-[#E55A2B] transition-colors"
-                        >
-                          {t.customAvatars?.save || 'Save'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingDescription(false);
-                            setDescription(avatar.description || '');
-                          }}
-                          className="px-3 py-2 bg-[#F7F7F5] text-[#666666] rounded-lg text-sm font-medium hover:bg-[#EFEFED] transition-colors"
-                        >
-                          {t.customAvatars?.cancel || 'Cancel'}
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setEditingMetadata(false)}
+                        className="w-full px-3 py-2 bg-[#F7F7F5] text-[#666666] rounded-lg text-sm font-medium hover:bg-[#EFEFED] transition-colors"
+                      >
+                        {t.customAvatars?.cancel || 'Cancel'}
+                      </button>
                     </div>
                   ) : (
                     <button
-                      onClick={() => setEditingDescription(true)}
+                      onClick={() => setEditingMetadata(true)}
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-[#F7F7F5] hover:bg-[#EFEFED] text-[#666666] transition-colors text-left"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       <span className="truncate">
-                        {avatar.description || (t.customAvatars?.addDescription || 'Add description...')}
+                        {avatar.description || (t.customAvatars?.editMetadata || 'Edit avatar details...')}
                       </span>
                     </button>
                   )}

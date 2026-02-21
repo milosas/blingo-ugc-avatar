@@ -21,7 +21,11 @@ export interface CustomAvatar {
   storage_path: string;
   image_url: string;
   description: string | null;
-  avatar_type: 'photo' | 'stylized' | 'pending';
+  avatar_type: 'photo' | 'stylized';
+  gender: 'male' | 'female' | 'other' | null;
+  age_range: 'child' | 'teen' | 'young_adult' | 'adult' | 'senior' | null;
+  hair_color: 'black' | 'brown' | 'blonde' | 'red' | 'gray' | 'white' | 'other' | null;
+  hair_length: 'short' | 'medium' | 'long' | 'bald' | null;
   model_id: string | null;
   display_order: number;
   created_at: string;

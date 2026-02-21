@@ -3,6 +3,51 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import type { CustomAvatar } from '../types/database';
 
+export interface AvatarMetadata {
+  avatar_type: 'photo' | 'stylized';
+  gender: 'male' | 'female' | 'other' | null;
+  age_range: 'child' | 'teen' | 'young_adult' | 'adult' | 'senior' | null;
+  hair_color: 'black' | 'brown' | 'blonde' | 'red' | 'gray' | 'white' | 'other' | null;
+  hair_length: 'short' | 'medium' | 'long' | 'bald' | null;
+}
+
+/**
+ * Compose an English description from avatar metadata dropdown values.
+ * Always in English regardless of UI language (used in AI generation prompts).
+ */
+export function composeDescription(meta: AvatarMetadata): string {
+  const parts: string[] = [];
+
+  // Age range
+  if (meta.age_range) {
+    parts.push(meta.age_range.replace('_', ' '));
+  }
+
+  // Gender
+  if (meta.gender) {
+    parts.push(meta.gender);
+  }
+
+  // Hair
+  if (meta.hair_length === 'bald') {
+    parts.push(', bald');
+  } else if (meta.hair_length || meta.hair_color) {
+    const hairParts: string[] = [];
+    if (meta.hair_length) hairParts.push(meta.hair_length);
+    if (meta.hair_color) hairParts.push(meta.hair_color);
+    if (hairParts.length > 0) {
+      parts.push(`with ${hairParts.join(' ')} hair`);
+    }
+  }
+
+  if (parts.length === 0) return '';
+
+  // Join intelligently: "young adult female with long blonde hair"
+  // Handle the ", bald" case
+  const result = parts.join(' ').replace(' , bald', ', bald');
+  return result;
+}
+
 interface UseCustomAvatarsReturn {
   avatars: CustomAvatar[];
   loading: boolean;
@@ -11,6 +56,7 @@ interface UseCustomAvatarsReturn {
   saveGeneratedAvatar: (base64Data: string, description: string) => Promise<CustomAvatar | null>;
   deleteAvatar: (avatarId: string, storagePath: string) => Promise<void>;
   updateDescription: (avatarId: string, description: string) => Promise<void>;
+  updateAvatarMetadata: (avatarId: string, metadata: AvatarMetadata) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -131,7 +177,7 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
           storage_path: storagePath,
           image_url: signedUrlData.signedUrl,
           description: null,
-          avatar_type: 'pending'
+          avatar_type: 'photo'
         })
         .select()
         .single();
@@ -140,24 +186,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         console.error('Database insert error:', dbError);
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
-
-      // Trigger AI analysis (non-blocking - don't await)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      fetch(`${supabaseUrl}/functions/v1/analyze-avatar`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
-        },
-        body: JSON.stringify({
-          avatarId: dbData.id,
-          imageUrl: signedUrlData.signedUrl,
-        }),
-      }).catch((err) => {
-        console.error('Avatar analysis trigger failed:', err);
-      });
 
       // Refresh list to include new avatar
       await fetchAvatars();
@@ -316,6 +344,36 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     }
   }, [user, fetchAvatars]);
 
+  const updateAvatarMetadata = useCallback(async (avatarId: string, metadata: AvatarMetadata): Promise<void> => {
+    if (!user) return;
+
+    try {
+      const description = composeDescription(metadata);
+
+      const { error: dbError } = await supabase
+        .from('custom_avatars')
+        .update({
+          avatar_type: metadata.avatar_type,
+          gender: metadata.gender,
+          age_range: metadata.age_range,
+          hair_color: metadata.hair_color,
+          hair_length: metadata.hair_length,
+          description: description || null,
+        })
+        .eq('id', avatarId)
+        .eq('user_id', user.id);
+
+      if (dbError) throw dbError;
+
+      await fetchAvatars();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update avatar metadata';
+      setError(errorMessage);
+      console.error('Update avatar metadata error:', err);
+      throw err;
+    }
+  }, [user, fetchAvatars]);
+
   const refresh = useCallback(async (): Promise<void> => {
     await fetchAvatars();
   }, [fetchAvatars]);
@@ -333,6 +391,7 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
     saveGeneratedAvatar,
     deleteAvatar,
     updateDescription,
+    updateAvatarMetadata,
     refresh
   };
 }

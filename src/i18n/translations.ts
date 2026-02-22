@@ -371,7 +371,11 @@ export const translations = {
       modelPhotos: 'Nuotraukos su modeliais',
       modelPhotosDesc: 'Produkto nuotraukos ant modelių',
       postCreator: 'Įrašų kūrėjas',
-      postCreatorDesc: 'Socialinių tinklų įrašai'
+      postCreatorDesc: 'Socialinių tinklų įrašai',
+      tryOn: 'Try-on',
+      posts: 'Įrašai',
+      settings: 'Nustatymai',
+      privacy: 'Privatumas'
     },
     avatarsPage: {
       title: 'Mano Avatarai',
@@ -999,7 +1003,11 @@ export const translations = {
       modelPhotos: 'Foto ar modeļiem',
       modelPhotosDesc: 'Produktu foto uz modeļiem',
       postCreator: 'Ierakstu veidotājs',
-      postCreatorDesc: 'Sociālo tīklu ieraksti'
+      postCreatorDesc: 'Sociālo tīklu ieraksti',
+      tryOn: 'Try-on',
+      posts: 'Ieraksti',
+      settings: 'Iestatījumi',
+      privacy: 'Privātums'
     },
     avatarsPage: {
       title: 'Mani Avatāri',
@@ -1627,7 +1635,11 @@ export const translations = {
       modelPhotos: 'Fotod modellidega',
       modelPhotosDesc: 'Tootefotod modellidel',
       postCreator: 'Postituste looja',
-      postCreatorDesc: 'Sotsiaalmeedia postitused'
+      postCreatorDesc: 'Sotsiaalmeedia postitused',
+      tryOn: 'Try-on',
+      posts: 'Postitused',
+      settings: 'Seaded',
+      privacy: 'Privaatsus'
     },
     avatarsPage: {
       title: 'Minu Avatarid',
@@ -2242,7 +2254,11 @@ export const translations = {
       modelPhotos: 'Photos with Models',
       modelPhotosDesc: 'Product photos on models',
       postCreator: 'Post Creator',
-      postCreatorDesc: 'Social media posts'
+      postCreatorDesc: 'Social media posts',
+      tryOn: 'Try-on',
+      posts: 'Posts',
+      settings: 'Settings',
+      privacy: 'Privacy'
     },
     avatarsPage: {
       title: 'My Avatars',

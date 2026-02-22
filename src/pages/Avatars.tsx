@@ -141,7 +141,7 @@ export default function Avatars() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              {t.avatarModels?.createModel || 'Create model'}
+              {'Įkelti modelį'}
             </button>
             <button
               onClick={() => { setCreatorTargetModelId(undefined); setShowCreatorModal(true); }}
@@ -150,7 +150,7 @@ export default function Avatars() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              AI {t.avatarCreator?.createAvatar || 'Create avatar'}
+              AI {'Sukurti avatarą'}
             </button>
           </div>
         </div>
@@ -212,13 +212,13 @@ export default function Avatars() {
                 onClick={() => setShowCreateModel(true)}
                 className="px-4 py-2 bg-[#F7F7F5] text-[#1A1A1A] border border-[#E5E5E3] rounded-full hover:bg-[#EFEFED] transition-all text-sm"
               >
-                {t.avatarModels?.createModel || 'Create model'}
+                {'Įkelti modelį'}
               </button>
               <button
                 onClick={() => { setCreatorTargetModelId(undefined); setShowCreatorModal(true); }}
                 className="px-4 py-2 bg-[#FF6B35] text-white rounded-full hover:bg-[#E55A2B] transition-all text-sm"
               >
-                AI {t.avatarCreator?.createAvatar || 'Create avatar'}
+                AI {'Sukurti avatarą'}
               </button>
             </div>
           </div>

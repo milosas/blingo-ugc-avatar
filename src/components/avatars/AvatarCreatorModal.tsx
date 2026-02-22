@@ -112,33 +112,21 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   const totalPhotos = currentModel?.photos?.length || 0;
   const canAddMore = totalPhotos < 5;
 
-  // Detect if we're adding to existing model with photos
+  // Reset state when modal opens — always creates new model
   useEffect(() => {
     if (!isOpen) return;
 
     setSavedPhotos([]);
     setCreatedModelId(null);
-    setSelectedModelId(targetModelId || 'new');
+    setSelectedModelId('new');
     setNewModelName('');
     setShowPrompt(false);
     setBatchCount(1);
     setBatchResults([]);
     setBatchProgress(0);
-
-    if (targetModelId) {
-      const model = safeModels.find(m => m.id === targetModelId);
-      if (model && (model.photos?.length || 0) > 0) {
-        const firstPhoto = model.photos![0];
-        const desc = firstPhoto.description || model.name;
-        setIsPoseMode(true);
-        setModelBaseDescription(desc);
-        setPoseMode(desc, firstPhoto.image_url);
-        return;
-      }
-    }
     setIsPoseMode(false);
     setModelBaseDescription('');
-  }, [isOpen, targetModelId, safeModels, setPoseMode]);
+  }, [isOpen]);
 
   const handleClose = () => {
     reset();
@@ -364,32 +352,18 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
 
         {/* Content */}
         <div className="p-5 space-y-4">
-          {/* Model selection - only when opened without a target model */}
-          {!isPoseMode && !createdModelId && !targetModelId && (
+          {/* Model name input - always creates new model */}
+          {!isPoseMode && !createdModelId && (
             <div>
               <label className="block text-xs font-medium text-[#666666] mb-1.5">
-                {tm?.selectModel || 'Save to model'}
+                {'Naujo modelio pavadinimas'}
               </label>
-              <select
-                value={selectedModelId}
-                onChange={(e) => setSelectedModelId(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] focus:outline-none focus:border-[#FF6B35]"
-              >
-                <option value="new">{tm?.createNewModel || '+ New model'}</option>
-                {safeModels.map(m => (
-                  <option key={m.id} value={m.id} disabled={(m.photos?.length || 0) >= 5}>
-                    {m.name} ({m.photos?.length || 0}/5)
-                  </option>
-                ))}
-              </select>
-              {selectedModelId === 'new' && (
-                <input
-                  value={newModelName}
-                  onChange={(e) => setNewModelName(e.target.value)}
-                  placeholder={tm?.modelName || 'Model name (optional)'}
-                  className="w-full mt-2 px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35]"
-                />
-              )}
+              <input
+                value={newModelName}
+                onChange={(e) => setNewModelName(e.target.value)}
+                placeholder={'Modelio pavadinimas (neprivaloma)'}
+                className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35]"
+              />
             </div>
           )}
 
@@ -480,11 +454,11 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   </button>
                 ))}
               </div>
-              {batchCount > 1 && (
-                <p className="text-[10px] text-[#999999] mt-1">
-                  {tm?.batchHint || 'Pirma nuotrauka su FLUX 2 Pro, likusios su PuLID (to paties veido)'}
-                </p>
-              )}
+              <p className="text-[10px] text-[#999999] mt-1">
+                {batchCount === 1
+                  ? 'FLUX 2 Pro (~$0.03)'
+                  : `1x FLUX 2 Pro + ${batchCount - 1}x PuLID (~$${(0.03 * batchCount).toFixed(2)})`}
+              </p>
             </div>
           )}
 

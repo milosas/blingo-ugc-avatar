@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useDashboard } from '../hooks/useDashboard';
@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { LoginModal } from '../components/auth/LoginModal';
 import { TiltCard } from '../components/animation/TiltCard';
 import { StaggerContainer, StaggerItem } from '../components/animation/StaggerChildren';
+import { supabase } from '../lib/supabase';
 
 export default function Dashboard() {
   const { t } = useLanguage();
@@ -13,6 +14,40 @@ export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const { stats, loading: dashboardLoading, error, refresh } = useDashboard();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Personal info state
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
+  // Pre-fill from user metadata
+  useEffect(() => {
+    if (user?.user_metadata) {
+      setName(user.user_metadata.name || '');
+      setPhone(user.user_metadata.phone || '');
+      setCompany(user.user_metadata.company || '');
+    }
+  }, [user]);
+
+  const handleSavePersonalInfo = async () => {
+    setSaving(true);
+    setSaveMessage(null);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { name, phone, company }
+      });
+      if (error) throw error;
+      setSaveMessage('Išsaugota!');
+      setTimeout(() => setSaveMessage(null), 2500);
+    } catch (err: any) {
+      setSaveMessage('Klaida: ' + (err.message || 'Nepavyko išsaugoti'));
+      setTimeout(() => setSaveMessage(null), 4000);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const loading = authLoading || dashboardLoading;
   const dashboard = t.dashboard;
@@ -84,6 +119,66 @@ export default function Dashboard() {
           {dashboard?.title || 'Settings'}
         </h1>
         <p className="text-[#666666] mt-1">{user.email}</p>
+      </div>
+
+      {/* Personal Info */}
+      <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6 mb-8">
+        <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4">Asmeniniai duomenys</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-[#333] mb-1">Vardas</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Jūsų vardas"
+              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#333] mb-1">El. paštas</label>
+            <input
+              type="email"
+              value={user.email || ''}
+              readOnly
+              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#999999] bg-[#F9F9F9] cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#333] mb-1">Telefonas</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+370..."
+              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#333] mb-1">Įmonė</label>
+            <input
+              type="text"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="Įmonės pavadinimas"
+              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-3 mt-5">
+          <button
+            onClick={handleSavePersonalInfo}
+            disabled={saving}
+            className="px-6 py-2.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saugoma...' : 'Išsaugoti'}
+          </button>
+          {saveMessage && (
+            <span className={`text-sm font-medium ${saveMessage.startsWith('Klaida') ? 'text-red-500' : 'text-green-600'}`}>
+              {saveMessage}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}

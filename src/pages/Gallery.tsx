@@ -170,6 +170,79 @@ function PostCard({
   );
 }
 
+function PaginationControls({
+  totalCount,
+  visibleCount,
+  page,
+  pageSize,
+  initialCount,
+  onShowMore,
+  onShowLess,
+  onNextPage,
+  onPrevPage,
+}: {
+  totalCount: number;
+  visibleCount: number;
+  page: number;
+  pageSize: number;
+  initialCount: number;
+  onShowMore: () => void;
+  onShowLess: () => void;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+}) {
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const pageStart = page * pageSize;
+  const pageEnd = Math.min(pageStart + visibleCount, totalCount);
+  const isCollapsed = visibleCount <= initialCount;
+  const hasMoreOnPage = pageEnd < Math.min(pageStart + pageSize, totalCount);
+
+  return (
+    <div className="flex items-center justify-center gap-3 mt-4">
+      {/* Show more / show less */}
+      {isCollapsed && totalCount > initialCount && (
+        <button
+          onClick={onShowMore}
+          className="px-4 py-2 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 rounded-lg transition-colors"
+        >
+          Rodyti daugiau
+        </button>
+      )}
+      {!isCollapsed && (
+        <button
+          onClick={onShowLess}
+          className="px-4 py-2 text-sm font-medium text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F7F7F5] rounded-lg transition-colors"
+        >
+          Rodyti mažiau
+        </button>
+      )}
+
+      {/* Page navigation (only when expanded and more than one page) */}
+      {!isCollapsed && totalPages > 1 && (
+        <>
+          <button
+            onClick={onPrevPage}
+            disabled={page === 0}
+            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#1A1A1A] hover:bg-[#F7F7F5]"
+          >
+            Ankstesnis
+          </button>
+          <span className="text-sm text-[#999999]">
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            onClick={onNextPage}
+            disabled={page >= totalPages - 1}
+            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#1A1A1A] hover:bg-[#F7F7F5]"
+          >
+            Kitas puslapis
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Gallery() {
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
@@ -189,6 +262,19 @@ export default function Gallery() {
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
+
+  // Pagination state per section
+  const INITIAL_COUNT = 4;
+  const PAGE_SIZE = 50;
+
+  const [photosVisible, setPhotosVisible] = useState(INITIAL_COUNT);
+  const [photosPage, setPhotosPage] = useState(0);
+
+  const [modelsVisible, setModelsVisible] = useState(INITIAL_COUNT);
+  const [modelsPage, setModelsPage] = useState(0);
+
+  const [postsVisible, setPostsVisible] = useState(INITIAL_COUNT);
+  const [postsPage, setPostsPage] = useState(0);
 
   // Editing state
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -405,74 +491,124 @@ export default function Gallery() {
       </div>
 
       {/* ===== Section 1: Sugeneruotos nuotraukos (Generated photos) ===== */}
-      {images.length > 0 && (
-        <div className="mb-8">
-          <SectionHeader
-            title="Sugeneruotos nuotraukos"
-            count={images.length}
-            isOpen={openSections.generated}
-            onToggle={() => toggleSection('generated')}
-          />
-          {openSections.generated && (
-            <div className="mt-3">
-              <GalleryGrid
-                images={images}
-                onImageClick={(index) => setLightboxIndex(index)}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onCreatePost={handleCreatePost}
-              />
-            </div>
-          )}
-        </div>
-      )}
+      {images.length > 0 && (() => {
+        const start = photosPage * PAGE_SIZE;
+        const sliced = images.slice(start, start + photosVisible);
+        return (
+          <div className="mb-8">
+            <SectionHeader
+              title="Sugeneruotos nuotraukos"
+              count={images.length}
+              isOpen={openSections.generated}
+              onToggle={() => toggleSection('generated')}
+            />
+            {openSections.generated && (
+              <div className="mt-3">
+                <GalleryGrid
+                  images={sliced}
+                  indexOffset={start}
+                  onImageClick={(index) => setLightboxIndex(index)}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onCreatePost={handleCreatePost}
+                />
+                <PaginationControls
+                  totalCount={images.length}
+                  visibleCount={photosVisible}
+                  page={photosPage}
+                  pageSize={PAGE_SIZE}
+                  initialCount={INITIAL_COUNT}
+                  onShowMore={() => setPhotosVisible(PAGE_SIZE)}
+                  onShowLess={() => { setPhotosVisible(INITIAL_COUNT); setPhotosPage(0); }}
+                  onNextPage={() => setPhotosPage(p => p + 1)}
+                  onPrevPage={() => setPhotosPage(p => Math.max(0, p - 1))}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ===== Section 2: Modeliai (Models) ===== */}
-      {models.length > 0 && (
-        <div className="mb-8">
-          <SectionHeader
-            title="Modeliai"
-            count={models.length}
-            isOpen={openSections.models}
-            onToggle={() => toggleSection('models')}
-          />
-          {openSections.models && (
-            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {models.map((model) => (
-                <ModelCard
-                  key={model.id}
-                  model={model}
-                  onClick={() => navigate('/modeliai')}
+      {models.length > 0 && (() => {
+        const start = modelsPage * PAGE_SIZE;
+        const slicedModels = models.slice(start, start + modelsVisible);
+        return (
+          <div className="mb-8">
+            <SectionHeader
+              title="Modeliai"
+              count={models.length}
+              isOpen={openSections.models}
+              onToggle={() => toggleSection('models')}
+            />
+            {openSections.models && (
+              <div className="mt-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {slicedModels.map((model) => (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      onClick={() => navigate('/modeliai')}
+                    />
+                  ))}
+                </div>
+                <PaginationControls
+                  totalCount={models.length}
+                  visibleCount={modelsVisible}
+                  page={modelsPage}
+                  pageSize={PAGE_SIZE}
+                  initialCount={INITIAL_COUNT}
+                  onShowMore={() => setModelsVisible(PAGE_SIZE)}
+                  onShowLess={() => { setModelsVisible(INITIAL_COUNT); setModelsPage(0); }}
+                  onNextPage={() => setModelsPage(p => p + 1)}
+                  onPrevPage={() => setModelsPage(p => Math.max(0, p - 1))}
                 />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ===== Section 3: Irasai (Posts) ===== */}
-      {posts.length > 0 && (
-        <div className="mb-8">
-          <SectionHeader
-            title="Irasai"
-            count={posts.length}
-            isOpen={openSections.posts}
-            onToggle={() => toggleSection('posts')}
-          />
-          {openSections.posts && (
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onDelete={handleDeletePost}
-                  onCopy={handleCopyPostText}
+      {posts.length > 0 && (() => {
+        const start = postsPage * PAGE_SIZE;
+        const slicedPosts = posts.slice(start, start + postsVisible);
+        return (
+          <div className="mb-8">
+            <SectionHeader
+              title="Irasai"
+              count={posts.length}
+              isOpen={openSections.posts}
+              onToggle={() => toggleSection('posts')}
+            />
+            {openSections.posts && (
+              <div className="mt-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {slicedPosts.map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onDelete={handleDeletePost}
+                      onCopy={handleCopyPostText}
+                    />
+                  ))}
+                </div>
+                <PaginationControls
+                  totalCount={posts.length}
+                  visibleCount={postsVisible}
+                  page={postsPage}
+                  pageSize={PAGE_SIZE}
+                  initialCount={INITIAL_COUNT}
+                  onShowMore={() => setPostsVisible(PAGE_SIZE)}
+                  onShowLess={() => { setPostsVisible(INITIAL_COUNT); setPostsPage(0); }}
+                  onNextPage={() => setPostsPage(p => p + 1)}
+                  onPrevPage={() => setPostsPage(p => Math.max(0, p - 1))}
                 />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Edit section -- appears when Edit icon is clicked on a photo */}
       {editingImage && (

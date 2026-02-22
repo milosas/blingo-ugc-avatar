@@ -327,6 +327,7 @@ export function useAvatarModels(): UseAvatarModelsReturn {
     if (!user) throw new Error('Must be logged in');
 
     try {
+      console.log('[useAvatarModels] addPhotoToModel called, modelId:', modelId, 'legacyMode:', legacyMode.current);
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         throw new Error('Only JPEG and PNG images are supported');
       }
@@ -334,10 +335,13 @@ export function useAvatarModels(): UseAvatarModelsReturn {
         throw new Error('File size must be less than 10MB');
       }
 
+      console.log('[useAvatarModels] Uploading to storage...');
       const { storagePath, imageUrl } = await uploadPhotoToStorage(user.id, file, file.type);
+      console.log('[useAvatarModels] Upload success, storagePath:', storagePath);
 
       const model = models.find(m => m.id === modelId);
       const nextOrder = (model?.photos?.length || 0);
+      console.log('[useAvatarModels] Model found:', !!model, 'nextOrder:', nextOrder);
 
       const insertData: Record<string, unknown> = {
         user_id: user.id,
@@ -352,12 +356,14 @@ export function useAvatarModels(): UseAvatarModelsReturn {
         insertData.display_order = nextOrder;
       }
 
+      console.log('[useAvatarModels] Inserting into DB:', JSON.stringify(insertData).substring(0, 200));
       const { data: photo, error: dbError } = await supabase
         .from('custom_avatars')
         .insert(insertData)
         .select()
         .single();
 
+      console.log('[useAvatarModels] DB result - data:', !!photo, 'error:', dbError);
       if (dbError) throw new Error(`Photo insert failed: ${dbError.message}`);
 
       if (!legacyMode.current && nextOrder === 0) {
@@ -384,12 +390,14 @@ export function useAvatarModels(): UseAvatarModelsReturn {
     if (!user) throw new Error('Must be logged in');
 
     try {
+      console.log('[useAvatarModels] addGeneratedPhotoToModel called, modelId:', modelId);
       await ensureProfile(user.id, user.email);
 
       // Convert base64 to blob
       const base64String = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
       const mimeMatch = base64Data.match(/data:([^;]+);/);
       const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+      console.log('[useAvatarModels] Converting base64, mimeType:', mimeType, 'dataLength:', base64String.length);
       const byteCharacters = atob(base64String);
       const byteArray = new Uint8Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -397,7 +405,9 @@ export function useAvatarModels(): UseAvatarModelsReturn {
       }
       const blob = new Blob([byteArray], { type: mimeType });
 
+      console.log('[useAvatarModels] Uploading generated photo to storage...');
       const { storagePath, imageUrl } = await uploadPhotoToStorage(user.id, blob, mimeType);
+      console.log('[useAvatarModels] Upload success, storagePath:', storagePath);
 
       const model = models.find(m => m.id === modelId);
       const nextOrder = (model?.photos?.length || 0);
@@ -415,12 +425,14 @@ export function useAvatarModels(): UseAvatarModelsReturn {
         insertData.display_order = nextOrder;
       }
 
+      console.log('[useAvatarModels] Inserting generated photo into DB...');
       const { data: photo, error: dbError } = await supabase
         .from('custom_avatars')
         .insert(insertData)
         .select()
         .single();
 
+      console.log('[useAvatarModels] DB result - data:', !!photo, 'error:', dbError);
       if (dbError) throw new Error(`Photo insert failed: ${dbError.message}`);
 
       if (!legacyMode.current && nextOrder === 0) {

@@ -41,6 +41,10 @@ interface UsePostCreatorReturn {
   isSaving: boolean;
   savedPostId: string | null;
 
+  // Improvise
+  isImprovising: boolean;
+  improvise: () => Promise<void>;
+
   // Actions
   generate: () => Promise<void>;
   regenerateText: () => Promise<void>;
@@ -75,7 +79,42 @@ export function usePostCreator(): UsePostCreatorReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [savedPostId, setSavedPostId] = useState<string | null>(null);
 
+  const [isImprovising, setIsImprovising] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const improvise = useCallback(async () => {
+    if (!industry) return;
+    setIsImprovising(true);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/improvise-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey,
+        },
+        body: JSON.stringify({
+          industry,
+          existingText: prompt || undefined,
+          target: 'post',
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.text) {
+        setPrompt(data.text);
+      } else {
+        setError(data.error || 'Improvizavimas nepavyko');
+      }
+    } catch (err) {
+      setError((err as Error).message || 'Improvizavimas nepavyko');
+    } finally {
+      setIsImprovising(false);
+    }
+  }, [industry, prompt]);
 
   const getConfig = useCallback((): PostConfig => ({
     industry,
@@ -258,6 +297,8 @@ export function usePostCreator(): UsePostCreatorReturn {
     error,
     isSaving,
     savedPostId,
+    isImprovising,
+    improvise,
     generate,
     regenerateText,
     regenerateImage,

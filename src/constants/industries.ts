@@ -1,4 +1,5 @@
 export const INDUSTRIES = [
+  'E-komercija (e-parduotuvės, dropshipping, online verslas)',
   'Grožio specialistai (kirpėjai, kosmetologai, nagų meistrai)',
   'Treneriai (fitness, joga, personaliniai)',
   'Kineziterapeutai ir masažuotojai',
@@ -24,6 +25,7 @@ export const INDUSTRIES = [
 export type Industry = typeof INDUSTRIES[number];
 
 export const INDUSTRY_PLACEHOLDERS: Record<string, string> = {
+  'e-komerc': 'Pvz.: Naujas produktas, sezoninė akcija -30%, nemokamas pristatymas, flash sale...',
   'grožio': 'Pvz.: Nauja plaukų dažymo technika, rudens akcija -20%, lash lift naujiena...',
   'trener': 'Pvz.: Nauja grupinė treniruotė, vasaros kūno iššūkis, nemokama pirmoji treniruotė...',
   'kineziterapeut': 'Pvz.: Nugaros skausmų gydymas, reabilitacija po traumos, masažo akcija...',

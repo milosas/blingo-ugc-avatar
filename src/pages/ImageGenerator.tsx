@@ -32,8 +32,22 @@ export default function ImageGenerator() {
 
         {/* 2. Prompt Textarea */}
         <AnimatedSection delay={0.1}><div>
-          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-            {p.promptLabel || 'Aprašymas'}
+          <label className="flex items-center justify-between text-sm font-medium text-[#1A1A1A] mb-1.5">
+            <span>{p.promptLabel || 'Aprašymas'}</span>
+            <button
+              onClick={ig.improvise}
+              disabled={!ig.industry || ig.isImprovising}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#FF6B35] hover:bg-[#FFF0EB] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {ig.isImprovising ? (
+                <div className="w-3 h-3 rounded-full border border-[#FF6B35] border-t-transparent animate-spin" />
+              ) : (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM19.5 10.5l-1 3-1-3-3-1 3-1 1-3 1 3 3 1-3 1z" />
+                </svg>
+              )}
+              {ig.isImprovising ? 'Improvizuojama...' : 'Improvizuoti'}
+            </button>
           </label>
           <textarea
             value={ig.prompt}

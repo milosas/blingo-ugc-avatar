@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const KIE_API_KEY = Deno.env.get('KIE_API_KEY')
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -312,6 +312,22 @@ RAŠYK KAIP TIKRAS VALYMO PASLAUGŲ TEIKĖJAS:
 
 CTA PAVYZDŽIAI: "Pirmas valymas -20%", "Nemokamas įvertinimas", "Grįžk į švarią erdvę"`,
 
+  'e-komercija': `Tu esi e-komercijos ir online verslo socialinių tinklų ekspertas Lietuvoje.
+
+ŽINAI:
+- E-parduotuvių marketingo strategijas: flash sales, abandoned cart, product launches
+- Dropshipping ir online verslo specifiką Lietuvoje
+- Kaip rašyti produktų aprašymus ir akcijų skelbimus
+- Socialinės medijos pardavimo taktikas: scarcity, social proof, FOMO
+
+RAŠYK KAIP TIKRAS E-KOMERCIJOS EKSPERTAS:
+- Pabrėžk produkto naudą ir vertę klientui
+- Naudok skubumo elementus: ribota akcija, liko X vnt, tik šiandien
+- Paminėk nemokamą pristatymą, greitą pristatymą ar grąžinimo galimybę
+- Sukurk norą pirkti DABAR
+
+CTA PAVYZDŽIAI: "Pirk dabar", "Naudok kodą SALE30", "Nemokamas pristatymas virš 50€", "Liko tik 5 vnt!"`,
+
   'kita': `Tu esi smulkaus verslo socialinių tinklų ekspertas Lietuvoje.
 
 ŽINAI:
@@ -394,8 +410,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!KIE_API_KEY) {
-      throw new Error('KIE_API_KEY not configured')
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured')
     }
 
     const body: GenerateRequest = await req.json()
@@ -410,12 +426,12 @@ serve(async (req) => {
     const systemPrompt = getSystemPrompt(body.industry)
     const userPrompt = buildUserPrompt(body)
 
-    // Call KIE.ai OpenAI proxy with streaming
-    const response = await fetch('https://api.kie.ai/v1/chat/completions', {
+    // Call OpenAI API directly with streaming
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -429,8 +445,8 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('KIE API error:', response.status, errorText)
-      throw new Error(`KIE API error: ${response.status}`)
+      console.error('OpenAI API error:', response.status, errorText)
+      throw new Error(`OpenAI API error: ${response.status}`)
     }
 
     // Forward the streaming response

@@ -17,6 +17,10 @@ interface UseImageGeneratorReturn {
   isSaving: boolean;
   savedId: string | null;
 
+  // Improvise
+  isImprovising: boolean;
+  improvise: () => Promise<void>;
+
   // Actions
   generate: () => Promise<void>;
   regenerate: () => Promise<void>;
@@ -34,6 +38,41 @@ export function useImageGenerator(): UseImageGeneratorReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [isImprovising, setIsImprovising] = useState(false);
+
+  const improvise = useCallback(async () => {
+    if (!industry) return;
+    setIsImprovising(true);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/improvise-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey,
+        },
+        body: JSON.stringify({
+          industry,
+          existingText: prompt || undefined,
+          target: 'image',
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.text) {
+        setPrompt(data.text);
+      } else {
+        setError(data.error || 'Improvizavimas nepavyko');
+      }
+    } catch (err) {
+      setError((err as Error).message || 'Improvizavimas nepavyko');
+    } finally {
+      setIsImprovising(false);
+    }
+  }, [industry, prompt]);
 
   const doGenerate = useCallback(async () => {
     setIsLoading(true);
@@ -112,6 +151,8 @@ export function useImageGenerator(): UseImageGeneratorReturn {
     error,
     isSaving,
     savedId,
+    isImprovising,
+    improvise,
     generate,
     regenerate,
     downloadImage,

@@ -95,15 +95,20 @@ serve(async (req) => {
       }
       imageUrl = pulidResult.images[0].url
     } else {
-      // FLUX Pro v1.1 Ultra uses aspect_ratio param (not image_size)
-      // Valid: 21:9, 16:9, 4:3, 3:2, 1:1, 2:3, 3:4, 9:16, 9:21
-      const aspectRatio = body.aspect_ratio || '1:1'
-      console.log('Using aspect_ratio:', aspectRatio)
-      const fluxResult = await falRun('fal-ai/flux-pro/v1.1-ultra', {
+      // FLUX 2 Pro — sharper, higher quality than FLUX 1.1 Pro Ultra
+      // Uses image_size enum instead of aspect_ratio
+      const imageSizeMap: Record<string, string> = {
+        '9:16': 'portrait_16_9',
+        '3:4': 'portrait_4_3',
+        '1:1': 'square_hd',
+      }
+      const imageSize = imageSizeMap[body.aspect_ratio || '1:1'] || 'square_hd'
+      console.log('Using FLUX 2 Pro, image_size:', imageSize)
+      const fluxResult = await falRun('fal-ai/flux-2-pro', {
         prompt: body.prompt,
-        aspect_ratio: aspectRatio,
-        num_images: 1,
+        image_size: imageSize,
         safety_tolerance: '2',
+        output_format: 'png',
       }) as { images?: Array<{ url: string }> }
 
       if (!fluxResult.images || fluxResult.images.length === 0) {
@@ -120,6 +125,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       image: base64Image,
+      imageUrl: imageUrl,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

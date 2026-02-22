@@ -69,6 +69,9 @@ async function uploadToFalStorage(base64Data: string): Promise<string> {
     contentType = 'image/webp'
   }
 
+  console.log(`Uploading to fal storage: ${bytes.length} bytes, type: ${contentType}`)
+
+  // Try direct upload via fal.run
   const response = await fetch('https://fal.run/fal-ai/fal-file-storage/upload', {
     method: 'PUT',
     headers: {
@@ -80,10 +83,48 @@ async function uploadToFalStorage(base64Data: string): Promise<string> {
 
   if (!response.ok) {
     const errorText = await response.text()
-    throw new Error(`Fal storage upload failed: ${response.status} - ${errorText}`)
+    console.error(`Fal storage upload failed (${response.status}):`, errorText)
+
+    // Fallback: try REST API upload
+    console.log('Trying REST API upload fallback...')
+    const initResponse = await fetch('https://rest.alpha.fal.ai/storage/upload/url', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${FAL_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content_type: contentType,
+        file_name: `upload-${Date.now()}.${contentType === 'image/png' ? 'png' : 'jpg'}`,
+      }),
+    })
+
+    if (!initResponse.ok) {
+      const initError = await initResponse.text()
+      console.error('REST API upload init failed:', initError)
+      throw new Error(`Fal storage upload failed: ${response.status} - ${errorText}`)
+    }
+
+    const { upload_url, file_url } = await initResponse.json()
+
+    const putResponse = await fetch(upload_url, {
+      method: 'PUT',
+      headers: { 'Content-Type': contentType },
+      body: bytes,
+    })
+
+    if (!putResponse.ok) {
+      const putError = await putResponse.text()
+      console.error('REST API PUT failed:', putError)
+      throw new Error(`Fal storage PUT failed: ${putResponse.status}`)
+    }
+
+    console.log('Upload via REST API succeeded:', file_url)
+    return file_url
   }
 
   const data = await response.json()
+  console.log('Upload succeeded:', data.url)
   return data.url
 }
 
@@ -130,6 +171,11 @@ async function falQueueSubmitAndPoll(endpoint: string, body: Record<string, unkn
 
   if (!submitResponse.ok) {
     const errorText = await submitResponse.text()
+    console.error(`Fal queue submit failed for ${endpoint}:`, {
+      status: submitResponse.status,
+      statusText: submitResponse.statusText,
+      error: errorText,
+    })
     throw new Error(`Fal queue submit failed: ${submitResponse.status} - ${errorText}`)
   }
 
@@ -179,6 +225,7 @@ async function falQueueSubmitAndPoll(endpoint: string, body: Record<string, unkn
     }
 
     if (statusData.status === 'FAILED') {
+      console.error('Fal generation FAILED:', JSON.stringify(statusData))
       throw new Error(statusData.error || 'Fal generation failed')
     }
   }
@@ -227,6 +274,15 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
   const numSamples = body.imageCount || 1
 
   console.log(`FASHN try-on: mode=${mode}, samples=${numSamples}`)
+
+  // Log full request body for debugging
+  console.log('FASHN request body:', JSON.stringify({
+    model_image: modelImageUrl,
+    garment_image: garmentUrl,
+    mode,
+    num_samples: numSamples,
+    output_format: 'png',
+  }))
 
   // Call FASHN v1.6 via fal queue
   // category & garment_photo_type default to 'auto' — FASHN auto-detects both
@@ -399,28 +455,45 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  let body: GenerateRequest | undefined
+
   try {
     if (!FAL_KEY) {
       throw new Error('FAL_KEY not configured')
     }
 
-    const body: GenerateRequest = await req.json()
-    const mode = body.mode || 'tryon'
+    try {
+      body = await req.json()
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError.message)
+      return new Response(JSON.stringify({
+        success: false,
+        images: [],
+        message: 'Invalid JSON in request body',
+        error: 'PARSE_ERROR',
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const mode = body!.mode || 'tryon'
+    console.log(`Processing request: mode=${mode}`)
 
     let response: GenerateResponse
 
     switch (mode) {
       case 'tryon':
-        response = await handleTryOn(body)
+        response = await handleTryOn(body!)
         break
       case 'background':
-        response = await handleBackgroundReplace(body)
+        response = await handleBackgroundReplace(body!)
         break
       case 'relight':
-        response = await handleRelight(body)
+        response = await handleRelight(body!)
         break
       case 'edit':
-        response = await handleKontextEdit(body)
+        response = await handleKontextEdit(body!)
         break
       default:
         throw new Error(`Unknown mode: ${mode}`)
@@ -431,13 +504,14 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('Error:', error.message)
+    const mode = body?.mode || 'unknown'
+    console.error(`Error in mode=${mode}:`, error.message)
 
     const response: GenerateResponse = {
       success: false,
       images: [],
       message: error.message || 'Generation failed',
-      error: error.message,
+      error: `[${mode}] ${error.message}`,
     }
 
     return new Response(JSON.stringify(response), {

@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
-import { Select } from '../ui/Select';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { AVATARS, IMAGE_COUNTS, QUALITY_MODES } from '../../constants/fluxOptions';
-import type { Avatar, ImageCountOption, QualityModeOption, Config } from '../../types';
+import { AVATARS, QUALITY_MODES } from '../../constants/fluxOptions';
+import type { Avatar, QualityModeOption, Config } from '../../types';
 import { useAvatarModels } from '../../hooks/useAvatarModels';
 import { useAuth } from '../../hooks/useAuth';
 import { ModelCard } from '../avatars/ModelCard';
@@ -16,7 +15,7 @@ interface ConfigPanelProps {
 export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { models, createModel, addPhotoToModel } = useAvatarModels();
+  const { models, createModel, addPhotoToModel, addGeneratedPhotoToModel, deletePhoto } = useAvatarModels();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modelFileInputRef = useRef<HTMLInputElement>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
@@ -39,10 +38,6 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
 
   const handleQualityModeChange = (mode: QualityModeOption) => {
     onConfigChange({ ...config, qualityMode: mode.id });
-  };
-
-  const handleImageCountChange = (option: ImageCountOption) => {
-    onConfigChange({ ...config, imageCount: option.id });
   };
 
   const handleAddPhotoToModel = (modelId: string) => {
@@ -133,8 +128,6 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
     e.target.value = '';
   };
 
-  const selectedImageCount = IMAGE_COUNTS.find(ic => ic.id === config.imageCount) || null;
-
   const getAvatarName = (avatar: Avatar) => {
     if (avatar.isCustom) return avatar.name || t.customAvatars?.customAvatar || 'Custom Avatar';
     const translated = t.avatars[avatar.id as keyof typeof t.avatars];
@@ -145,11 +138,6 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
     if (avatar.isCustom) return avatar.description;
     const translated = t.avatars[avatar.id as keyof typeof t.avatars];
     return translated?.description || avatar.description;
-  };
-
-  const getImageCountName = (ic: ImageCountOption) => {
-    const translated = t.imageCounts[ic.id as keyof typeof t.imageCounts];
-    return translated?.name || ic.name;
   };
 
   const getQualityModeName = (qm: QualityModeOption) => {
@@ -358,24 +346,15 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
         </div>
       </div>
 
-      {/* Divider */}
-      <hr className="border-[#E5E5E3]" />
-
-      {/* Image Count */}
-      <Select<ImageCountOption>
-        value={selectedImageCount}
-        onChange={handleImageCountChange}
-        options={IMAGE_COUNTS}
-        getLabel={getImageCountName}
-        label={t.config.imageCount}
-        placeholder={t.config.placeholder}
-      />
-
       {/* Avatar Creator Modal */}
       <AvatarCreatorModal
         isOpen={showCreatorModal}
         onClose={() => setShowCreatorModal(false)}
         targetModelId={creatorTargetModelId}
+        models={models}
+        createModel={createModel}
+        addGeneratedPhotoToModel={addGeneratedPhotoToModel}
+        deletePhoto={deletePhoto}
       />
     </div>
   );

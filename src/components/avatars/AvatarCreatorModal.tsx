@@ -258,7 +258,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
       await onSaved?.();
       handleClose();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save avatar';
+      const message = err instanceof Error ? err.message : 'Failed to save model';
       setError(message);
       setIsSaving(false);
     }
@@ -532,7 +532,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
           {!isBatchMode && generatedImage && !isBatchGenerating && (
             <div className="flex justify-center">
               <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-[#FF6B35]">
-                <img src={generatedImage} alt="Generated avatar" className="w-full h-full object-cover object-top" />
+                <img src={generatedImage} alt="Generated model" className="w-full h-full object-cover object-top" />
               </div>
             </div>
           )}

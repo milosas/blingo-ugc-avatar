@@ -42,7 +42,7 @@ export function SimpleAvatarCard({
       <div className="aspect-square bg-[#F7F7F5] rounded-lg overflow-hidden">
         <img
           src={avatar.image_url}
-          alt="Custom avatar"
+          alt="Custom model"
           className="w-full h-full object-cover object-top"
           onError={handleImageError}
         />

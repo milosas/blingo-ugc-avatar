@@ -69,7 +69,7 @@ export function AvatarMetadataEditor({ avatar, onSave }: AvatarMetadataEditorPro
     <div className="space-y-3">
       {/* Avatar Type */}
       <div>
-        <label className={labelClass}>{meta?.avatarType || 'Avatar Type'}</label>
+        <label className={labelClass}>{meta?.avatarType || 'Model Type'}</label>
         <select
           value={avatarType}
           onChange={(e) => setAvatarType(e.target.value as 'photo' | 'stylized')}

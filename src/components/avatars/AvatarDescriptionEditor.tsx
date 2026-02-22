@@ -85,7 +85,7 @@ export function AvatarDescriptionEditor({
         maxLength={maxLength}
         disabled={saving}
         className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-        placeholder={t.avatarsPage?.descriptionPlaceholder || 'Describe this avatar (used for AI generation)...'}
+        placeholder={t.avatarsPage?.descriptionPlaceholder || 'Describe this model (used for AI generation)...'}
       />
 
       {/* Character counter */}

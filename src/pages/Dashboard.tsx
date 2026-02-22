@@ -50,7 +50,7 @@ export default function Dashboard() {
             {dashboard?.guestTitle || 'Sign in to view your settings'}
           </h2>
           <p className="text-[#666666] mb-6">
-            {dashboard?.guestDescription || 'Track your generations, manage avatars, and view your credits'}
+            {dashboard?.guestDescription || 'Track your generations, manage models, and view your credits'}
           </p>
           <button
             onClick={() => setShowLoginModal(true)}
@@ -111,7 +111,7 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           }
-          label={dashboard?.stats?.avatars || 'Custom Avatars'}
+          label={dashboard?.stats?.avatars || 'Custom Models'}
           value={stats?.avatarsCount ?? 0}
           color="teal"
         /></StaggerItem>
@@ -188,7 +188,7 @@ export default function Dashboard() {
 
         {/* Avatars Section */}
         <AccordionSection
-          title={sections?.avatars || 'Avatars'}
+          title={sections?.avatars || 'Models'}
           icon={
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -205,11 +205,11 @@ export default function Dashboard() {
                   <div
                     key={avatar.id}
                     className="aspect-square rounded-xl overflow-hidden bg-[#F7F7F5] cursor-pointer hover:opacity-90 transition-opacity"
-                    onClick={() => navigate('/avatars')}
+                    onClick={() => navigate('/modeliai')}
                   >
                     <img
                       src={avatar.image_url}
-                      alt={avatar.description || 'Avatar'}
+                      alt={avatar.description || 'Model'}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -217,7 +217,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-4 text-right">
                 <Link
-                  to="/avatars"
+                  to="/modeliai"
                   className="text-[#FF6B35] hover:text-[#E55A2B] text-sm font-medium"
                 >
                   {dashboard?.viewAll || 'View All'} →
@@ -226,9 +226,9 @@ export default function Dashboard() {
             </div>
           ) : (
             <EmptyAccordion
-              message={sections?.noAvatars || 'No avatars yet'}
-              cta={sections?.addAvatar || 'Add avatar'}
-              onClick={() => navigate('/avatars')}
+              message={sections?.noAvatars || 'No models yet'}
+              cta={sections?.addAvatar || 'Add model'}
+              onClick={() => navigate('/modeliai')}
             />
           )}
         </AccordionSection>

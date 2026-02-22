@@ -122,7 +122,7 @@ export function CustomAvatarCard({
         <div className="aspect-square bg-[#F7F7F5] rounded-lg overflow-hidden">
           <img
             src={avatar.image_url}
-            alt="Custom avatar"
+            alt="Custom model"
             className="w-full h-full object-cover object-top"
             onError={handleImageError}
           />
@@ -153,7 +153,7 @@ export function CustomAvatarCard({
             >
               <img
                 src={avatar.image_url}
-                alt="Custom avatar"
+                alt="Custom model"
                 className="w-full h-auto max-h-[70vh] object-cover object-top cursor-pointer"
               />
 
@@ -183,7 +183,7 @@ export function CustomAvatarCard({
                   <span className="font-medium">
                     {isSelected
                       ? (t.customAvatars?.selected || 'Selected')
-                      : (t.customAvatars?.selectAvatar || 'Select this avatar')}
+                      : (t.customAvatars?.selectAvatar || 'Select this model')}
                   </span>
                 </button>
 
@@ -211,7 +211,7 @@ export function CustomAvatarCard({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       <span className="truncate">
-                        {avatar.description || (t.customAvatars?.editMetadata || 'Edit avatar details...')}
+                        {avatar.description || (t.customAvatars?.editMetadata || 'Edit model details...')}
                       </span>
                     </button>
                   )}
@@ -236,7 +236,7 @@ export function CustomAvatarCard({
                   <span className="font-medium">
                     {deleting
                       ? (t.customAvatars?.deleting || 'Deleting...')
-                      : (t.customAvatars?.delete || 'Delete avatar')}
+                      : (t.customAvatars?.delete || 'Delete model')}
                   </span>
                 </button>
 

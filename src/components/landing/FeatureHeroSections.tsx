@@ -83,6 +83,41 @@ function ImageToImageVisual() {
   );
 }
 
+function ModelCreatorVisual() {
+  return (
+    <div className="relative">
+      <div className="bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex gap-3">
+            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md flex items-center justify-center border-2 border-[#10B981]">
+              <svg className="w-8 h-8 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#CCCCCC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md border-2 border-dashed border-[#10B981]/40 flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 bg-white rounded-lg shadow-sm px-3 py-2">
+            <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+            <span className="text-xs text-[#666] font-medium">5 nuotraukos per modelį</span>
+          </div>
+        </div>
+      </div>
+      <div className="absolute -top-3 -right-3 bg-[#10B981] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+        AI
+      </div>
+    </div>
+  );
+}
+
 function PostCreatorVisual() {
   return (
     <div className="relative">
@@ -274,10 +309,10 @@ export function FeatureHeroSections() {
       <FeatureBlock
         badge={features?.imageToImage?.badge || 'Most Popular'}
         badgeColor="bg-[#FF6B35] text-white"
-        title={features?.imageToImage?.title || 'Product Photos on Real Models'}
-        subtitle={features?.imageToImage?.subtitle || 'Upload a clothing or product photo — AI will place it on a selected model.'}
+        title={features?.imageToImage?.title || 'Try-on su modeliais'}
+        subtitle={features?.imageToImage?.subtitle || 'Įkelkite drabužio ar produkto nuotrauką — AI uždės ją ant pasirinkto modelio.'}
         features={[
-          features?.imageToImage?.feature1 || 'Choose from 10+ professional models or upload your own avatar',
+          features?.imageToImage?.feature1 || 'Choose from 10+ professional models or upload your own model',
           features?.imageToImage?.feature2 || 'Change environments, poses, styles, and moods with one click',
           features?.imageToImage?.feature3 || 'Get studio-quality photos ready for social media and e-commerce',
         ]}
@@ -288,7 +323,26 @@ export function FeatureHeroSections() {
         bgColor="bg-white"
       />
 
-      {/* Section 2: Post Creator */}
+      {/* Section 2: Model Creator */}
+      <FeatureBlock
+        badge={features?.modelCreator?.badge || 'Modeliai'}
+        badgeColor="bg-[#10B981] text-white"
+        title={features?.modelCreator?.title || 'Modelių kūrimas'}
+        subtitle={features?.modelCreator?.subtitle || 'Sukurkite AI modelius iš savo nuotraukų arba leiskite AI sugeneruoti naujus.'}
+        features={[
+          features?.modelCreator?.feature1 || 'Įkelkite savo nuotraukas arba sukurkite modelį su AI vienu paspaudimu',
+          features?.modelCreator?.feature2 || 'Iki 5 nuotraukų kiekvienam modeliui — skirtingos pozos ir kampai',
+          features?.modelCreator?.feature3 || 'Naudokite modelius nuotraukų generavimui ir socialinių tinklų įrašams',
+        ]}
+        creditInfo={features?.modelCreator?.creditInfo || 'Nuo 1 kredito per nuotrauką'}
+        cta={features?.modelCreator?.cta || 'Kurti modelį'}
+        ctaLink="/modeliai"
+        reversed
+        visual={<ModelCreatorVisual />}
+        bgColor="bg-[#F7F7F5]"
+      />
+
+      {/* Section 3: Post Creator */}
       <FeatureBlock
         badge={features?.postCreator?.badge || 'All-in-One'}
         badgeColor="bg-[#9B6CF7] text-white"

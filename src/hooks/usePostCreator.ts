@@ -83,7 +83,6 @@ export function usePostCreator(): UsePostCreatorReturn {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const improvise = useCallback(async () => {
-    if (!industry) return;
     setIsImprovising(true);
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
@@ -97,7 +96,7 @@ export function usePostCreator(): UsePostCreatorReturn {
           'apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
-          industry,
+          industry: industry || 'general',
           existingText: prompt || undefined,
           target: 'post',
         }),

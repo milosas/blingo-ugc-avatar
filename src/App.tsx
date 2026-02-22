@@ -33,7 +33,7 @@ const router = createBrowserRouter([
         element: <Gallery />,
       },
       {
-        path: '/avatars',
+        path: '/modeliai',
         element: <Avatars />,
       },
       {

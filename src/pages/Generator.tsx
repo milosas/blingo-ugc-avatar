@@ -61,8 +61,8 @@ export default function Generator() {
           ...prev,
           avatar: {
             id: avatar.id,
-            name: t.customAvatars?.customAvatar || 'Custom Avatar',
-            description: avatar.description || t.customAvatars?.customAvatar || 'Custom avatar',
+            name: t.customAvatars?.customAvatar || 'Custom Model',
+            description: avatar.description || t.customAvatars?.customAvatar || 'Custom model',
             imageUrl: avatar.image_url,
             promptDescription: avatar.description || 'the person shown in the reference image',
             isCustom: true

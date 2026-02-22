@@ -7,11 +7,11 @@ import { LanguageSelector } from '../ui/LanguageSelector';
 import { MobileMenu } from './MobileMenu';
 
 const navItems = [
-  { key: 'tryOn', path: '/generator' },
-  { key: 'gallery', path: '/gallery' },
-  { key: 'posts', path: '/post-creator' },
-  { key: 'avatars', path: '/avatars' },
-  { key: 'settings', path: '/dashboard' },
+  { key: 'tryon', path: '/generator', label: 'Try-on' },
+  { key: 'gallery', path: '/gallery', label: 'Galerija' },
+  { key: 'models', path: '/modeliai', label: 'Modelių kūrimas' },
+  { key: 'posts', path: '/post-creator', label: 'Įrašai' },
+  { key: 'settings', path: '/dashboard', label: 'Nustatymai' },
 ] as const;
 
 export function Header() {
@@ -47,7 +47,7 @@ export function Header() {
                       : 'text-[#64748B] hover:text-[#1A1A1A] hover:bg-[#F7F7F5]'
                   }`}
                 >
-                  {nav?.[item.key] || item.key}
+                  {nav?.[item.key] || item.label}
                   {activeNavKey === item.key && (
                     <motion.div
                       layoutId="nav-underline"

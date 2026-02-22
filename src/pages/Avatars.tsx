@@ -14,10 +14,9 @@ export default function Avatars() {
     models,
     loading: modelsLoading,
     createModel,
-    addPhotoToModel,
+    addGeneratedPhotoToModel,
     deleteModel,
     deletePhoto,
-    movePhoto,
     setCover,
     renameModel,
     refresh,
@@ -31,48 +30,9 @@ export default function Avatars() {
   const [newModelName, setNewModelName] = useState('');
   const [creatingModel, setCreatingModel] = useState(false);
 
-  // Drag-and-drop state
-  const [dragPhotoId, setDragPhotoId] = useState<string | null>(null);
-  const [dragFromModelId, setDragFromModelId] = useState<string | null>(null);
-  const [dragOverModelId, setDragOverModelId] = useState<string | null>(null);
-
-  // File input for adding photos to specific models
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [addPhotoTargetModelId, setAddPhotoTargetModelId] = useState<string | null>(null);
   const newModelFileInputRef = useRef<HTMLInputElement>(null);
 
   const loading = authLoading || modelsLoading;
-
-  const handleAddPhoto = (modelId: string) => {
-    setAddPhotoTargetModelId(modelId);
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !addPhotoTargetModelId) return;
-
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      alert(t.avatarsPage?.invalidFileType || 'Only JPEG and PNG files are allowed');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert(t.avatarsPage?.fileTooLarge || 'File size must be less than 10MB');
-      return;
-    }
-
-    try {
-      await addPhotoToModel(addPhotoTargetModelId, file);
-    } catch (error) {
-      console.error('Failed to add photo:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      alert(`${t.avatarsPage?.uploadFailed || 'Failed to upload'}: ${errorMessage}`);
-    }
-
-    e.target.value = '';
-    setAddPhotoTargetModelId(null);
-  };
 
   const handleCreateModel = async () => {
     if (!newModelName.trim()) return;
@@ -117,30 +77,6 @@ export default function Avatars() {
       setCreatingModel(false);
     }
     e.target.value = '';
-  };
-
-  const handleAiGenerate = (modelId: string) => {
-    setCreatorTargetModelId(modelId);
-    setShowCreatorModal(true);
-  };
-
-  // Drag-and-drop handlers
-  const handleDragStart = (photoId: string, modelId: string) => {
-    setDragPhotoId(photoId);
-    setDragFromModelId(modelId);
-  };
-
-  const handleDrop = async (targetModelId: string) => {
-    if (dragPhotoId && dragFromModelId && targetModelId !== dragFromModelId) {
-      try {
-        await movePhoto(dragPhotoId, dragFromModelId, targetModelId);
-      } catch (error) {
-        console.error('Failed to move photo:', error);
-      }
-    }
-    setDragPhotoId(null);
-    setDragFromModelId(null);
-    setDragOverModelId(null);
   };
 
   if (loading) {
@@ -295,43 +231,21 @@ export default function Avatars() {
               <StaggerItem key={model.id}>
                 <ModelManagementCard
                   model={model}
-                  allModels={models}
                   isExpanded={expandedModelId === model.id}
                   onToggleExpand={() => setExpandedModelId(expandedModelId === model.id ? null : model.id)}
                   onRename={renameModel}
                   onDeleteModel={deleteModel}
                   onDeletePhoto={deletePhoto}
                   onSetCover={setCover}
-                  onMovePhoto={movePhoto}
-                  onAddPhoto={handleAddPhoto}
-                  onAiGenerate={handleAiGenerate}
-                  onDragStart={handleDragStart}
-                  onDragEnter={(id) => setDragOverModelId(id)}
-                  onDragEnd={() => { setDragPhotoId(null); setDragFromModelId(null); setDragOverModelId(null); }}
-                  onDrop={handleDrop}
-                  isDragOver={dragOverModelId === model.id && dragFromModelId !== model.id}
                 />
               </StaggerItem>
             ))}
           </StaggerContainer>
         )}
 
-        {/* Drag hint */}
-        {models.length > 1 && (
-          <p className="text-xs text-[#999999] text-center mt-4">
-            {t.avatarModels?.dragToMove || 'Drag photos between models to reorganize'}
-          </p>
-        )}
       </div>
 
-      {/* Hidden file inputs */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/png"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+      {/* Hidden file input for new model creation */}
       <input
         ref={newModelFileInputRef}
         type="file"
@@ -346,6 +260,10 @@ export default function Avatars() {
         onClose={() => setShowCreatorModal(false)}
         targetModelId={creatorTargetModelId}
         onSaved={refresh}
+        models={models}
+        createModel={createModel}
+        addGeneratedPhotoToModel={addGeneratedPhotoToModel}
+        deletePhoto={deletePhoto}
       />
     </div>
   );

@@ -4,40 +4,22 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ModelManagementCardProps {
   model: AvatarModel;
-  allModels: AvatarModel[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   onRename: (modelId: string, name: string) => Promise<void>;
   onDeleteModel: (modelId: string) => Promise<void>;
   onDeletePhoto: (photoId: string, storagePath: string, modelId: string) => Promise<void>;
   onSetCover: (modelId: string, photoId: string) => Promise<void>;
-  onMovePhoto: (photoId: string, fromModelId: string, toModelId: string) => Promise<void>;
-  onAddPhoto: (modelId: string) => void;
-  onAiGenerate: (modelId: string) => void;
-  onDragStart?: (photoId: string, modelId: string) => void;
-  onDragEnter?: (modelId: string) => void;
-  onDragEnd?: () => void;
-  onDrop?: (modelId: string) => void;
-  isDragOver?: boolean;
 }
 
 export function ModelManagementCard({
   model,
-  allModels,
   isExpanded,
   onToggleExpand,
   onRename,
   onDeleteModel,
   onDeletePhoto,
   onSetCover,
-  onMovePhoto,
-  onAddPhoto,
-  onAiGenerate,
-  onDragStart,
-  onDragEnter,
-  onDragEnd,
-  onDrop,
-  isDragOver,
 }: ModelManagementCardProps) {
   const { t } = useLanguage();
   const photos = model.photos || [];
@@ -48,10 +30,8 @@ export function ModelManagementCard({
   const [confirmingDeleteModel, setConfirmingDeleteModel] = useState(false);
   const [activePhotoMenu, setActivePhotoMenu] = useState<string | null>(null);
   const [confirmingDeletePhoto, setConfirmingDeletePhoto] = useState<string | null>(null);
-  const [moveMenuPhoto, setMoveMenuPhoto] = useState<string | null>(null);
   const [previewPhoto, setPreviewPhoto] = useState<CustomAvatar | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
-  const didDragRef = useRef(false);
 
   const handleRenameSubmit = async () => {
     if (renameValue.trim() && renameValue.trim() !== model.name) {
@@ -80,33 +60,9 @@ export function ModelManagementCard({
     setConfirmingDeletePhoto(null);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    onDragEnter?.(model.id);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    onDrop?.(model.id);
-  };
-
-  const otherModels = allModels.filter(m => m.id !== model.id);
-
   return (
     <div
-      className={`rounded-2xl border-2 transition-all overflow-hidden ${
-        isDragOver
-          ? 'border-[#FF6B35] border-dashed bg-[#FFF0EB]'
-          : 'border-[#E5E5E3] bg-white hover:border-[#D4D4D2]'
-      }`}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDrop={handleDrop}
+      className="rounded-2xl border-2 border-[#E5E5E3] bg-white hover:border-[#D4D4D2] transition-all overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-center gap-3 p-3">
@@ -198,24 +154,10 @@ export function ModelManagementCard({
               return (
                 <div
                   key={photo.id}
-                  className="relative flex-shrink-0 cursor-grab active:cursor-grabbing"
-                  draggable
-                  onDragStart={(e) => {
-                    didDragRef.current = true;
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', photo.id);
-                    onDragStart?.(photo.id, model.id);
-                  }}
-                  onDragEnd={() => { onDragEnd?.(); }}
-                  onClick={() => {
-                    if (didDragRef.current) {
-                      didDragRef.current = false;
-                      return;
-                    }
-                    setPreviewPhoto(photo);
-                  }}
+                  className="relative flex-shrink-0 cursor-pointer"
+                  onClick={() => setPreviewPhoto(photo)}
                 >
-                  <div className="w-20 h-20 rounded-xl overflow-hidden border border-[#E5E5E3] hover:ring-2 hover:ring-[#FF6B35]/40 transition-all pointer-events-none">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden border border-[#E5E5E3] hover:ring-2 hover:ring-[#FF6B35]/40 transition-all">
                     <img
                       src={photo.image_url}
                       alt={photo.description || model.name}
@@ -252,14 +194,6 @@ export function ModelManagementCard({
                           {t.avatarModels?.setCover || 'Set as cover'}
                         </button>
                       )}
-                      {otherModels.length > 0 && (
-                        <button
-                          onClick={() => setMoveMenuPhoto(moveMenuPhoto === photo.id ? null : photo.id)}
-                          className="w-full px-3 py-1.5 text-left text-xs text-[#1A1A1A] hover:bg-[#F7F7F5] transition-colors"
-                        >
-                          {t.avatarModels?.movePhoto || 'Move to...'}
-                        </button>
-                      )}
                       <button
                         onClick={() => handleDeletePhoto(photo)}
                         className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
@@ -273,53 +207,12 @@ export function ModelManagementCard({
                           : (t.avatarsPage?.delete || 'Delete')}
                       </button>
 
-                      {/* Move submenu */}
-                      {moveMenuPhoto === photo.id && (
-                        <div className="border-t border-[#E5E5E3] mt-1 pt-1">
-                          {otherModels.map(m => (
-                            <button
-                              key={m.id}
-                              onClick={() => {
-                                onMovePhoto(photo.id, model.id, m.id);
-                                setActivePhotoMenu(null);
-                                setMoveMenuPhoto(null);
-                              }}
-                              className="w-full px-3 py-1.5 text-left text-xs text-[#1A1A1A] hover:bg-[#F7F7F5] transition-colors truncate"
-                            >
-                              {m.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
               );
             })}
 
-            {/* AI generate + Add photo buttons */}
-            {photos.length < 5 && (
-              <>
-                <button
-                  onClick={() => onAiGenerate(model.id)}
-                  className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-[#D4D4D2] hover:border-[#FF6B35] hover:bg-[#FFF0EB] transition-all flex flex-col items-center justify-center gap-1"
-                >
-                  <svg className="w-5 h-5 text-[#999999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                  <span className="text-[9px] text-[#999999]">AI</span>
-                </button>
-                <button
-                  onClick={() => onAddPhoto(model.id)}
-                  className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-[#D4D4D2] hover:border-[#FF6B35] hover:bg-[#FFF0EB] transition-all flex flex-col items-center justify-center gap-1"
-                >
-                  <svg className="w-5 h-5 text-[#999999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-[9px] text-[#999999]">{t.avatarModels?.addPhoto || 'Add'}</span>
-                </button>
-              </>
-            )}
           </div>
         </div>
       )}

@@ -410,7 +410,7 @@ export const translations = {
       backToHome: 'Grįžti į pradžią',
       welcome: 'Sveiki sugrįžę',
       guestTitle: 'Prisijunkite, kad matytumėte savo kūrybą',
-      guestDescription: 'Visos jūsų nuotraukos, modeliai ir kreditai — vienoje vietoje',
+      guestDescription: 'Visos jūsų nuotraukos ir modeliai — vienoje vietoje',
       signIn: 'Prisijungti',
       stats: {
         generations: 'Sukurta nuotraukų',
@@ -473,49 +473,7 @@ export const translations = {
           description: 'AI parašys tekstą ir sukurs paveikslėlį socialiniams tinklams. Jums tereikia paspausti „Generuoti"'
         }
       },
-      pricing: {
-        title: 'Kainos be staigmenų',
-        subtitle: 'Vienas kreditas = viena nuotrauka. Mokėkite tik už tai, ką naudojate.',
-        comingSoon: 'Netrukus',
-        perMonth: '/mėn',
-        getStarted: 'Pradėti',
-        getPlan: 'Pasirinkti planą',
-        mostPopular: 'Populiariausias',
-        plans: {
-          starter: {
-            badge: 'Pradinis',
-            name: 'Pradinis',
-            subtitle: 'Norintiems išbandyti',
-            price: '€9',
-            features: ['30 kreditų per mėnesį', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Palaikymas el. paštu']
-          },
-          pro: {
-            badge: 'Populiariausias',
-            name: 'Pro',
-            subtitle: 'Reguliariai kuriantiems turinį',
-            price: '€19',
-            features: ['70 kreditų per mėnesį', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Prioritetinis palaikymas']
-          },
-          unlimited: {
-            badge: 'Neribota',
-            name: 'Neribota',
-            subtitle: 'Kurkite be apribojimų',
-            price: '€49',
-            features: ['Neriboti kreditai', 'Visos AI funkcijos', 'Nuotraukų galerija', 'Prioritetinis palaikymas']
-          }
-        },
-        credits: {
-          title: 'Reikia daugiau kreditų?',
-          subtitle: 'Papildykite bet kada — prenumerata nereikalinga.',
-          buyNow: 'Pirkti',
-          save: 'Sutaupyk',
-          packs: [
-            { credits: '10', price: '€5' },
-            { credits: '30', price: '€12', save: '20%' },
-            { credits: '100', price: '€35', save: '30%' }
-          ]
-        }
-      },
+      pricing: {},
       faq: {
         title: 'Klausimai ir atsakymai',
         subtitle: 'Dažniausiai klausiama prieš pradedant',
@@ -554,8 +512,7 @@ export const translations = {
           feature1: '10+ modelių šablonų arba įkelkite savo nuotrauką',
           feature2: 'Keiskite foną, nuotaiką ir aplinką vienu paspaudimu',
           feature3: 'Rezultatas paruoštas socialiniams tinklams ir e-parduotuvei',
-          cta: 'Išbandyti dabar',
-          creditInfo: '1 kreditas = 1 nuotrauka'
+          cta: 'Išbandyti dabar'
         },
         imageGenerator: {
           badge: 'Naujiena',
@@ -564,8 +521,7 @@ export const translations = {
           feature1: '20+ verslo sričių: grožis, medicina, nekilnojamasis turtas, HoReCa ir kt.',
           feature2: 'Aprašykite savo žodžiais — AI sugeneruos pagal jūsų sritį ir temą',
           feature3: 'Atsisiųskite aukštos kokybės paveikslėlį, paruoštą socialiniams tinklams',
-          cta: 'Sukurti paveikslėlį',
-          creditInfo: '2 kreditai = 1 paveikslėlis'
+          cta: 'Sukurti paveikslėlį'
         },
         postCreator: {
           badge: 'Viskas viename',
@@ -574,8 +530,7 @@ export const translations = {
           feature1: 'AI rašo tekstą jūsų prekės ženklo tonu',
           feature2: 'Tekstas su paveikslėliu arba tik tekstas — kaip norite',
           feature3: 'Pritaikyta Instagram, Facebook ir TikTok formatams',
-          cta: 'Kurti įrašą',
-          creditInfo: '1 kreditas = 1 įrašas'
+          cta: 'Kurti įrašą'
         }
       },
       footer: {
@@ -1042,7 +997,7 @@ export const translations = {
       backToHome: 'Atpakaļ uz sākumu',
       welcome: 'Laipni lūgti atpakaļ',
       guestTitle: 'Pieslēdzieties, lai redzētu savu jaunradi',
-      guestDescription: 'Visas jūsu fotogrāfijas, modeļi un kredīti — vienuviet',
+      guestDescription: 'Visas jūsu fotogrāfijas un modeļi — vienuviet',
       signIn: 'Pieslēgties',
       stats: {
         generations: 'Izveidoti attēli',
@@ -1105,49 +1060,7 @@ export const translations = {
           description: 'AI uzrakstīs tekstu un izveidos attēlu sociālajiem tīkliem. Jums tikai jānospiež „Ģenerēt"'
         }
       },
-      pricing: {
-        title: 'Cenas bez pārsteigumiem',
-        subtitle: 'Viens kredīts = viena fotogrāfija. Maksājiet tikai par to, ko izmantojat.',
-        comingSoon: 'Drīzumā',
-        perMonth: '/mēn',
-        getStarted: 'Sākt',
-        getPlan: 'Izvēlēties plānu',
-        mostPopular: 'Populārākais',
-        plans: {
-          starter: {
-            badge: 'Sākuma',
-            name: 'Sākuma',
-            subtitle: 'Tiem, kas vēlas izmēģināt',
-            price: '€9',
-            features: ['30 kredīti mēnesī', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Atbalsts pa e-pastu']
-          },
-          pro: {
-            badge: 'Populārākais',
-            name: 'Pro',
-            subtitle: 'Regulāri satura veidotāji',
-            price: '€19',
-            features: ['70 kredīti mēnesī', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Prioritārs atbalsts']
-          },
-          unlimited: {
-            badge: 'Neierobežots',
-            name: 'Neierobežots',
-            subtitle: 'Veidojiet bez ierobežojumiem',
-            price: '€49',
-            features: ['Neierobežoti kredīti', 'Visas AI funkcijas', 'Fotogrāfiju galerija', 'Prioritārs atbalsts']
-          }
-        },
-        credits: {
-          title: 'Nepieciešami vairāk kredītu?',
-          subtitle: 'Papildiniet jebkurā laikā — abonements nav nepieciešams.',
-          buyNow: 'Pirkt',
-          save: 'Ietaupiet',
-          packs: [
-            { credits: '10', price: '€5' },
-            { credits: '30', price: '€12', save: '20%' },
-            { credits: '100', price: '€35', save: '30%' }
-          ]
-        }
-      },
+      pricing: {},
       faq: {
         title: 'Jautājumi un atbildes',
         subtitle: 'Biežāk uzdotie jautājumi pirms sākšanas',
@@ -1186,8 +1099,7 @@ export const translations = {
           feature1: '10+ modeļu šablonu vai augšupielādējiet savu fotogrāfiju',
           feature2: 'Mainiet fonu, noskaņojumu un vidi ar vienu klikšķi',
           feature3: 'Rezultāts gatavs sociālajiem tīkliem un e-veikalam',
-          cta: 'Izmēģināt tagad',
-          creditInfo: '1 kredīts = 1 fotogrāfija'
+          cta: 'Izmēģināt tagad'
         },
         imageGenerator: {
           badge: 'Jaunums',
@@ -1196,8 +1108,7 @@ export const translations = {
           feature1: '20+ biznesa nozares: skaistumkopšana, medicīna, nekustamais īpašums, HoReCa u.c.',
           feature2: 'Aprakstiet saviem vārdiem — AI ģenerēs atbilstoši jūsu nozarei un tēmai',
           feature3: 'Lejupielādējiet augstas kvalitātes attēlu, gatavu sociālajiem tīkliem',
-          cta: 'Izveidot attēlu',
-          creditInfo: '2 kredīti = 1 attēls'
+          cta: 'Izveidot attēlu'
         },
         postCreator: {
           badge: 'Viss vienā',
@@ -1206,8 +1117,7 @@ export const translations = {
           feature1: 'AI raksta tekstu jūsu zīmola tonī',
           feature2: 'Teksts ar attēlu vai tikai teksts — kā vēlaties',
           feature3: 'Pielāgots Instagram, Facebook un TikTok formātiem',
-          cta: 'Veidot ierakstu',
-          creditInfo: '1 kredīts = 1 ieraksts'
+          cta: 'Veidot ierakstu'
         }
       },
       footer: {
@@ -1674,7 +1584,7 @@ export const translations = {
       backToHome: 'Tagasi avalehele',
       welcome: 'Tere tulemast tagasi',
       guestTitle: 'Logi sisse, et näha oma loomingut',
-      guestDescription: 'Kõik sinu fotod, mudelid ja krediidid — ühes kohas',
+      guestDescription: 'Kõik sinu fotod ja mudelid — ühes kohas',
       signIn: 'Logi sisse',
       stats: {
         generations: 'Loodud pilte',
@@ -1737,49 +1647,7 @@ export const translations = {
           description: 'AI kirjutab teksti ja loob pildi sotsiaalmeedia jaoks. Teil tuleb vaid vajutada „Genereeri"'
         }
       },
-      pricing: {
-        title: 'Hinnad ilma üllatusteta',
-        subtitle: 'Üks krediit = üks foto. Makske ainult selle eest, mida kasutate.',
-        comingSoon: 'Varsti',
-        perMonth: '/kuu',
-        getStarted: 'Alusta',
-        getPlan: 'Vali plaan',
-        mostPopular: 'Populaarseim',
-        plans: {
-          starter: {
-            badge: 'Alustaja',
-            name: 'Alustaja',
-            subtitle: 'Neile, kes soovivad proovida',
-            price: '€9',
-            features: ['30 krediiti kuus', 'Kõik AI funktsioonid', 'Fotogalerii', 'E-posti tugi']
-          },
-          pro: {
-            badge: 'Populaarseim',
-            name: 'Pro',
-            subtitle: 'Regulaarselt sisu loovatele',
-            price: '€19',
-            features: ['70 krediiti kuus', 'Kõik AI funktsioonid', 'Fotogalerii', 'Prioriteetne tugi']
-          },
-          unlimited: {
-            badge: 'Piiramatu',
-            name: 'Piiramatu',
-            subtitle: 'Looge ilma piiranguteta',
-            price: '€49',
-            features: ['Piiramatult krediite', 'Kõik AI funktsioonid', 'Fotogalerii', 'Prioriteetne tugi']
-          }
-        },
-        credits: {
-          title: 'Vajad rohkem krediite?',
-          subtitle: 'Täienda igal ajal — tellimust pole vaja.',
-          buyNow: 'Osta',
-          save: 'Säästa',
-          packs: [
-            { credits: '10', price: '€5' },
-            { credits: '30', price: '€12', save: '20%' },
-            { credits: '100', price: '€35', save: '30%' }
-          ]
-        }
-      },
+      pricing: {},
       faq: {
         title: 'Küsimused ja vastused',
         subtitle: 'Kõige sagedamini küsitav enne alustamist',
@@ -1818,8 +1686,7 @@ export const translations = {
           feature1: '10+ mudeli malli või laadige üles oma foto',
           feature2: 'Muutke tausta, meeleolu ja keskkonda ühe klõpsuga',
           feature3: 'Tulemus valmis sotsiaalmeediaks ja e-poeks',
-          cta: 'Proovi kohe',
-          creditInfo: '1 krediit = 1 foto'
+          cta: 'Proovi kohe'
         },
         imageGenerator: {
           badge: 'Uus',
@@ -1828,8 +1695,7 @@ export const translations = {
           feature1: '20+ ärivaldkonda: iluteenused, meditsiin, kinnisvara, HoReCa jne.',
           feature2: 'Kirjeldage oma sõnadega — AI genereerib vastavalt teie valdkonnale ja teemale',
           feature3: 'Laadige alla kõrge kvaliteediga pilt, valmis sotsiaalmeediaks',
-          cta: 'Loo pilt',
-          creditInfo: '2 krediiti = 1 pilt'
+          cta: 'Loo pilt'
         },
         postCreator: {
           badge: 'Kõik ühes',
@@ -1838,8 +1704,7 @@ export const translations = {
           feature1: 'AI kirjutab teksti teie brändi toonis',
           feature2: 'Tekst pildiga või ainult tekst — kuidas soovite',
           feature3: 'Kohandatud Instagram, Facebook ja TikTok formaatidele',
-          cta: 'Loo postitus',
-          creditInfo: '1 krediit = 1 postitus'
+          cta: 'Loo postitus'
         }
       },
       footer: {
@@ -2293,7 +2158,7 @@ export const translations = {
       backToHome: 'Back to Home',
       welcome: 'Welcome back',
       guestTitle: 'Sign in to view your dashboard',
-      guestDescription: 'Track your generations, manage models, and view your credits',
+      guestDescription: 'Track your generations and manage models',
       signIn: 'Sign In',
       stats: {
         generations: 'Images Created',
@@ -2356,49 +2221,7 @@ export const translations = {
           description: 'Create social media posts with AI — text, images, or both together'
         }
       },
-      pricing: {
-        title: 'Simple, Transparent Pricing',
-        subtitle: 'Choose the plan that fits your needs',
-        comingSoon: 'Coming soon',
-        perMonth: '/month',
-        getStarted: 'Get Started',
-        getPlan: 'Get Plan',
-        mostPopular: 'Most Popular',
-        plans: {
-          starter: {
-            badge: 'Starter',
-            name: 'Starter',
-            subtitle: 'Perfect for getting started',
-            price: '€9',
-            features: ['30 credits/month', 'All AI models', 'Gallery storage', 'Email support']
-          },
-          pro: {
-            badge: 'Most Popular',
-            name: 'Pro',
-            subtitle: 'For creators & influencers',
-            price: '€19',
-            features: ['70 credits/month', 'All AI models', 'Gallery storage', 'Email support']
-          },
-          unlimited: {
-            badge: 'Unlimited',
-            name: 'Unlimited',
-            subtitle: 'For power users',
-            price: '€49',
-            features: ['Unlimited credits', 'All AI models', 'Gallery storage', 'Email support']
-          }
-        },
-        credits: {
-          title: 'Need More Credits?',
-          subtitle: 'Buy additional credits anytime. No subscription required.',
-          buyNow: 'Buy Now',
-          save: 'Save',
-          packs: [
-            { credits: '10', price: '€5' },
-            { credits: '30', price: '€12', save: '20%' },
-            { credits: '100', price: '€35', save: '30%' }
-          ]
-        }
-      },
+      pricing: {},
       faq: {
         title: 'Frequently Asked Questions',
         subtitle: 'Got questions? We have answers',
@@ -2437,8 +2260,7 @@ export const translations = {
           feature1: 'Choose from 10+ professional models or upload your own model',
           feature2: 'Change environments, poses, styles, and moods with one click',
           feature3: 'Get studio-quality photos ready for social media and e-commerce',
-          cta: 'Try Now',
-          creditInfo: 'From 1 credit per photo'
+          cta: 'Try Now'
         },
         imageGenerator: {
           badge: 'New',
@@ -2447,8 +2269,7 @@ export const translations = {
           feature1: 'Describe your desired image and AI will create it in seconds',
           feature2: 'Choose the style, composition, and mood to match your brand',
           feature3: 'Export in high resolution, ready for print and web',
-          cta: 'Start Creating',
-          creditInfo: 'From 2 credits per image'
+          cta: 'Start Creating'
         },
         postCreator: {
           badge: 'All-in-One',
@@ -2457,8 +2278,7 @@ export const translations = {
           feature1: 'AI writes copy tailored to your brand voice and audience',
           feature2: 'Create posts with images or text-only — your choice',
           feature3: 'Optimized for Instagram, Facebook, TikTok, and more',
-          cta: 'Create Post',
-          creditInfo: 'From 1 credit per post'
+          cta: 'Create Post'
         }
       },
       footer: {

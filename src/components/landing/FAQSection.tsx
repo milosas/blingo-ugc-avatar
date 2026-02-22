@@ -5,7 +5,6 @@ import { FAQItem } from './FAQItem';
 const FAQ_KEYS = [
   'whatIsTool',
   'howGeneration',
-  'whatAreCredits',
   'howUploadAvatars',
   'isDataSafe',
   'howContact',

@@ -10,15 +10,185 @@ import { GalleryLightbox } from '../components/gallery/GalleryLightbox';
 import { EmptyState } from '../components/gallery/EmptyState';
 import { PostProcessToolbar } from '../components/generation/PostProcessToolbar';
 import { LoginModal } from '../components/auth/LoginModal';
+import { formatRelativeTime } from '../utils/date';
+import type { AvatarModel, GeneratedPost } from '../types/database';
+
+function SectionHeader({
+  title,
+  count,
+  isOpen,
+  onToggle,
+}: {
+  title: string;
+  count: number;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="flex items-center gap-3 w-full text-left group py-2"
+    >
+      <h2 className="text-lg font-semibold text-[#1A1A1A]">{title}</h2>
+      <span className="px-2 py-0.5 text-xs font-medium bg-[#F7F7F5] text-[#999999] rounded-full">
+        {count}
+      </span>
+      <svg
+        className={`w-4 h-4 text-[#999999] transition-transform ml-auto ${isOpen ? 'rotate-180' : ''}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  );
+}
+
+function ModelCard({ model, onClick }: { model: AvatarModel; onClick: () => void }) {
+  const coverPhoto = model.photos?.find(p => p.id === model.cover_photo_id) || model.photos?.[0];
+  const photoCount = model.photos?.length || 0;
+
+  return (
+    <div
+      onClick={onClick}
+      className="group relative rounded-lg overflow-hidden bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all"
+    >
+      {coverPhoto ? (
+        <img
+          src={coverPhoto.image_url}
+          alt={model.name}
+          className="w-full aspect-square object-cover object-top"
+          loading="lazy"
+        />
+      ) : (
+        <div className="w-full aspect-square flex items-center justify-center bg-[#F7F7F5]">
+          <svg className="w-12 h-12 text-[#CCCCCC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+      )}
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      {/* Info bar */}
+      <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black/70 to-transparent">
+        <p className="text-white text-sm font-medium truncate">{model.name}</p>
+        <p className="text-white/70 text-xs">
+          {photoCount} {photoCount === 1 ? 'nuotrauka' : 'nuotraukos'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PostCard({
+  post,
+  onDelete,
+  onCopy,
+}: {
+  post: GeneratedPost;
+  onDelete: (id: string) => void;
+  onCopy: (text: string) => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirming) {
+      setConfirming(true);
+      setTimeout(() => setConfirming(false), 3000);
+      return;
+    }
+    onDelete(post.id);
+  };
+
+  return (
+    <div className="bg-white border border-[#E5E5E3] rounded-xl overflow-hidden hover:shadow-md transition-all group">
+      {/* Post image */}
+      {post.image_url && (
+        <div className="aspect-video overflow-hidden bg-gray-100">
+          <img
+            src={post.image_url}
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+
+      {/* Post text */}
+      <div className="p-3">
+        {post.text && (
+          <p className="text-sm text-[#1A1A1A] line-clamp-3 mb-2 whitespace-pre-wrap">
+            {post.text}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#999999]">
+            {formatRelativeTime(post.created_at)}
+          </span>
+
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Copy */}
+            {post.text && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onCopy(post.text!); }}
+                className="p-1.5 text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F7F7F5] rounded-md transition-colors"
+                title="Kopijuoti"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            )}
+
+            {/* Delete */}
+            <button
+              onClick={handleDelete}
+              className={`p-1.5 rounded-md transition-colors ${
+                confirming
+                  ? 'text-red-500 bg-red-50 hover:bg-red-100'
+                  : 'text-[#999999] hover:text-red-500 hover:bg-[#F7F7F5]'
+              }`}
+              title={confirming ? 'Patvirtinti' : 'Ištrinti'}
+            >
+              {confirming ? (
+                <span className="text-xs font-medium px-1">?</span>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Gallery() {
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
-  const { images, loading: galleryLoading, error, deleteImage, refresh } = useGallery();
+  const { images, models, posts, loading: galleryLoading, error, deleteImage, deletePost, refresh } = useGallery();
   const navigate = useNavigate();
 
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Section collapse state
+  const [openSections, setOpenSections] = useState({
+    generated: true,
+    models: true,
+    posts: true,
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   // Editing state
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -132,6 +302,22 @@ export default function Gallery() {
     }
   };
 
+  const handleCopyPostText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Silently fail
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await deletePost(postId);
+    } catch {
+      // Error handled in hook
+    }
+  };
+
   const pp = (t as Record<string, unknown>).postProcess as Record<string, string> | undefined;
 
   if (loading) {
@@ -179,7 +365,9 @@ export default function Gallery() {
     );
   }
 
-  if (images.length === 0) {
+  const totalItems = images.length + models.length + posts.length;
+
+  if (totalItems === 0) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">
@@ -202,7 +390,7 @@ export default function Gallery() {
         </h1>
         <div className="flex items-center gap-3">
           <p className="text-[#999999] text-sm">
-            {images.length} {images.length === 1 ? 'image' : 'images'}
+            {totalItems} {totalItems === 1 ? 'item' : 'items'}
           </p>
           <button
             onClick={refresh}
@@ -216,15 +404,77 @@ export default function Gallery() {
         </div>
       </div>
 
-      <GalleryGrid
-        images={images}
-        onImageClick={(index) => setLightboxIndex(index)}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-        onCreatePost={handleCreatePost}
-      />
+      {/* ===== Section 1: Sugeneruotos nuotraukos (Generated photos) ===== */}
+      {images.length > 0 && (
+        <div className="mb-8">
+          <SectionHeader
+            title="Sugeneruotos nuotraukos"
+            count={images.length}
+            isOpen={openSections.generated}
+            onToggle={() => toggleSection('generated')}
+          />
+          {openSections.generated && (
+            <div className="mt-3">
+              <GalleryGrid
+                images={images}
+                onImageClick={(index) => setLightboxIndex(index)}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                onCreatePost={handleCreatePost}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Edit section — appears when Edit icon is clicked on a photo */}
+      {/* ===== Section 2: Modeliai (Models) ===== */}
+      {models.length > 0 && (
+        <div className="mb-8">
+          <SectionHeader
+            title="Modeliai"
+            count={models.length}
+            isOpen={openSections.models}
+            onToggle={() => toggleSection('models')}
+          />
+          {openSections.models && (
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {models.map((model) => (
+                <ModelCard
+                  key={model.id}
+                  model={model}
+                  onClick={() => navigate('/modeliai')}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== Section 3: Irasai (Posts) ===== */}
+      {posts.length > 0 && (
+        <div className="mb-8">
+          <SectionHeader
+            title="Irasai"
+            count={posts.length}
+            isOpen={openSections.posts}
+            onToggle={() => toggleSection('posts')}
+          />
+          {openSections.posts && (
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onDelete={handleDeletePost}
+                  onCopy={handleCopyPostText}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Edit section -- appears when Edit icon is clicked on a photo */}
       {editingImage && (
         <div ref={editSectionRef} className="mt-8">
           {/* Editing header with preview */}
@@ -238,13 +488,13 @@ export default function Gallery() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-[#1A1A1A]">
-                {pp?.title || 'Redaguoti nuotrauką'}
+                {pp?.title || 'Redaguoti nuotrauka'}
               </h3>
             </div>
             <button
               onClick={handleCloseEdit}
               className="p-2 text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F7F7F5] rounded-lg transition-colors"
-              title={t.actions?.cancel || 'Uždaryti'}
+              title={t.actions?.cancel || 'Uzdaryti'}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

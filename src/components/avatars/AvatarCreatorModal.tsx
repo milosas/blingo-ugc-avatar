@@ -106,11 +106,49 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   const [batchResults, setBatchResults] = useState<Array<{base64: string, description: string}>>([]);
   const [batchProgress, setBatchProgress] = useState(0); // 0 = not started, 1-N = generating Nth photo
 
+  // Simulated progress percentage
+  const [progressPercent, setProgressPercent] = useState(0);
+
+  // Modal state: 'selection' | 'generating' | 'result'
+  type ModalState = 'selection' | 'generating' | 'result';
+  const getModalState = (): ModalState => {
+    if (isGenerating || batchProgress > 0) return 'generating';
+    if (generatedImage || batchResults.length > 0) return 'result';
+    return 'selection';
+  };
+  const modalState = getModalState();
+
   const effectiveModelId = createdModelId || (selectedModelId !== 'new' ? selectedModelId : null);
   const safeModels = models || [];
   const currentModel = effectiveModelId ? safeModels.find(m => m.id === effectiveModelId) : null;
   const totalPhotos = currentModel?.photos?.length || 0;
   const canAddMore = totalPhotos < 5;
+
+  // Simulated progress animation during generation
+  useEffect(() => {
+    if (modalState !== 'generating') {
+      setProgressPercent(0);
+      return;
+    }
+    setProgressPercent(0);
+    const startTime = Date.now();
+    const expectedDuration = batchCount > 1 ? 15000 : 12000; // ms per image estimate
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      // Ease out: fast at start, slows approaching 90%
+      const raw = elapsed / expectedDuration;
+      const simulated = Math.min(90, raw * 100 * (1 - raw * 0.3));
+      setProgressPercent(Math.round(simulated));
+    }, 200);
+    return () => clearInterval(interval);
+  }, [modalState, batchProgress, batchCount]);
+
+  // Jump to 100% briefly when generation completes
+  useEffect(() => {
+    if (modalState === 'result' && progressPercent > 0 && progressPercent < 100) {
+      setProgressPercent(100);
+    }
+  }, [modalState]);
 
   // Reset state when modal opens — always creates new model
   useEffect(() => {
@@ -126,6 +164,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     setBatchProgress(0);
     setIsPoseMode(false);
     setModelBaseDescription('');
+    setProgressPercent(0);
   }, [isOpen]);
 
   const handleClose = () => {
@@ -135,7 +174,15 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     setBatchCount(1);
     setBatchResults([]);
     setBatchProgress(0);
+    setProgressPercent(0);
     onClose();
+  };
+
+  const handleBackToSelection = () => {
+    clearImage();
+    setBatchResults([]);
+    setBatchProgress(0);
+    setProgressPercent(0);
   };
 
   const handleGenerate = useCallback(async () => {
@@ -267,8 +314,6 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   if (!isOpen) return null;
 
   const hasSavedAny = savedPhotos.length > 0;
-  const hasUnsavedImage = !!generatedImage;
-  const hasBatchResults = batchResults.length > 0;
   const isBatchMode = batchCount > 1;
   const isBatchGenerating = batchProgress > 0;
 
@@ -352,242 +397,315 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
 
         {/* Content */}
         <div className="p-5 space-y-4">
-          {/* Model name input - always creates new model */}
-          {!isPoseMode && !createdModelId && (
-            <div>
-              <label className="block text-xs font-medium text-[#666666] mb-1.5">
-                {'Naujo modelio pavadinimas'}
-              </label>
-              <input
-                value={newModelName}
-                onChange={(e) => setNewModelName(e.target.value)}
-                placeholder={'Modelio pavadinimas (neprivaloma)'}
-                className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35]"
-              />
-            </div>
-          )}
 
-          {/* Model identity badge (pose mode) */}
-          {isPoseMode && currentModel && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] rounded-xl">
-              {currentModel.photos?.[0] && (
-                <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
-                  <img src={currentModel.photos[0].image_url} alt="" className="w-full h-full object-cover object-top" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-[#1A1A1A] truncate">{currentModel.name}</p>
-                <p className="text-[10px] text-[#999999] truncate">{modelBaseDescription}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Identity traits - ONLY when creating new model (not in pose mode) */}
-          {!isPoseMode && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TraitSelector label={tc.gender} options={GENDER_OPTIONS} value={traits.gender} onChange={(v) => setTrait('gender', v)} lang={language} />
-              <TraitSelector label={tc.age} options={AGE_OPTIONS} value={traits.age} onChange={(v) => setTrait('age', v)} lang={language} />
-              <TraitSelector label={tc.ethnicity} options={ETHNICITY_OPTIONS} value={traits.ethnicity} onChange={(v) => setTrait('ethnicity', v)} lang={language} />
-              <TraitSelector label={tc.hairLength || 'Hair length'} options={HAIR_LENGTH_OPTIONS} value={traits.hairLength} onChange={(v) => setTrait('hairLength', v)} lang={language} />
-              {traits.hairLength !== 'bald' && (
-                <TraitSelector label={tc.hairColor || 'Hair color'} options={HAIR_COLOR_OPTIONS} value={traits.hairColor} onChange={(v) => setTrait('hairColor', v)} lang={language} />
-              )}
-            </div>
-          )}
-
-          {/* Variable traits: Pose, Mood, Framing - always visible */}
-          <TraitSelector
-            label={tm?.pose || 'Pose'}
-            options={POSE_OPTIONS}
-            value={traits.pose}
-            onChange={(v) => setTrait('pose', v)}
-            lang={language}
-          />
-
-          <TraitSelector
-            label={tm?.mood || 'Mood'}
-            options={MOOD_OPTIONS}
-            value={traits.mood}
-            onChange={(v) => setTrait('mood', v)}
-            lang={language}
-          />
-
-          <TraitSelector
-            label={tc.framing}
-            options={FRAMING_OPTIONS}
-            value={traits.framing}
-            onChange={(v) => setTrait('framing', v)}
-            lang={language}
-          />
-
-          {/* Special features */}
-          <div>
-            <label className="block text-xs font-medium text-[#666666] mb-1.5">{tc.specialFeatures}</label>
-            <textarea
-              value={specialFeatures}
-              onChange={(e) => setSpecialFeatures(e.target.value)}
-              placeholder={tc.specialFeaturesPlaceholder}
-              rows={2}
-              className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 resize-none text-sm"
-            />
-          </div>
-
-          {/* Batch count selector - only when NOT in pose mode */}
-          {!isPoseMode && (
-            <div>
-              <label className="block text-xs font-medium text-[#666666] mb-1.5">
-                {tm?.batchCount || 'Kiekis'}
-              </label>
-              <div className="flex gap-1.5">
-                {[1, 2, 3, 4, 5].map((count) => (
-                  <button
-                    key={count}
-                    onClick={() => setBatchCount(count)}
-                    disabled={isBatchGenerating || isGenerating}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      batchCount === count
-                        ? 'bg-[#FF6B35] text-white'
-                        : 'bg-[#F7F7F5] text-[#666666] hover:bg-[#EFEFED] border border-[#E5E5E3]'
-                    } disabled:opacity-50`}
-                  >
-                    {count}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[10px] text-[#999999] mt-1">
-                {batchCount === 1
-                  ? 'FLUX 2 Pro (~$0.03)'
-                  : `1x FLUX 2 Pro + ${batchCount - 1}x PuLID (~$${(0.03 * batchCount).toFixed(2)})`}
-              </p>
-            </div>
-          )}
-
-          {/* Prompt preview (collapsible) -- hidden in pose mode */}
-          {!isPoseMode && (
-            <div>
-              <button
-                onClick={() => setShowPrompt(!showPrompt)}
-                className="flex items-center gap-1.5 text-xs text-[#999999] hover:text-[#666666] transition-colors"
-              >
-                <svg className={`w-3 h-3 transition-transform ${showPrompt ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          {/* ===== GENERATING STATE ===== */}
+          {modalState === 'generating' && (
+            <div className="flex flex-col items-center gap-4 py-8">
+              {/* Circular progress indicator */}
+              <div className="relative w-20 h-20">
+                <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="35" fill="none" stroke="#F7F7F5" strokeWidth="6" />
+                  <circle
+                    cx="40" cy="40" r="35" fill="none" stroke="#FF6B35" strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 35}`}
+                    strokeDashoffset={`${2 * Math.PI * 35 * (1 - progressPercent / 100)}`}
+                    className="transition-all duration-300 ease-out"
+                  />
                 </svg>
-                {tc.prompt}
-              </button>
-              {showPrompt && (
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  rows={3}
-                  className="w-full mt-2 px-3 py-2 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl text-[#1A1A1A] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 resize-none text-xs font-mono"
-                />
-              )}
-            </div>
-          )}
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#FF6B35]">
+                  {progressPercent}%
+                </span>
+              </div>
 
-          {/* Error */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-              {error}
-            </div>
-          )}
-
-          {/* Batch generation progress */}
-          {isBatchGenerating && (
-            <div className="flex flex-col items-center gap-3 py-6">
-              <div className="w-12 h-12 border-3 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-[#999999]">
-                Generuojama {batchProgress}/{batchCount}...
+              {/* Progress text */}
+              <p className="text-sm font-medium text-[#1A1A1A]">
+                {isBatchGenerating
+                  ? `Generuojama ${batchProgress}/${batchCount}...`
+                  : `Generuojama... ${progressPercent}%`}
               </p>
-              {/* Thumbnails of completed batch photos */}
+              <p className="text-xs text-[#999999]">Tai gali užtrukti iki 15 sekundžių</p>
+
+              {/* Thumbnails of completed batch photos so far */}
               {batchResults.length > 0 && (
-                <div className="flex gap-2 flex-wrap justify-center">
+                <div className="flex gap-2 flex-wrap justify-center mt-2">
                   {batchResults.map((result, i) => (
-                    <div key={i} className="w-16 h-16 rounded-lg overflow-hidden border border-[#E5E5E3]">
+                    <div key={i} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-[#FF6B35]">
                       <img src={result.base64} alt="" className="w-full h-full object-cover object-top" />
                     </div>
                   ))}
                 </div>
               )}
+
+              {/* Error during generation */}
+              {error && (
+                <div className="w-full p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                  {error}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Batch results grid (after batch generation completes) */}
-          {!isBatchGenerating && hasBatchResults && (
-            <div>
-              <label className="block text-xs font-medium text-[#666666] mb-2">
-                {tm?.generatedPhotos || 'Sugeneruotos nuotraukos'} ({batchResults.length})
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {batchResults.map((result, i) => (
-                  <div key={i} className="aspect-square rounded-xl overflow-hidden border-2 border-[#FF6B35]">
-                    <img src={result.base64} alt="" className="w-full h-full object-cover object-top" />
+          {/* ===== RESULT STATE ===== */}
+          {modalState === 'result' && (
+            <div className="flex flex-col items-center gap-4">
+              {/* Success badge */}
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full">
+                <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-xs font-medium text-green-700">
+                  {batchResults.length > 0
+                    ? `Sugeneruota ${batchResults.length} nuotrauk${batchResults.length === 1 ? 'a' : 'os'}`
+                    : 'Nuotrauka sugeneruota'}
+                </span>
+              </div>
+
+              {/* Batch results grid */}
+              {batchResults.length > 0 && (
+                <div className="w-full">
+                  <div className="grid grid-cols-3 gap-2">
+                    {batchResults.map((result, i) => (
+                      <div key={i} className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#FF6B35] shadow-sm">
+                        <img src={result.base64} alt="" className="w-full h-full object-cover object-top" />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Single generated image - prominent */}
+              {generatedImage && batchResults.length === 0 && (
+                <div className="w-56 aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#FF6B35] shadow-lg">
+                  <img src={generatedImage} alt="Generated model" className="w-full h-full object-cover object-top" />
+                </div>
+              )}
+
+              {/* Model name input (for new model) */}
+              {!isPoseMode && !createdModelId && (
+                <div className="w-full">
+                  <label className="block text-xs font-medium text-[#666666] mb-1.5">
+                    Modelio pavadinimas
+                  </label>
+                  <input
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    placeholder="Modelio pavadinimas (neprivaloma)"
+                    className="w-full px-3 py-2.5 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10"
+                  />
+                </div>
+              )}
+
+              {/* Error in result state */}
+              {error && (
+                <div className="w-full p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div className="flex gap-3 w-full mt-2">
+                <button
+                  onClick={handleBackToSelection}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors"
+                >
+                  Generuoti dar
+                </button>
+                <button
+                  onClick={batchResults.length > 0 ? handleBatchSave : handleSaveAndClose}
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSaving ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      {tc.saving}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {batchResults.length > 1
+                        ? `Išsaugoti (${batchResults.length})`
+                        : 'Išsaugoti'}
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
 
-          {/* Single generated image preview (non-batch mode) */}
-          {!isBatchMode && generatedImage && !isBatchGenerating && (
-            <div className="flex justify-center">
-              <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-[#FF6B35]">
-                <img src={generatedImage} alt="Generated model" className="w-full h-full object-cover object-top" />
-              </div>
-            </div>
-          )}
+          {/* ===== SELECTION STATE ===== */}
+          {modalState === 'selection' && (
+            <>
+              {/* Model name input - always creates new model */}
+              {!isPoseMode && !createdModelId && (
+                <div>
+                  <label className="block text-xs font-medium text-[#666666] mb-1.5">
+                    {'Naujo modelio pavadinimas'}
+                  </label>
+                  <input
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    placeholder={'Modelio pavadinimas (neprivaloma)'}
+                    className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35]"
+                  />
+                </div>
+              )}
 
-          {/* Loading state (single generation) */}
-          {!isBatchMode && isGenerating && !isBatchGenerating && (
-            <div className="flex flex-col items-center gap-3 py-6">
-              <div className="w-12 h-12 border-3 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-[#999999]">{tc.generating}</p>
-            </div>
+              {/* Model identity badge (pose mode) */}
+              {isPoseMode && currentModel && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] rounded-xl">
+                  {currentModel.photos?.[0] && (
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                      <img src={currentModel.photos[0].image_url} alt="" className="w-full h-full object-cover object-top" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[#1A1A1A] truncate">{currentModel.name}</p>
+                    <p className="text-[10px] text-[#999999] truncate">{modelBaseDescription}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Identity traits - ONLY when creating new model (not in pose mode) */}
+              {!isPoseMode && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <TraitSelector label={tc.gender} options={GENDER_OPTIONS} value={traits.gender} onChange={(v) => setTrait('gender', v)} lang={language} />
+                  <TraitSelector label={tc.age} options={AGE_OPTIONS} value={traits.age} onChange={(v) => setTrait('age', v)} lang={language} />
+                  <TraitSelector label={tc.ethnicity} options={ETHNICITY_OPTIONS} value={traits.ethnicity} onChange={(v) => setTrait('ethnicity', v)} lang={language} />
+                  <TraitSelector label={tc.hairLength || 'Hair length'} options={HAIR_LENGTH_OPTIONS} value={traits.hairLength} onChange={(v) => setTrait('hairLength', v)} lang={language} />
+                  {traits.hairLength !== 'bald' && (
+                    <TraitSelector label={tc.hairColor || 'Hair color'} options={HAIR_COLOR_OPTIONS} value={traits.hairColor} onChange={(v) => setTrait('hairColor', v)} lang={language} />
+                  )}
+                </div>
+              )}
+
+              {/* Variable traits: Pose, Mood, Framing - always visible */}
+              <TraitSelector
+                label={tm?.pose || 'Pose'}
+                options={POSE_OPTIONS}
+                value={traits.pose}
+                onChange={(v) => setTrait('pose', v)}
+                lang={language}
+              />
+
+              <TraitSelector
+                label={tm?.mood || 'Mood'}
+                options={MOOD_OPTIONS}
+                value={traits.mood}
+                onChange={(v) => setTrait('mood', v)}
+                lang={language}
+              />
+
+              <TraitSelector
+                label={tc.framing}
+                options={FRAMING_OPTIONS}
+                value={traits.framing}
+                onChange={(v) => setTrait('framing', v)}
+                lang={language}
+              />
+
+              {/* Special features */}
+              <div>
+                <label className="block text-xs font-medium text-[#666666] mb-1.5">{tc.specialFeatures}</label>
+                <textarea
+                  value={specialFeatures}
+                  onChange={(e) => setSpecialFeatures(e.target.value)}
+                  placeholder={tc.specialFeaturesPlaceholder}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 resize-none text-sm"
+                />
+              </div>
+
+              {/* Batch count selector - only when NOT in pose mode */}
+              {!isPoseMode && (
+                <div>
+                  <label className="block text-xs font-medium text-[#666666] mb-1.5">
+                    {tm?.batchCount || 'Kiekis'}
+                  </label>
+                  <div className="flex gap-1.5">
+                    {[1, 2, 3, 4, 5].map((count) => (
+                      <button
+                        key={count}
+                        onClick={() => setBatchCount(count)}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          batchCount === count
+                            ? 'bg-[#FF6B35] text-white'
+                            : 'bg-[#F7F7F5] text-[#666666] hover:bg-[#EFEFED] border border-[#E5E5E3]'
+                        }`}
+                      >
+                        {count}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-[#999999] mt-1">
+                    {batchCount === 1
+                      ? 'FLUX 2 Pro'
+                      : `1x FLUX 2 Pro + ${batchCount - 1}x PuLID`}
+                  </p>
+                </div>
+              )}
+
+              {/* Prompt preview (collapsible) -- hidden in pose mode */}
+              {!isPoseMode && (
+                <div>
+                  <button
+                    onClick={() => setShowPrompt(!showPrompt)}
+                    className="flex items-center gap-1.5 text-xs text-[#999999] hover:text-[#666666] transition-colors"
+                  >
+                    <svg className={`w-3 h-3 transition-transform ${showPrompt ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    {tc.prompt}
+                  </button>
+                  {showPrompt && (
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      rows={3}
+                      className="w-full mt-2 px-3 py-2 bg-[#F7F7F5] border border-[#E5E5E3] rounded-xl text-[#1A1A1A] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 resize-none text-xs font-mono"
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* Error */}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+            </>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex gap-3 p-5 border-t border-[#E5E5E3]">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors"
-          >
-            {hasSavedAny ? (tm?.done || 'Done') : tc.cancel}
-          </button>
-
-          {/* Batch results: show save all button */}
-          {!isBatchGenerating && hasBatchResults ? (
+        {/* Footer - only shown in selection and generating states */}
+        {modalState !== 'result' && (
+          <div className="flex gap-3 p-5 border-t border-[#E5E5E3]">
             <button
-              onClick={handleBatchSave}
-              disabled={isSaving}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleClose}
+              className="px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors"
             >
-              {isSaving ? tc.saving : `${tc.save} (${batchResults.length})`}
+              {hasSavedAny ? (tm?.done || 'Done') : tc.cancel}
             </button>
-          ) : !hasUnsavedImage && !isBatchGenerating ? (
-            <button
-              onClick={isBatchMode ? handleBatchGenerate : handleGenerate}
-              disabled={isGenerating || !canAddMore || isBatchGenerating}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGenerating
-                ? tc.generating
-                : !canAddMore
+
+            {modalState === 'selection' && (
+              <button
+                onClick={isBatchMode ? handleBatchGenerate : handleGenerate}
+                disabled={isGenerating || !canAddMore}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {!canAddMore
                   ? (tm?.photoLimit || 'Limitas pasiektas')
                   : isBatchMode
                     ? `${tc.generate} (${batchCount})`
                     : tc.generate}
-            </button>
-          ) : hasUnsavedImage && !isBatchGenerating ? (
-            <button
-              onClick={handleSaveAndClose}
-              disabled={isSaving}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? tc.saving : tc.save}
-            </button>
-          ) : null}
-        </div>
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -12,16 +12,6 @@ function CheckIcon() {
   );
 }
 
-function CreditBadge({ text }: { text: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF0EB] text-[#FF6B35] text-sm font-medium">
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      {text}
-    </span>
-  );
-}
 
 // Count-up animation hook
 function useCountUp(target: number, duration = 2000) {
@@ -153,7 +143,6 @@ interface FeatureBlockProps {
   title: string;
   subtitle: string;
   features: string[];
-  creditInfo: string;
   cta: string;
   ctaLink: string;
   visual: React.ReactNode;
@@ -167,7 +156,6 @@ function FeatureBlock({
   title,
   subtitle,
   features,
-  creditInfo,
   cta,
   ctaLink,
   visual,
@@ -206,7 +194,6 @@ function FeatureBlock({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
-            <CreditBadge text={creditInfo} />
           </div>
         </AnimatedSection>
         {/* Visual */}
@@ -316,7 +303,6 @@ export function FeatureHeroSections() {
           features?.imageToImage?.feature2 || 'Change environments, poses, styles, and moods with one click',
           features?.imageToImage?.feature3 || 'Get studio-quality photos ready for social media and e-commerce',
         ]}
-        creditInfo={features?.imageToImage?.creditInfo || 'From 1 credit per photo'}
         cta={features?.imageToImage?.cta || 'Try Now'}
         ctaLink="/generator"
         visual={<ImageToImageVisual />}
@@ -334,7 +320,6 @@ export function FeatureHeroSections() {
           features?.modelCreator?.feature2 || 'Iki 5 nuotraukų kiekvienam modeliui — skirtingos pozos ir kampai',
           features?.modelCreator?.feature3 || 'Naudokite modelius nuotraukų generavimui ir socialinių tinklų įrašams',
         ]}
-        creditInfo={features?.modelCreator?.creditInfo || 'Nuo 1 kredito per nuotrauką'}
         cta={features?.modelCreator?.cta || 'Kurti modelį'}
         ctaLink="/modeliai"
         reversed
@@ -353,7 +338,6 @@ export function FeatureHeroSections() {
           features?.postCreator?.feature2 || 'Create posts with images or text-only — your choice',
           features?.postCreator?.feature3 || 'Optimized for Instagram, Facebook, TikTok, and more',
         ]}
-        creditInfo={features?.postCreator?.creditInfo || 'From 1 credit per post'}
         cta={features?.postCreator?.cta || 'Create Post'}
         ctaLink="/post-creator"
         visual={<PostCreatorVisual />}

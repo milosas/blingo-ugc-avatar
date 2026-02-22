@@ -10,7 +10,7 @@ const corsHeaders = {
 interface ImproviseRequest {
   industry: string
   existingText?: string
-  target: 'image' | 'post'
+  target: 'image' | 'post' | 'topic'
 }
 
 serve(async (req) => {
@@ -32,13 +32,29 @@ serve(async (req) => {
       )
     }
 
-    const targetLabel = body.target === 'image' ? 'marketingo nuotraukai' : 'socialinio tinklo įrašui'
-
+    let systemPrompt: string
     let userContent: string
-    if (body.existingText?.trim()) {
-      userContent = `Sritis: ${body.industry}\nEsamas tekstas: ${body.existingText}\nPatobulink jį arba sugalvok naują variantą.`
+    let maxTokens = 200
+
+    if (body.target === 'topic') {
+      // Generate just a short topic/theme idea, not a full post
+      systemPrompt = `Tu esi kūrybinis Lietuvos verslo turinio strategas. Sugalvok trumpą, konkrečią TEMĄ socialinio tinklo įrašui pagal nurodytą sritį. Rašyk tik temą/idėją lietuviškai - vieną trumpą sakinį arba frazę (5-15 žodžių). Tai turi būti temos pasiūlymas, NE pilnas įrašo tekstas. Nerašyk jokių paaiškinimų - tik pačią temą.`
+      maxTokens = 60
+
+      if (body.existingText?.trim()) {
+        userContent = `Sritis: ${body.industry}\nEsama tema: ${body.existingText}\nPasiūlyk kitą panašią arba geresnę temą.`
+      } else {
+        userContent = `Sritis: ${body.industry}\nPasiūlyk įdomią temą socialinio tinklo įrašui.`
+      }
     } else {
-      userContent = `Sritis: ${body.industry}\nSugalvok kūrybišką aprašymą.`
+      const targetLabel = body.target === 'image' ? 'marketingo nuotraukai' : 'socialinio tinklo įrašui'
+      systemPrompt = `Tu esi kūrybinis Lietuvos verslo turinio generatorius. Sugalvok konkretų, kūrybišką aprašymą ${targetLabel} pagal nurodytą sritį. Jei pateiktas esamas tekstas - patobulink jį. Rašyk TIKTAI aprašymo tekstą lietuviškai, 1-3 sakinius. Nerašyk jokių paaiškinimų ar komentarų - tik patį tekstą.`
+
+      if (body.existingText?.trim()) {
+        userContent = `Sritis: ${body.industry}\nEsamas tekstas: ${body.existingText}\nPatobulink jį arba sugalvok naują variantą.`
+      } else {
+        userContent = `Sritis: ${body.industry}\nSugalvok kūrybišką aprašymą.`
+      }
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -50,14 +66,11 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          {
-            role: 'system',
-            content: `Tu esi kūrybinis Lietuvos verslo turinio generatorius. Sugalvok konkretų, kūrybišką aprašymą ${targetLabel} pagal nurodytą sritį. Jei pateiktas esamas tekstas - patobulink jį. Rašyk TIKTAI aprašymo tekstą lietuviškai, 1-3 sakinius. Nerašyk jokių paaiškinimų ar komentarų - tik patį tekstą.`
-          },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent }
         ],
         temperature: 0.9,
-        max_tokens: 200,
+        max_tokens: maxTokens,
       }),
     })
 

@@ -98,7 +98,7 @@ export function usePostCreator(): UsePostCreatorReturn {
         body: JSON.stringify({
           industry: industry || 'general',
           existingText: prompt || undefined,
-          target: 'post',
+          target: 'topic',
         }),
       });
 
@@ -116,7 +116,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   }, [industry, prompt]);
 
   const getConfig = useCallback((): PostConfig => ({
-    industry,
+    industry: industry || 'general',
     prompt,
     tone,
     emoji,
@@ -131,7 +131,7 @@ export function usePostCreator(): UsePostCreatorReturn {
 
     try {
       const response = await generatePostText({
-        industry, prompt, tone, emoji, length, signal,
+        industry: industry || 'general', prompt, tone, emoji, length, signal,
       });
 
       let fullText = '';
@@ -154,7 +154,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   const generateImage = useCallback(async () => {
     setIsLoadingImage(true);
     try {
-      const result = await generatePostImage({ industry, prompt });
+      const result = await generatePostImage({ industry: industry || 'general', prompt });
       setGeneratedImageUrl(result.imageUrl);
       return result.imageUrl;
     } catch (err) {

@@ -6,6 +6,7 @@ import { useGeneration } from '../hooks/useGeneration';
 import { usePostProcess } from '../hooks/usePostProcess';
 import { useSupabaseStorage } from '../hooks/useSupabaseStorage';
 import { useAuth } from '../hooks/useAuth';
+import { LoginModal } from '../components/auth/LoginModal';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AnimatedSection } from '../components/animation/AnimatedSection';
 import { ImageUploader } from '../components/upload/ImageUploader';
@@ -43,6 +44,7 @@ export default function Generator() {
   });
 
   // Generation state
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { state, generate, cancel, reset } = useGeneration();
 
   // Post-processing state
@@ -156,7 +158,27 @@ export default function Generator() {
     <div className="">
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {state.status === 'success' && state.results && state.results.length > 0 ? (
+        {!user ? (
+          <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#FFF0EB] flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-[#FF6B35]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <p className="text-[#666666] mb-4">
+                Prisijunkite, kad galėtumėte generuoti nuotraukas
+              </p>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-6 py-3 bg-[#FF6B35] text-white rounded-full hover:bg-[#E55A2B] transition-all"
+              >
+                {t.auth?.signIn || 'Prisijungti'}
+              </button>
+            </div>
+            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+          </div>
+        ) : state.status === 'success' && state.results && state.results.length > 0 ? (
           <div className="animate-fade-in">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-[#1A1A1A]">

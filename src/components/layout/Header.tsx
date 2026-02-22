@@ -8,9 +8,9 @@ import { MobileMenu } from './MobileMenu';
 
 const navItems = [
   { key: 'tryon', path: '/generator', label: 'Try-on' },
-  { key: 'gallery', path: '/gallery', label: 'Galerija' },
+  { key: 'gallery', path: '/gallery', label: 'Galerija/Įrašai' },
   { key: 'models', path: '/modeliai', label: 'Modelių kūrimas' },
-  { key: 'posts', path: '/post-creator', label: 'Įrašai' },
+  { key: 'posts', path: '/post-creator', label: 'Įrašų kūrėjas' },
   { key: 'settings', path: '/dashboard', label: 'Nustatymai' },
 ] as const;
 

@@ -83,37 +83,6 @@ function ImageToImageVisual() {
   );
 }
 
-function ImageGeneratorVisual() {
-  return (
-    <div className="relative">
-      <div className="bg-gradient-to-br from-[#EBF0FF] to-[#D4E0FF] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="bg-white rounded-xl shadow-md px-4 py-3 max-w-[200px]">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />
-              <div className="h-2 bg-[#E5E5E3] rounded-full w-32" />
-            </div>
-            <div className="h-2 bg-[#E5E5E3] rounded-full w-24" />
-          </div>
-          <div className="w-8 h-8 rounded-full bg-[#4A6CF7] flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </div>
-          <div className="flex gap-2">
-            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-lg shadow-md border border-[#4A6CF7]/20" />
-            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-lg shadow-md border-2 border-[#4A6CF7]" />
-            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-lg shadow-md border border-[#4A6CF7]/20" />
-          </div>
-        </div>
-      </div>
-      <div className="absolute -top-3 -right-3 bg-[#4A6CF7] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-        NEW
-      </div>
-    </div>
-  );
-}
-
 function PostCreatorVisual() {
   return (
     <div className="relative">
@@ -319,26 +288,7 @@ export function FeatureHeroSections() {
         bgColor="bg-white"
       />
 
-      {/* Section 2: Image Generator */}
-      <FeatureBlock
-        badge={features?.imageGenerator?.badge || 'New'}
-        badgeColor="bg-[#4A6CF7] text-white"
-        title={features?.imageGenerator?.title || 'AI Image Generator'}
-        subtitle={features?.imageGenerator?.subtitle || 'Create entirely new, unique product images from scratch with AI.'}
-        features={[
-          features?.imageGenerator?.feature1 || 'Describe your desired image and AI will create it in seconds',
-          features?.imageGenerator?.feature2 || 'Choose the style, composition, and mood to match your brand',
-          features?.imageGenerator?.feature3 || 'Export in high resolution, ready for print and web',
-        ]}
-        creditInfo={features?.imageGenerator?.creditInfo || 'From 2 credits per image'}
-        cta={features?.imageGenerator?.cta || 'Start Creating'}
-        ctaLink="/image-generator"
-        reversed
-        visual={<ImageGeneratorVisual />}
-        bgColor="bg-[#F7F7F5]"
-      />
-
-      {/* Section 3: Post Creator */}
+      {/* Section 2: Post Creator */}
       <FeatureBlock
         badge={features?.postCreator?.badge || 'All-in-One'}
         badgeColor="bg-[#9B6CF7] text-white"

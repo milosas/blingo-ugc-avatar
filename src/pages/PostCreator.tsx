@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePostCreator } from '../hooks/usePostCreator';
 import { AnimatedSection } from '../components/animation/AnimatedSection';
@@ -12,13 +14,26 @@ import { ImageSourceToggle } from '../components/post-creator/ImageSourceToggle'
 export default function PostCreator() {
   const { t } = useLanguage();
   const pc = usePostCreator();
+  const location = useLocation();
+
+  // Accept gallery image from navigation state
+  const galleryImageUrl = (location.state as any)?.galleryImageUrl as string | undefined;
+
+  useEffect(() => {
+    if (galleryImageUrl) {
+      pc.setImageSource('gallery');
+      pc.setImagePreview(galleryImageUrl);
+      // Clear navigation state so refresh doesn't re-apply
+      window.history.replaceState({}, '');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const p = t.postCreatorPage || {} as any;
   const canGenerate = pc.industry && pc.prompt.trim().length >= 3;
   const isLoading = pc.isLoadingText || pc.isLoadingImage;
 
-  // Resolve the displayed image: AI-generated or uploaded preview
-  const displayImageUrl = pc.generatedImageUrl || (pc.imageSource === 'upload' ? pc.imagePreview : null);
+  // Resolve the displayed image: AI-generated, uploaded, or gallery preview
+  const displayImageUrl = pc.generatedImageUrl || (['upload', 'gallery'].includes(pc.imageSource) ? pc.imagePreview : null);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">

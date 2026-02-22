@@ -7,6 +7,7 @@ interface GalleryGridProps {
   onImageClick: (index: number) => void;
   onDelete: (imageId: string, storagePath: string) => Promise<void>;
   onEdit?: (index: number) => void;
+  onCreatePost?: (index: number) => void;
 }
 
 const breakpointColumns = {
@@ -16,7 +17,7 @@ const breakpointColumns = {
   640: 2       // Mobile - 2 columns
 };
 
-export function GalleryGrid({ images, onImageClick, onDelete, onEdit }: GalleryGridProps) {
+export function GalleryGrid({ images, onImageClick, onDelete, onEdit, onCreatePost }: GalleryGridProps) {
   return (
     <Masonry
       breakpointCols={breakpointColumns}
@@ -30,6 +31,7 @@ export function GalleryGrid({ images, onImageClick, onDelete, onEdit }: GalleryG
             onClick={() => onImageClick(index)}
             onDelete={onDelete}
             onEdit={onEdit ? () => onEdit(index) : undefined}
+            onCreatePost={onCreatePost ? () => onCreatePost(index) : undefined}
           />
         </div>
       ))}

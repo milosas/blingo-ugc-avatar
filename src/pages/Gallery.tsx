@@ -63,6 +63,13 @@ export default function Gallery() {
     }
   };
 
+  const handleCreatePost = (index: number) => {
+    const image = images[index];
+    if (image) {
+      navigate('/post-creator', { state: { galleryImageUrl: image.image_url, galleryImageId: image.id } });
+    }
+  };
+
   const handleEdit = (index: number) => {
     setEditingIndex(index);
     setPostProcessResult(null);
@@ -214,6 +221,7 @@ export default function Gallery() {
         onImageClick={(index) => setLightboxIndex(index)}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onCreatePost={handleCreatePost}
       />
 
       {/* Edit section — appears when Edit icon is clicked on a photo */}

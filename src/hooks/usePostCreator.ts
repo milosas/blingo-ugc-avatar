@@ -8,7 +8,7 @@ import {
 } from '../services/postService';
 import { useAuth } from './useAuth';
 
-export type ImageSource = 'upload' | 'ai';
+export type ImageSource = 'upload' | 'ai' | 'gallery';
 
 interface UsePostCreatorReturn {
   // Form state
@@ -218,8 +218,8 @@ export function usePostCreator(): UsePostCreatorReturn {
         }
       }
 
-      // Use uploaded image URL if user chose upload
-      if (imageSource === 'upload' && imagePreview) {
+      // Use uploaded/gallery image URL
+      if ((imageSource === 'upload' || imageSource === 'gallery') && imagePreview) {
         finalImageUrl = imagePreview;
       }
 

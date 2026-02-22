@@ -6,7 +6,6 @@ import Gallery from './pages/Gallery';
 import Dashboard from './pages/Dashboard';
 import Avatars from './pages/Avatars';
 import PostCreator from './pages/PostCreator';
-import ImageGenerator from './pages/ImageGenerator';
 import Privacy from './pages/Privacy';
 
 const router = createBrowserRouter([
@@ -40,10 +39,6 @@ const router = createBrowserRouter([
       {
         path: '/post-creator',
         element: <PostCreator />,
-      },
-      {
-        path: '/image-generator',
-        element: <ImageGenerator />,
       },
       {
         path: '/privacy',

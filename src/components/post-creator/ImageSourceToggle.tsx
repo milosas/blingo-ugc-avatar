@@ -11,6 +11,7 @@ interface ImageSourceToggleProps {
   labels: {
     upload: string;
     ai: string;
+    gallery?: string;
     uploadHint: string;
     aiHint: string;
     remove: string;
@@ -48,6 +49,14 @@ export function ImageSourceToggle({
     <div>
       {/* Toggle */}
       <div className="flex gap-1 bg-[#F7F7F5] rounded-lg p-1 mb-3">
+        {imageSource === 'gallery' && (
+          <button
+            onClick={() => onImageSourceChange('gallery')}
+            className="flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-white text-[#1A1A1A] shadow-sm"
+          >
+            {labels.gallery || 'Galerija'}
+          </button>
+        )}
         <button
           onClick={() => onImageSourceChange('upload')}
           className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -71,7 +80,21 @@ export function ImageSourceToggle({
       </div>
 
       {/* Content */}
-      {imageSource === 'upload' ? (
+      {imageSource === 'gallery' ? (
+        imagePreview ? (
+          <div className="relative">
+            <img src={imagePreview} alt="Gallery" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" />
+            <button
+              onClick={() => { onFileRemove(); onImageSourceChange('upload'); }}
+              className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-[#666] hover:text-red-500 transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ) : null
+      ) : imageSource === 'upload' ? (
         imagePreview ? (
           <div className="relative">
             <img src={imagePreview} alt="Uploaded" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" />

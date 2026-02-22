@@ -43,7 +43,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   };
 
   const isActive = (path: string) => location.pathname === path;
-  const isGenerateActive = ['/image-generator', '/generator', '/post-creator'].includes(location.pathname);
+  const isGenerateActive = ['/generator', '/post-creator'].includes(location.pathname);
 
   const nav = t.nav as any;
 
@@ -125,19 +125,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {generateOpen && (
               <div className="ml-4 mt-1 space-y-1 border-l-2 border-[#E5E5E3] pl-3">
-                <Link
-                  to="/image-generator"
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive('/image-generator')
-                      ? 'bg-[#FFF0EB] text-[#FF6B35] font-medium'
-                      : 'text-[#666666] hover:bg-[#F7F7F5] hover:text-[#1A1A1A]'
-                  }`}
-                >
-                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {nav?.imageGenerator || 'Nuotraukų generatorius'}
-                </Link>
                 <Link
                   to="/generator"
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${

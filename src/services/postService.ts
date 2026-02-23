@@ -5,6 +5,24 @@ import type { PostConfig, GeneratedPost } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = API_CONFIG.supabaseAnonKey;
 
+async function getAuthToken(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || supabaseAnonKey;
+}
+
+class InsufficientCreditsError extends Error {
+  required: number;
+  balance: number;
+  constructor(message: string, required: number, balance: number) {
+    super(message);
+    this.name = 'InsufficientCreditsError';
+    this.required = required;
+    this.balance = balance;
+  }
+}
+
+export { InsufficientCreditsError };
+
 interface GenerateTextParams {
   industry: string;
   prompt: string;
@@ -25,12 +43,13 @@ interface GenerateImageParams {
  */
 export async function generatePostText(params: GenerateTextParams): Promise<Response> {
   const { signal, ...body } = params;
+  const token = await getAuthToken();
 
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-post-text`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${supabaseAnonKey}`,
+      'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
     body: JSON.stringify(body),
@@ -39,6 +58,13 @@ export async function generatePostText(params: GenerateTextParams): Promise<Resp
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
+    if (response.status === 402 && errorData?.error === 'insufficient_credits') {
+      throw new InsufficientCreditsError(
+        errorData.message || 'Nepakanka kreditų',
+        errorData.required,
+        errorData.balance
+      );
+    }
     throw new Error(errorData?.message || 'Teksto generavimas nepavyko');
   }
 
@@ -49,11 +75,13 @@ export async function generatePostText(params: GenerateTextParams): Promise<Resp
  * Generate a post image via KIE Seedream.
  */
 export async function generatePostImage(params: GenerateImageParams): Promise<{ imageUrl: string }> {
+  const token = await getAuthToken();
+
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-post-image`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${supabaseAnonKey}`,
+      'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
     body: JSON.stringify(params),
@@ -61,6 +89,13 @@ export async function generatePostImage(params: GenerateImageParams): Promise<{ 
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
+    if (response.status === 402 && errorData?.error === 'insufficient_credits') {
+      throw new InsufficientCreditsError(
+        errorData.message || 'Nepakanka kreditų',
+        errorData.required,
+        errorData.balance
+      );
+    }
     throw new Error(errorData?.message || 'Paveikslėlio generavimas nepavyko');
   }
 
@@ -79,12 +114,13 @@ export async function generateTextFromImage(params: {
   signal?: AbortSignal;
 }): Promise<Response> {
   const { signal, ...body } = params;
+  const token = await getAuthToken();
 
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-text-from-image`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${supabaseAnonKey}`,
+      'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
     body: JSON.stringify(body),
@@ -93,6 +129,13 @@ export async function generateTextFromImage(params: {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
+    if (response.status === 402 && errorData?.error === 'insufficient_credits') {
+      throw new InsufficientCreditsError(
+        errorData.message || 'Nepakanka kreditų',
+        errorData.required,
+        errorData.balance
+      );
+    }
     throw new Error(errorData?.message || 'Teksto generavimas pagal nuotrauką nepavyko');
   }
 

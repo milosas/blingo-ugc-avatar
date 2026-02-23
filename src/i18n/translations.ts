@@ -84,6 +84,7 @@ export const translations = {
       network: 'Patikrinkite interneto ryšį ir bandykite dar kartą.',
       api: 'Nepavyko sugeneruoti. Bandykite vėliau.',
       avatarLoad: 'Nepavyko įkelti modelio nuotraukos. Bandykite dar kartą.',
+      insufficientCredits: 'Nepakanka kreditų. Papildykite kreditų balansą.',
       default: 'Įvyko klaida. Bandykite dar kartą.'
     },
     footer: 'Re Edit Me',
@@ -705,6 +706,7 @@ export const translations = {
       network: 'Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.',
       api: 'Neizdevās ģenerēt. Mēģiniet vēlāk.',
       avatarLoad: 'Neizdevās ielādēt modeļa attēlu. Mēģiniet vēlreiz.',
+      insufficientCredits: 'Nepietiek kredītu. Papildiniet kredītu atlikumu.',
       default: 'Radās kļūda. Mēģiniet vēlreiz.'
     },
     footer: 'Re Edit Me',
@@ -1324,6 +1326,7 @@ export const translations = {
       network: 'Kontrollige internetiühendust ja proovige uuesti.',
       api: 'Genereerimine ebaõnnestus. Proovige hiljem.',
       avatarLoad: 'Mudeli pildi laadimine ebaõnnestus. Proovige uuesti.',
+      insufficientCredits: 'Krediiti pole piisavalt. Täiendage oma krediidijääki.',
       default: 'Tekkis viga. Proovige uuesti.'
     },
     footer: 'Re Edit Me',
@@ -1939,6 +1942,7 @@ export const translations = {
       network: 'Check your internet connection and try again.',
       api: 'Failed to generate. Please try later.',
       avatarLoad: 'Failed to load model image. Please try again.',
+      insufficientCredits: 'Insufficient credits. Please top up your credit balance.',
       default: 'An error occurred. Please try again.'
     },
     footer: 'Re Edit Me',

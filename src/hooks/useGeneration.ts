@@ -145,6 +145,8 @@ export function useGeneration() {
         // User cancelled - reset to idle (silent)
         setState(INITIAL_STATE);
         return;
+      } else if (error.message?.startsWith('INSUFFICIENT_CREDITS')) {
+        errorType = 'INSUFFICIENT_CREDITS';
       } else if (error.message === 'API_ERROR') {
         errorType = 'API_ERROR';
       } else if (error.message === 'AVATAR_LOAD_FAILED') {

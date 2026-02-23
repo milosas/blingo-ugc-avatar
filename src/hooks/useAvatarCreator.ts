@@ -1,9 +1,15 @@
 import { useState, useCallback } from 'react';
 import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt, buildPosePrompt, type TraitOption } from '../constants/avatarTraits';
 import type { Language } from '../i18n/translations';
+import { supabase } from '../lib/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+async function getAuthToken(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || supabaseAnonKey;
+}
 
 interface GenerateResult {
   base64: string;
@@ -73,12 +79,13 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
         : buildAvatarPrompt(traits, specialFeatures, 'en');
 
       const refUrl = overrideReferenceUrl || referenceImageUrl;
+      const token = await getAuthToken();
 
       const response = await fetch(`${supabaseUrl}/functions/v1/generate-avatar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Authorization': `Bearer ${token}`,
           'apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
@@ -89,6 +96,10 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
       });
 
       const data = await response.json();
+
+      if (response.status === 402 && data.error === 'insufficient_credits') {
+        throw new Error(`Nepakanka kreditų. Reikia: ${data.required}, likutis: ${data.balance}`);
+      }
 
       if (!data.success) {
         throw new Error(data.error || 'Generation failed');

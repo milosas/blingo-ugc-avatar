@@ -21,6 +21,8 @@ export function ErrorMessage({ errorType, onDismiss }: ErrorMessageProps) {
         return t.errors.api;
       case 'AVATAR_LOAD_FAILED':
         return t.errors.avatarLoad || t.errors.default;
+      case 'INSUFFICIENT_CREDITS':
+        return t.errors.insufficientCredits || 'Nepakanka kreditų. Papildykite kreditų balansą.';
       default:
         return t.errors.default;
     }

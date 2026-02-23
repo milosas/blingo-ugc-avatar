@@ -1,7 +1,49 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const FAL_KEY = Deno.env.get('FAL_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+const TRYON_CREDIT_COST = 3 // tryon_photo
+const TRYON_CREDIT_DESCRIPTION = 'Try-on nuotrauka'
+
+async function checkCredits(authHeader: string, cost: number): Promise<{ userId: string; balance: number }> {
+  const token = authHeader.replace('Bearer ', '')
+  const payload = JSON.parse(atob(token.split('.')[1]))
+  const userId = payload.sub
+  if (!userId) throw new Error('Invalid token')
+
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', userId)
+    .single()
+
+  const balance = profile?.credits || 0
+  if (balance < cost) {
+    const err = new Error('insufficient_credits') as any
+    err.type = 'insufficient_credits'
+    err.required = cost
+    err.balance = balance
+    throw err
+  }
+
+  return { userId, balance }
+}
+
+async function deductCredits(userId: string, cost: number, description: string): Promise<void> {
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+  const { data } = await supabase.from('profiles').select('credits').eq('id', userId).single()
+  const newBalance = Math.max(0, (data?.credits || 0) - cost)
+  await supabase.from('profiles').update({ credits: newBalance }).eq('id', userId)
+  await supabase.from('credit_transactions').insert({
+    user_id: userId, amount: -cost, type: 'usage', description
+  })
+  console.log(`Deducted ${cost} credits from user ${userId}. New balance: ${newBalance}`)
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -480,6 +522,37 @@ serve(async (req) => {
     const mode = body!.mode || 'tryon'
     console.log(`Processing request: mode=${mode}`)
 
+    // Credit check for tryon mode only
+    let creditUser: { userId: string; balance: number } | null = null
+    if (mode === 'tryon') {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+      if (!authHeader) {
+        return new Response(JSON.stringify({
+          success: false, images: [],
+          error: 'Missing authorization header',
+          message: 'Missing authorization header',
+        }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+
+      try {
+        creditUser = await checkCredits(authHeader, TRYON_CREDIT_COST)
+      } catch (creditErr: any) {
+        if (creditErr.type === 'insufficient_credits') {
+          return new Response(JSON.stringify({
+            error: 'insufficient_credits',
+            message: 'Nepakanka kreditų',
+            required: creditErr.required,
+            balance: creditErr.balance,
+          }), {
+            status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        throw creditErr
+      }
+    }
+
     let response: GenerateResponse
 
     switch (mode) {
@@ -497,6 +570,11 @@ serve(async (req) => {
         break
       default:
         throw new Error(`Unknown mode: ${mode}`)
+    }
+
+    // Deduct credits after successful tryon generation
+    if (mode === 'tryon' && creditUser && response.success) {
+      await deductCredits(creditUser.userId, TRYON_CREDIT_COST, TRYON_CREDIT_DESCRIPTION)
     }
 
     return new Response(JSON.stringify(response), {

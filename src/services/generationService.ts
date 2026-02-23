@@ -1,6 +1,12 @@
 import { API_CONFIG } from '../constants/api';
+import { supabase } from '../lib/supabase';
 import type { Config, UploadedImage } from '../types';
 import type { GenerationResponse } from '../types/generation';
+
+async function getAuthToken(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || API_CONFIG.supabaseAnonKey;
+}
 
 /**
  * Convert File to base64 data URL
@@ -88,11 +94,13 @@ export async function generateImages(
     avatarIsCustom: config.avatar?.isCustom || false
   };
 
+  const token = await getAuthToken();
+
   const response = await fetch(API_CONFIG.generateUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${API_CONFIG.supabaseAnonKey}`,
+      'Authorization': `Bearer ${token}`,
       'apikey': API_CONFIG.supabaseAnonKey
     },
     body: JSON.stringify(requestBody),
@@ -102,10 +110,16 @@ export async function generateImages(
   if (!response.ok) {
     try {
       const errorData = await response.json();
+      if (response.status === 402 && errorData.error === 'insufficient_credits') {
+        throw new Error(`INSUFFICIENT_CREDITS:${errorData.required}:${errorData.balance}`);
+      }
       if (errorData.error?.includes('AVATAR_UPLOAD_FAILED')) {
         throw new Error('AVATAR_LOAD_FAILED');
       }
     } catch (parseErr) {
+      if ((parseErr as Error).message?.startsWith('INSUFFICIENT_CREDITS') || (parseErr as Error).message === 'AVATAR_LOAD_FAILED') {
+        throw parseErr;
+      }
       // If parsing fails, throw generic error
     }
     throw new Error('API_ERROR');

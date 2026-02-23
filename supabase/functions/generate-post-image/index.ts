@@ -1,6 +1,48 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const FAL_KEY = Deno.env.get('FAL_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+const CREDIT_COST = 3 // post_image
+const CREDIT_DESCRIPTION = 'Iraso nuotrauka'
+
+async function checkCredits(authHeader: string, cost: number): Promise<{ userId: string; balance: number }> {
+  const token = authHeader.replace('Bearer ', '')
+  const payload = JSON.parse(atob(token.split('.')[1]))
+  const userId = payload.sub
+  if (!userId) throw new Error('Invalid token')
+
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', userId)
+    .single()
+
+  const balance = profile?.credits || 0
+  if (balance < cost) {
+    const err = new Error('insufficient_credits') as any
+    err.type = 'insufficient_credits'
+    err.required = cost
+    err.balance = balance
+    throw err
+  }
+
+  return { userId, balance }
+}
+
+async function deductCredits(userId: string, cost: number, description: string): Promise<void> {
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+  const { data } = await supabase.from('profiles').select('credits').eq('id', userId).single()
+  const newBalance = Math.max(0, (data?.credits || 0) - cost)
+  await supabase.from('profiles').update({ credits: newBalance }).eq('id', userId)
+  await supabase.from('credit_transactions').insert({
+    user_id: userId, amount: -cost, type: 'usage', description
+  })
+  console.log(`Deducted ${cost} credits from user ${userId}. New balance: ${newBalance}`)
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,6 +57,32 @@ serve(async (req) => {
   try {
     if (!FAL_KEY) {
       throw new Error('FAL_KEY not configured')
+    }
+
+    // Credit check
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'auth_error', message: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    let creditUser: { userId: string; balance: number }
+    try {
+      creditUser = await checkCredits(authHeader, CREDIT_COST)
+    } catch (creditErr: any) {
+      if (creditErr.type === 'insufficient_credits') {
+        return new Response(JSON.stringify({
+          error: 'insufficient_credits',
+          message: 'Nepakanka kreditų',
+          required: creditErr.required,
+          balance: creditErr.balance,
+        }), {
+          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+      throw creditErr
     }
 
     const body: { industry: string; prompt: string } = await req.json()
@@ -57,6 +125,9 @@ serve(async (req) => {
 
     const imageUrl = result.images[0].url
     console.log('Post image generated:', imageUrl.substring(0, 50))
+
+    // Deduct credits after successful generation
+    await deductCredits(creditUser.userId, CREDIT_COST, CREDIT_DESCRIPTION)
 
     return new Response(
       JSON.stringify({ success: true, imageUrl }),

@@ -6,6 +6,7 @@ import {
   generateTextFromImage,
   parseSSEStream,
   savePost,
+  InsufficientCreditsError,
 } from '../services/postService';
 import { useAuth } from './useAuth';
 
@@ -148,7 +149,11 @@ export function usePostCreator(): UsePostCreatorReturn {
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
-        setError((err as Error).message || 'Teksto generavimas pagal nuotrauką nepavyko');
+        if (err instanceof InsufficientCreditsError) {
+          setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+        } else {
+          setError((err as Error).message || 'Teksto generavimas pagal nuotrauką nepavyko');
+        }
       }
     } finally {
       setIsGeneratingFromImage(false);
@@ -185,6 +190,10 @@ export function usePostCreator(): UsePostCreatorReturn {
       return fullText;
     } catch (err) {
       if ((err as Error).name === 'AbortError') return null;
+      if (err instanceof InsufficientCreditsError) {
+        setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+        return null;
+      }
       throw err;
     } finally {
       setIsLoadingText(false);
@@ -199,6 +208,10 @@ export function usePostCreator(): UsePostCreatorReturn {
       setGeneratedImageUrl(result.imageUrl);
       return result.imageUrl;
     } catch (err) {
+      if (err instanceof InsufficientCreditsError) {
+        setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+        return null;
+      }
       throw err;
     } finally {
       setIsLoadingImage(false);

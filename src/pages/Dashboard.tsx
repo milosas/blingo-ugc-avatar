@@ -123,20 +123,20 @@ export default function Dashboard() {
 
       {/* Personal Info */}
       <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6 mb-8">
-        <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4">Asmeniniai duomenys</h2>
+        <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4">{dashboard?.personalInfo?.title || 'Asmeniniai duomenys'}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#333] mb-1">Vardas</label>
+            <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.name || 'Vardas'}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Jūsų vardas"
+              placeholder={dashboard?.personalInfo?.namePlaceholder || 'Jūsų vardas'}
               className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#333] mb-1">El. paštas</label>
+            <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.email || 'El. paštas'}</label>
             <input
               type="email"
               value={user.email || ''}
@@ -145,22 +145,22 @@ export default function Dashboard() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#333] mb-1">Telefonas</label>
+            <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.phone || 'Telefonas'}</label>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+370..."
+              placeholder={dashboard?.personalInfo?.phonePlaceholder || '+370...'}
               className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#333] mb-1">Įmonė</label>
+            <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.company || 'Įmonė'}</label>
             <input
               type="text"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              placeholder="Įmonės pavadinimas"
+              placeholder={dashboard?.personalInfo?.companyPlaceholder || 'Įmonės pavadinimas'}
               className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
             />
           </div>
@@ -171,7 +171,7 @@ export default function Dashboard() {
             disabled={saving}
             className="px-6 py-2.5 bg-[#FF6B35] text-white font-semibold rounded-full hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saugoma...' : 'Išsaugoti'}
+            {saving ? (dashboard?.personalInfo?.saving || 'Saugoma...') : (dashboard?.personalInfo?.save || 'Išsaugoti')}
           </button>
           {saveMessage && (
             <span className={`text-sm font-medium ${saveMessage.startsWith('Klaida') ? 'text-red-500' : 'text-green-600'}`}>

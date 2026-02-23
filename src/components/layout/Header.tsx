@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { AuthButton } from '../auth/AuthButton';
 import { LanguageSelector } from '../ui/LanguageSelector';
+import { CreditBadge } from '../credits/CreditBadge';
 import { MobileMenu } from './MobileMenu';
 
 const navItems = [
@@ -62,6 +63,7 @@ export function Header() {
             {/* Right side */}
             <div className="flex items-center gap-2">
               <div className="hidden md:flex items-center gap-2">
+                <CreditBadge />
                 <AuthButton />
                 <LanguageSelector />
               </div>

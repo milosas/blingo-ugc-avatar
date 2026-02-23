@@ -66,10 +66,10 @@ export default function Avatars() {
       {/* Page header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-          Modelių kūrimas
+          {t.avatarsPage?.title || 'Modelių kūrimas'}
         </h1>
         <p className="text-[#999999] text-sm mt-2">
-          Sukurkite AI modelius nuotraukoms ir įrašams
+          {t.avatarsPage?.subtitle || 'Sukurkite AI modelius nuotraukoms ir įrašams'}
         </p>
       </div>
 
@@ -83,10 +83,10 @@ export default function Avatars() {
           </div>
 
           <h2 className="text-xl font-semibold text-[#1A1A1A] mb-2">
-            Kurkite savo AI modelį
+            {t.avatarsPage?.createTitle || 'Kurkite savo AI modelį'}
           </h2>
           <p className="text-[#999999] text-sm mb-8 max-w-md">
-            Pasirinkite bruožus, generuokite nuotraukas su AI ir sukurkite unikalų modelį savo turiniui
+            {t.avatarsPage?.createDescription || 'Pasirinkite bruožus, generuokite nuotraukas su AI ir sukurkite unikalų modelį savo turiniui'}
           </p>
 
           <button
@@ -96,15 +96,15 @@ export default function Avatars() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Sukurti naują modelį
+            {t.avatarsPage?.createButton || 'Sukurti naują modelį'}
           </button>
 
           {/* Model count info */}
           {models.length > 0 && (
             <p className="mt-6 text-sm text-[#999999]">
-              Turite {models.length} {models.length === 1 ? 'modelį' : models.length < 10 ? 'modelius' : 'modelių'}.{' '}
+              {(t.avatarsPage?.modelCount || 'Turite {count} {label}.').replace('{count}', String(models.length)).replace('{label}', models.length === 1 ? (t.avatarsPage?.modelCountOne || 'modelį') : models.length < 10 ? (t.avatarsPage?.modelCountFew || 'modelius') : (t.avatarsPage?.modelCountMany || 'modelių'))}{' '}
               <a href="/gallery" className="text-[#10B981] hover:text-[#059669] underline transition-colors">
-                Peržiūrėti galeriją
+                {t.avatarsPage?.viewGallery || 'Peržiūrėti galeriją'}
               </a>
             </p>
           )}

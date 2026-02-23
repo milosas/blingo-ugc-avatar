@@ -167,7 +167,7 @@ export default function Generator() {
                 </svg>
               </div>
               <p className="text-[#666666] mb-4">
-                Prisijunkite, kad galėtumėte generuoti nuotraukas
+                {(t as any).generatorPage?.loginRequired || 'Prisijunkite, kad galėtumėte generuoti nuotraukas'}
               </p>
               <button
                 onClick={() => setIsLoginModalOpen(true)}

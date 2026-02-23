@@ -10,6 +10,7 @@ import { StreamingText } from '../components/post-creator/StreamingText';
 import { SocialPreview } from '../components/post-creator/SocialPreview';
 import { PostActionButtons } from '../components/post-creator/PostActionButtons';
 import { ImageSourceToggle } from '../components/post-creator/ImageSourceToggle';
+import { PublishButtons } from '../components/post-creator/PublishButtons';
 
 export default function PostCreator() {
   const { t } = useLanguage();
@@ -55,7 +56,7 @@ export default function PostCreator() {
               </svg>
             </div>
             <p className="text-[#666666] mb-4">
-              Prisijunkite, kad galėtumėte kurti įrašus
+              {p.loginRequired || 'Prisijunkite, kad galėtumėte kurti įrašus'}
             </p>
             <button
               onClick={() => setIsLoginModalOpen(true)}
@@ -70,27 +71,13 @@ export default function PostCreator() {
       <div className="space-y-6">
         {/* 1. Topic Textarea */}
         <AnimatedSection delay={0}><div>
-          <label className="flex items-center justify-between text-sm font-medium text-[#1A1A1A] mb-1.5">
-            <span>{p.topicLabel || 'Tema'}</span>
-            <button
-              onClick={pc.improvise}
-              disabled={pc.isImprovising}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#FF6B35] hover:bg-[#FFF0EB] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {pc.isImprovising ? (
-                <div className="w-3 h-3 rounded-full border border-[#FF6B35] border-t-transparent animate-spin" />
-              ) : (
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM19.5 10.5l-1 3-1-3-3-1 3-1 1-3 1 3 3 1-3 1z" />
-                </svg>
-              )}
-              {pc.isImprovising ? 'Improvizuojama...' : 'Improvizuoti'}
-            </button>
+          <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+            {p.topicLabel || 'Apie ką bus įrašas, trumpai apibūdinkite'}
           </label>
           <textarea
             value={pc.prompt}
             onChange={(e) => pc.setPrompt(e.target.value)}
-            placeholder="Pvz.: Nauja kolekcija, vasaros nuolaidos, produkto pristatymas..."
+            placeholder={p.topicPlaceholder || 'Pvz.: Nauja kolekcija, vasaros nuolaidos, produkto pristatymas...'}
             rows={3}
             className="w-full px-4 py-3 border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999] focus:border-[#FF6B35] focus:ring-1 focus:ring-[#FF6B35]/20 outline-none resize-none transition-colors"
           />
@@ -124,6 +111,30 @@ export default function PostCreator() {
             }}
           />
         </div></AnimatedSection>
+
+        {/* 2.5. Generate text from image button */}
+        {pc.imagePreview && !pc.generatedText && (
+          <button
+            onClick={pc.generateFromImage}
+            disabled={pc.isGeneratingFromImage || pc.isStreaming}
+            className="w-full py-3 border-2 border-dashed border-[#FF6B35]/30 text-[#FF6B35] font-medium rounded-xl hover:bg-[#FFF0EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            {pc.isGeneratingFromImage ? (
+              <>
+                <div className="w-4 h-4 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
+                {p.generatingTextFromImage || 'Generuojamas tekstas...'}
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {p.generateTextFromImage || 'Sugeneruoti tekstą pagal nuotrauką'}
+              </>
+            )}
+          </button>
+        )}
 
         {/* 3. Post Config */}
         <AnimatedSection delay={0.2}><div>
@@ -243,19 +254,12 @@ export default function PostCreator() {
           />
         )}
 
-        {/* 10. Social Publish Hint */}
+        {/* 10. Social Publishing */}
         {pc.generatedText && (
-          <div className="flex items-center gap-3 justify-center pt-2">
-            <span className="text-sm text-[#999]">Skelbti:</span>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#1877F2] text-white hover:bg-[#1877F2]/90 transition-colors">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              Facebook
-            </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white hover:opacity-90 transition-opacity">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-              Instagram
-            </button>
-          </div>
+          <PublishButtons
+            text={pc.generatedText}
+            imageUrl={displayImageUrl}
+          />
         )}
 
         {/* 11. Save Status */}

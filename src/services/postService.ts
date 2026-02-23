@@ -69,6 +69,37 @@ export async function generatePostImage(params: GenerateImageParams): Promise<{ 
 }
 
 /**
+ * Generate post text from an image via GPT-4o Vision (streaming).
+ */
+export async function generateTextFromImage(params: {
+  imageUrl: string;
+  tone: string;
+  emoji: string;
+  length: string;
+  signal?: AbortSignal;
+}): Promise<Response> {
+  const { signal, ...body } = params;
+
+  const response = await fetch(`${supabaseUrl}/functions/v1/generate-text-from-image`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${supabaseAnonKey}`,
+      'apikey': supabaseAnonKey,
+    },
+    body: JSON.stringify(body),
+    signal,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Teksto generavimas pagal nuotrauką nepavyko');
+  }
+
+  return response;
+}
+
+/**
  * Parse SSE stream from OpenAI-compatible endpoint into text chunks.
  */
 export async function* parseSSEStream(response: Response): AsyncGenerator<string> {

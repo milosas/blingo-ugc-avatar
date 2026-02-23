@@ -3,6 +3,7 @@ import type { PostConfig } from '../types/database';
 import {
   generatePostText,
   generatePostImage,
+  generateTextFromImage,
   parseSSEStream,
   savePost,
 } from '../services/postService';
@@ -45,6 +46,10 @@ interface UsePostCreatorReturn {
   isImprovising: boolean;
   improvise: () => Promise<void>;
 
+  // Generate text from image
+  isGeneratingFromImage: boolean;
+  generateFromImage: () => Promise<void>;
+
   // Actions
   generate: () => Promise<void>;
   regenerateText: () => Promise<void>;
@@ -80,6 +85,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   const [savedPostId, setSavedPostId] = useState<string | null>(null);
 
   const [isImprovising, setIsImprovising] = useState(false);
+  const [isGeneratingFromImage, setIsGeneratingFromImage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const improvise = useCallback(async () => {
@@ -114,6 +120,41 @@ export function usePostCreator(): UsePostCreatorReturn {
       setIsImprovising(false);
     }
   }, [industry, prompt]);
+
+  const generateFromImage = useCallback(async () => {
+    if (!imagePreview) return;
+    setIsGeneratingFromImage(true);
+    setIsStreaming(true);
+    setGeneratedText('');
+    setError(null);
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    try {
+      const response = await generateTextFromImage({
+        imageUrl: imagePreview,
+        tone,
+        emoji,
+        length,
+        signal: controller.signal,
+      });
+
+      let fullText = '';
+      for await (const chunk of parseSSEStream(response)) {
+        if (controller.signal.aborted) break;
+        fullText += chunk;
+        setGeneratedText(fullText);
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        setError((err as Error).message || 'Teksto generavimas pagal nuotrauką nepavyko');
+      }
+    } finally {
+      setIsGeneratingFromImage(false);
+      setIsStreaming(false);
+    }
+  }, [imagePreview, tone, emoji, length]);
 
   const getConfig = useCallback((): PostConfig => ({
     industry: industry || 'general',
@@ -298,6 +339,8 @@ export function usePostCreator(): UsePostCreatorReturn {
     savedPostId,
     isImprovising,
     improvise,
+    isGeneratingFromImage,
+    generateFromImage,
     generate,
     regenerateText,
     regenerateImage,

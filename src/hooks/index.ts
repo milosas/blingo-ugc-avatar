@@ -1,5 +1,6 @@
 // Hook re-exports for convenient imports
 export { useAuth } from '../contexts/AuthContext';
+export { useCredits } from './useCredits';
 export { useCustomAvatars } from './useCustomAvatars';
 export { useGallery } from './useGallery';
 export { useGeneration } from './useGeneration';

@@ -5,6 +5,7 @@ import { API_CONFIG } from '../constants/api';
 import { generateImages } from '../services/generationService';
 import { useSupabaseStorage } from './useSupabaseStorage';
 import { useAuth } from './useAuth';
+import { notifyCreditChange } from './useCredits';
 
 const INITIAL_STATE: GenerationState = {
   status: 'idle',
@@ -15,6 +16,7 @@ const INITIAL_STATE: GenerationState = {
 
 export function useGeneration() {
   const [state, setState] = useState<GenerationState>(INITIAL_STATE);
+  const [creditError, setCreditError] = useState<{ required: number; balance: number } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const progressTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { user } = useAuth();
@@ -93,6 +95,7 @@ export function useGeneration() {
           results: data.images,
           error: null
         });
+        notifyCreditChange();
 
         // Save to Supabase if user is authenticated
         if (user) {
@@ -147,6 +150,11 @@ export function useGeneration() {
         return;
       } else if (error.message?.startsWith('INSUFFICIENT_CREDITS')) {
         errorType = 'INSUFFICIENT_CREDITS';
+        const parts = error.message.split(':');
+        setCreditError({
+          required: parseInt(parts[1], 10) || 0,
+          balance: parseInt(parts[2], 10) || 0,
+        });
       } else if (error.message === 'API_ERROR') {
         errorType = 'API_ERROR';
       } else if (error.message === 'AVATAR_LOAD_FAILED') {
@@ -177,8 +185,12 @@ export function useGeneration() {
     setState(INITIAL_STATE);
   }, []);
 
+  const clearCreditError = useCallback(() => setCreditError(null), []);
+
   return {
     state,
+    creditError,
+    clearCreditError,
     generate,
     cancel,
     reset

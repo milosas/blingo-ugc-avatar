@@ -9,6 +9,7 @@ import {
   InsufficientCreditsError,
 } from '../services/postService';
 import { useAuth } from './useAuth';
+import { notifyCreditChange } from './useCredits';
 
 export type ImageSource = 'upload' | 'ai' | 'gallery';
 
@@ -42,6 +43,10 @@ interface UsePostCreatorReturn {
   error: string | null;
   isSaving: boolean;
   savedPostId: string | null;
+
+  // Credit error (for InsufficientCreditsModal)
+  creditError: { required: number; balance: number } | null;
+  clearCreditError: () => void;
 
   // Improvise
   isImprovising: boolean;
@@ -87,6 +92,7 @@ export function usePostCreator(): UsePostCreatorReturn {
 
   const [isImprovising, setIsImprovising] = useState(false);
   const [isGeneratingFromImage, setIsGeneratingFromImage] = useState(false);
+  const [creditError, setCreditError] = useState<{ required: number; balance: number } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const improvise = useCallback(async () => {
@@ -147,10 +153,11 @@ export function usePostCreator(): UsePostCreatorReturn {
         fullText += chunk;
         setGeneratedText(fullText);
       }
+      notifyCreditChange();
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
         if (err instanceof InsufficientCreditsError) {
-          setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+          setCreditError({ required: err.required, balance: err.balance });
         } else {
           setError((err as Error).message || 'Teksto generavimas pagal nuotrauką nepavyko');
         }
@@ -187,11 +194,12 @@ export function usePostCreator(): UsePostCreatorReturn {
         setGeneratedText(fullText);
       }
 
+      notifyCreditChange();
       return fullText;
     } catch (err) {
       if ((err as Error).name === 'AbortError') return null;
       if (err instanceof InsufficientCreditsError) {
-        setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+        setCreditError({ required: err.required, balance: err.balance });
         return null;
       }
       throw err;
@@ -206,10 +214,11 @@ export function usePostCreator(): UsePostCreatorReturn {
     try {
       const result = await generatePostImage({ industry: industry || 'general', prompt });
       setGeneratedImageUrl(result.imageUrl);
+      notifyCreditChange();
       return result.imageUrl;
     } catch (err) {
       if (err instanceof InsufficientCreditsError) {
-        setError(`Nepakanka kreditų. Reikia: ${err.required}, likutis: ${err.balance}`);
+        setCreditError({ required: err.required, balance: err.balance });
         return null;
       }
       throw err;
@@ -326,6 +335,7 @@ export function usePostCreator(): UsePostCreatorReturn {
     setGeneratedText('');
     setGeneratedImageUrl(null);
     setError(null);
+    setCreditError(null);
     setSavedPostId(null);
     setIsLoadingText(false);
     setIsLoadingImage(false);
@@ -350,6 +360,8 @@ export function usePostCreator(): UsePostCreatorReturn {
     error,
     isSaving,
     savedPostId,
+    creditError,
+    clearCreditError: () => setCreditError(null),
     isImprovising,
     improvise,
     isGeneratingFromImage,

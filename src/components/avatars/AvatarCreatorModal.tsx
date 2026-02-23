@@ -1,5 +1,6 @@
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAvatarCreator } from '../../hooks/useAvatarCreator';
+import { InsufficientCreditsModal } from '../credits/InsufficientCreditsModal';
 import { useState, useEffect, useCallback } from 'react';
 import {
   GENDER_OPTIONS,
@@ -81,6 +82,8 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     setSpecialFeatures,
     setPrompt,
     setError,
+    creditError,
+    clearCreditError,
     generateAvatar,
     setGeneratedImage,
     clearImage,
@@ -707,6 +710,16 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
           </div>
         )}
       </div>
+
+      {/* Insufficient credits modal */}
+      {creditError && (
+        <InsufficientCreditsModal
+          isOpen={!!creditError}
+          onClose={clearCreditError}
+          required={creditError.required}
+          balance={creditError.balance}
+        />
+      )}
     </div>
   );
 }

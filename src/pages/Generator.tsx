@@ -19,6 +19,7 @@ import { ResultsActions } from '../components/generation/ResultsActions';
 import { PostProcessToolbar } from '../components/generation/PostProcessToolbar';
 import { ErrorMessage } from '../components/generation/ErrorMessage';
 import type { Config } from '../types';
+import { InsufficientCreditsModal } from '../components/credits/InsufficientCreditsModal';
 
 export default function Generator() {
   const { t } = useLanguage();
@@ -45,7 +46,7 @@ export default function Generator() {
 
   // Generation state
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { state, generate, cancel, reset } = useGeneration();
+  const { state, creditError, clearCreditError, generate, cancel, reset } = useGeneration();
 
   // Post-processing state
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
@@ -321,9 +322,19 @@ export default function Generator() {
         <LoadingOverlay progress={state.progress} onCancel={cancel} />
       )}
 
-      {/* Error Overlay */}
-      {state.status === 'error' && state.error && (
+      {/* Error Overlay - skip for insufficient credits since we show the modal */}
+      {state.status === 'error' && state.error && state.error !== 'INSUFFICIENT_CREDITS' && (
         <ErrorMessage errorType={state.error} onDismiss={handleErrorDismiss} />
+      )}
+
+      {/* Insufficient credits modal */}
+      {creditError && (
+        <InsufficientCreditsModal
+          isOpen={!!creditError}
+          onClose={() => { clearCreditError(); handleErrorDismiss(); }}
+          required={creditError.required}
+          balance={creditError.balance}
+        />
       )}
     </div>
   );

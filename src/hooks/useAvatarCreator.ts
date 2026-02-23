@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt, buildPosePrompt, type TraitOption } from '../constants/avatarTraits';
 import type { Language } from '../i18n/translations';
 import { supabase } from '../lib/supabase';
+import { notifyCreditChange } from './useCredits';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -27,6 +28,8 @@ interface UseAvatarCreatorReturn {
   setSpecialFeatures: (value: string) => void;
   setPrompt: (value: string) => void;
   setError: (error: string | null) => void;
+  creditError: { required: number; balance: number } | null;
+  clearCreditError: () => void;
   generateAvatar: (overrideReferenceUrl?: string) => Promise<GenerateResult | null>;
   setGeneratedImage: (image: string | null) => void;
   clearImage: () => void;
@@ -42,6 +45,7 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [creditError, setCreditError] = useState<{ required: number; balance: number } | null>(null);
   // When set, prompt is built from base description + pose/mood/framing only
   const [baseDescription, setBaseDescription] = useState<string | null>(null);
   // Reference image URL for PuLID identity-preserving generation
@@ -98,7 +102,8 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
       const data = await response.json();
 
       if (response.status === 402 && data.error === 'insufficient_credits') {
-        throw new Error(`Nepakanka kreditų. Reikia: ${data.required}, likutis: ${data.balance}`);
+        setCreditError({ required: data.required ?? 0, balance: data.balance ?? 0 });
+        return null;
       }
 
       if (!data.success) {
@@ -106,6 +111,7 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
       }
 
       setGeneratedImage(data.image);
+      notifyCreditChange();
       return { base64: data.image, imageUrl: data.imageUrl || '' };
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Generation failed';
@@ -135,6 +141,7 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
     setPrompt(buildAvatarPrompt(DEFAULT_TRAITS, '', lang));
     setGeneratedImage(null);
     setError(null);
+    setCreditError(null);
   }, [lang]);
 
   return {
@@ -148,6 +155,8 @@ export function useAvatarCreator(lang: Language = 'en'): UseAvatarCreatorReturn 
     setSpecialFeatures: handleSetSpecialFeatures,
     setPrompt,
     setError,
+    creditError,
+    clearCreditError: useCallback(() => setCreditError(null), []),
     generateAvatar,
     setGeneratedImage,
     clearImage,

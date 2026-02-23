@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { AuthButton } from '../auth/AuthButton';
 import { LanguageSelector } from '../ui/LanguageSelector';
+import { CreditBadge } from '../credits/CreditBadge';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -153,6 +154,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* Bottom section */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#E5E5E3] space-y-3">
           <div className="flex items-center gap-2">
+            <CreditBadge />
             <AuthButton />
             <LanguageSelector />
           </div>

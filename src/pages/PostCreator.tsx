@@ -11,6 +11,7 @@ import { SocialPreview } from '../components/post-creator/SocialPreview';
 import { PostActionButtons } from '../components/post-creator/PostActionButtons';
 import { ImageSourceToggle } from '../components/post-creator/ImageSourceToggle';
 import { PublishButtons } from '../components/post-creator/PublishButtons';
+import { InsufficientCreditsModal } from '../components/credits/InsufficientCreditsModal';
 
 export default function PostCreator() {
   const { t } = useLanguage();
@@ -281,6 +282,16 @@ export default function PostCreator() {
           </div>
         )}
       </div>
+      )}
+
+      {/* Insufficient credits modal */}
+      {pc.creditError && (
+        <InsufficientCreditsModal
+          isOpen={!!pc.creditError}
+          onClose={pc.clearCreditError}
+          required={pc.creditError.required}
+          balance={pc.creditError.balance}
+        />
       )}
     </div>
   );

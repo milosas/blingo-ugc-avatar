@@ -4,6 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 export type CreditAction = 'model_photo' | 'tryon_photo' | 'post_image' | 'post_text' | 'text_from_image';
 
+const CREDITS_CHANGED_EVENT = 'credits-changed';
+
+/** Dispatch this after any successful generation to refresh CreditBadge everywhere */
+export function notifyCreditChange() {
+  window.dispatchEvent(new Event(CREDITS_CHANGED_EVENT));
+}
+
 interface CheckCreditsResult {
   hasCredits: boolean;
   required: number;
@@ -39,6 +46,13 @@ export function useCredits() {
 
   useEffect(() => {
     fetchBalance();
+  }, [fetchBalance]);
+
+  // Listen for credit changes from other hooks/components
+  useEffect(() => {
+    const handler = () => fetchBalance();
+    window.addEventListener(CREDITS_CHANGED_EVENT, handler);
+    return () => window.removeEventListener(CREDITS_CHANGED_EVENT, handler);
   }, [fetchBalance]);
 
   const purchaseCredits = async (packageId: '50' | '150' | '500') => {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt, buildPosePrompt, type TraitOption } from '../constants/avatarTraits';
+import { AvatarTraits, DEFAULT_TRAITS, buildAvatarPrompt, buildPosePrompt } from '../constants/avatarTraits';
 import type { Language } from '../i18n/translations';
 import { supabase } from '../lib/supabase';
 import { notifyCreditChange } from './useCredits';

@@ -193,7 +193,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   }, [generateAvatar]);
 
   // Enter pose mode after first save (lock traits, use PuLID reference for subsequent photos)
-  const enterPoseModeAfterSave = useCallback((description: string, referenceUrl?: string) => {
+  const _enterPoseModeAfterSave = useCallback((description: string, referenceUrl?: string) => {
     setIsPoseMode(true);
     setModelBaseDescription(description);
     setPoseMode(description, referenceUrl);

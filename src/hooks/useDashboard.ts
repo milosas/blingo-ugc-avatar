@@ -124,7 +124,7 @@ export function useDashboard(): UseDashboardReturn {
         subscription = profileResult.data.subscription ?? 'free';
       } else if (profileResult.error?.code === 'PGRST116') {
         // Profile doesn't exist, create it
-        const { error: insertError } = await supabase
+        const { error: _insertError } = await supabase
           .from('profiles')
           .insert({ id: user.id, email: user.email, credits: 10, subscription: 'free' });
 

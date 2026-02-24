@@ -18,7 +18,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { stats, loading: dashboardLoading, error, refresh } = useDashboard();
-  const { accounts: socialAccounts, isLoading: socialLoading, syncAccounts, connectAccount, fetchAccounts } = useSocialAccounts();
+  const { accounts: socialAccounts, fetchAccounts } = useSocialAccounts();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
 

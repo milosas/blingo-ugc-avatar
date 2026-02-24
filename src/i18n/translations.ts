@@ -191,6 +191,8 @@ export const translations = {
       done: 'Baigti',
       mood: 'Nuotaika',
       addPose: 'Pridėti pozą',
+      deletePhoto: 'Ištrinti',
+      batchCount: 'Kiekis',
     },
     // Options
     avatars: {
@@ -498,7 +500,64 @@ export const translations = {
           description: 'AI parašys tekstą ir sukurs paveikslėlį socialiniams tinklams. Jums tereikia paspausti „Generuoti"'
         }
       },
-      pricing: {},
+      pricing: {
+        title: 'Paprastos ir skaidrios kainos',
+        subtitle: 'Pasirinkite planą, kuris tinka jūsų poreikiams',
+        mostPopular: 'Populiariausias',
+        perMonth: '/mėn.',
+        getPlan: 'Pasirinkti planą',
+        plans: {
+          starter: {
+            badge: 'Pradinis',
+            name: 'Starter',
+            subtitle: 'Pradėkite kurti su AI',
+            price: '€9.99',
+            features: [
+              '50 kreditų per mėnesį',
+              'Nuotraukos su modeliais',
+              'Paveikslėlių generatorius',
+              'Standartinė kokybė'
+            ]
+          },
+          pro: {
+            badge: 'Pro',
+            name: 'Pro',
+            subtitle: 'Daugiau galimybių augančiam verslui',
+            price: '€24.99',
+            features: [
+              '200 kreditų per mėnesį',
+              'Visi generavimo įrankiai',
+              'Aukšta kokybė',
+              'Prioritetinis generavimas',
+              'Įrašų kūrėjas'
+            ]
+          },
+          unlimited: {
+            badge: 'Verslas',
+            name: 'Unlimited',
+            subtitle: 'Neribotam turiniui kurti',
+            price: '€49.99',
+            features: [
+              '500 kreditų per mėnesį',
+              'Visi įrankiai ir funkcijos',
+              'Aukščiausia kokybė',
+              'Prioritetinis palaikymas',
+              'Socialinių tinklų publikavimas'
+            ]
+          }
+        },
+        credits: {
+          title: 'Reikia daugiau kreditų?',
+          subtitle: 'Pirkite papildomus kreditus bet kada. Prenumerata nebūtina.',
+          save: 'Sutaupykite',
+          buyNow: 'Pirkti',
+          packs: [
+            { price: '€4.99', credits: '25' },
+            { price: '€9.99', credits: '60', save: '17%' },
+            { price: '€19.99', credits: '150', save: '25%' }
+          ]
+        }
+      },
       faq: {
         title: 'Klausimai ir atsakymai',
         subtitle: 'Dažniausiai klausiama prieš pradedant',
@@ -547,6 +606,15 @@ export const translations = {
           feature2: 'Aprašykite savo žodžiais — AI sugeneruos pagal jūsų sritį ir temą',
           feature3: 'Atsisiųskite aukštos kokybės paveikslėlį, paruoštą socialiniams tinklams',
           cta: 'Sukurti paveikslėlį'
+        },
+        modelCreator: {
+          badge: 'Modeliai',
+          title: 'Modelių kūrimas su AI',
+          subtitle: 'Sukurkite AI modelius iš savo nuotraukų arba leiskite AI sugeneruoti naujus — naudokite juos nuotraukų generavimui ir socialinių tinklų įrašams.',
+          feature1: 'Įkelkite savo nuotraukas arba sukurkite modelį su AI vienu paspaudimu',
+          feature2: 'Iki 5 nuotraukų kiekvienam modeliui — skirtingos pozos ir kampai',
+          feature3: 'Naudokite modelius nuotraukų generavimui ir socialinių tinklų įrašams',
+          cta: 'Kurti modelį'
         },
         postCreator: {
           badge: 'Viskas viename',
@@ -812,6 +880,8 @@ export const translations = {
       done: 'Gatavs',
       mood: 'Noskaņojums',
       addPose: 'Pievienot pozu',
+      deletePhoto: 'Dzēst',
+      batchCount: 'Daudzums',
     },
     avatars: {
       'fashion-woman-full': { name: 'Modes modelis', description: 'Pilna auguma, stilīga poza' },
@@ -1118,7 +1188,64 @@ export const translations = {
           description: 'AI uzrakstīs tekstu un izveidos attēlu sociālajiem tīkliem. Jums tikai jānospiež „Ģenerēt"'
         }
       },
-      pricing: {},
+      pricing: {
+        title: 'Vienkāršas un caurspīdīgas cenas',
+        subtitle: 'Izvēlieties plānu, kas atbilst jūsu vajadzībām',
+        mostPopular: 'Populārākais',
+        perMonth: '/mēn.',
+        getPlan: 'Izvēlēties plānu',
+        plans: {
+          starter: {
+            badge: 'Sākuma',
+            name: 'Starter',
+            subtitle: 'Sāciet veidot ar AI',
+            price: '€9.99',
+            features: [
+              '50 kredīti mēnesī',
+              'Fotogrāfijas ar modeļiem',
+              'Attēlu ģenerators',
+              'Standarta kvalitāte'
+            ]
+          },
+          pro: {
+            badge: 'Pro',
+            name: 'Pro',
+            subtitle: 'Vairāk iespēju augošam biznesam',
+            price: '€24.99',
+            features: [
+              '200 kredīti mēnesī',
+              'Visi ģenerēšanas rīki',
+              'Augsta kvalitāte',
+              'Prioritāra ģenerēšana',
+              'Ierakstu veidotājs'
+            ]
+          },
+          unlimited: {
+            badge: 'Bizness',
+            name: 'Unlimited',
+            subtitle: 'Neierobežotai satura veidošanai',
+            price: '€49.99',
+            features: [
+              '500 kredīti mēnesī',
+              'Visi rīki un funkcijas',
+              'Augstākā kvalitāte',
+              'Prioritārs atbalsts',
+              'Sociālo tīklu publicēšana'
+            ]
+          }
+        },
+        credits: {
+          title: 'Nepieciešams vairāk kredītu?',
+          subtitle: 'Iegādājieties papildu kredītus jebkurā laikā. Abonements nav nepieciešams.',
+          save: 'Ietaupiet',
+          buyNow: 'Pirkt',
+          packs: [
+            { price: '€4.99', credits: '25' },
+            { price: '€9.99', credits: '60', save: '17%' },
+            { price: '€19.99', credits: '150', save: '25%' }
+          ]
+        }
+      },
       faq: {
         title: 'Jautājumi un atbildes',
         subtitle: 'Biežāk uzdotie jautājumi pirms sākšanas',
@@ -1167,6 +1294,15 @@ export const translations = {
           feature2: 'Aprakstiet saviem vārdiem — AI ģenerēs atbilstoši jūsu nozarei un tēmai',
           feature3: 'Lejupielādējiet augstas kvalitātes attēlu, gatavu sociālajiem tīkliem',
           cta: 'Izveidot attēlu'
+        },
+        modelCreator: {
+          badge: 'Modeļi',
+          title: 'Modeļu izveide ar AI',
+          subtitle: 'Izveidojiet AI modeļus no savām fotogrāfijām vai ļaujiet AI ģenerēt jaunus — izmantojiet tos fotogrāfiju ģenerēšanai un sociālo tīklu ierakstiem.',
+          feature1: 'Augšupielādējiet savas fotogrāfijas vai izveidojiet modeli ar AI ar vienu klikšķi',
+          feature2: 'Līdz 5 fotogrāfijām katram modelim — dažādas pozas un leņķi',
+          feature3: 'Izmantojiet modeļus fotogrāfiju ģenerēšanai un sociālo tīklu ierakstiem',
+          cta: 'Izveidot modeli'
         },
         postCreator: {
           badge: 'Viss vienā',
@@ -1432,6 +1568,8 @@ export const translations = {
       done: 'Valmis',
       mood: 'Meeleolu',
       addPose: 'Lisa poos',
+      deletePhoto: 'Kustuta',
+      batchCount: 'Kogus',
     },
     avatars: {
       'fashion-woman-full': { name: 'Moemodell', description: 'Täispikkus, stiilne poos' },
@@ -1738,7 +1876,64 @@ export const translations = {
           description: 'AI kirjutab teksti ja loob pildi sotsiaalmeedia jaoks. Teil tuleb vaid vajutada „Genereeri"'
         }
       },
-      pricing: {},
+      pricing: {
+        title: 'Lihtsad ja läbipaistvad hinnad',
+        subtitle: 'Valige plaan, mis sobib teie vajadustega',
+        mostPopular: 'Populaarseim',
+        perMonth: '/kuus',
+        getPlan: 'Vali plaan',
+        plans: {
+          starter: {
+            badge: 'Algaja',
+            name: 'Starter',
+            subtitle: 'Alustage AI-ga loomist',
+            price: '€9.99',
+            features: [
+              '50 krediiti kuus',
+              'Fotod mudelite peal',
+              'Piltide generaator',
+              'Standardne kvaliteet'
+            ]
+          },
+          pro: {
+            badge: 'Pro',
+            name: 'Pro',
+            subtitle: 'Rohkem võimalusi kasvavale ärile',
+            price: '€24.99',
+            features: [
+              '200 krediiti kuus',
+              'Kõik genereerimise tööriistad',
+              'Kõrge kvaliteet',
+              'Prioriteetne genereerimine',
+              'Postituste looja'
+            ]
+          },
+          unlimited: {
+            badge: 'Äri',
+            name: 'Unlimited',
+            subtitle: 'Piiramatu sisu loomiseks',
+            price: '€49.99',
+            features: [
+              '500 krediiti kuus',
+              'Kõik tööriistad ja funktsioonid',
+              'Kõrgeim kvaliteet',
+              'Prioriteetne tugi',
+              'Sotsiaalmeedia avaldamine'
+            ]
+          }
+        },
+        credits: {
+          title: 'Vaja rohkem krediite?',
+          subtitle: 'Ostke lisakrediite igal ajal. Tellimus pole vajalik.',
+          save: 'Säästate',
+          buyNow: 'Osta',
+          packs: [
+            { price: '€4.99', credits: '25' },
+            { price: '€9.99', credits: '60', save: '17%' },
+            { price: '€19.99', credits: '150', save: '25%' }
+          ]
+        }
+      },
       faq: {
         title: 'Küsimused ja vastused',
         subtitle: 'Kõige sagedamini küsitav enne alustamist',
@@ -1787,6 +1982,15 @@ export const translations = {
           feature2: 'Kirjeldage oma sõnadega — AI genereerib vastavalt teie valdkonnale ja teemale',
           feature3: 'Laadige alla kõrge kvaliteediga pilt, valmis sotsiaalmeediaks',
           cta: 'Loo pilt'
+        },
+        modelCreator: {
+          badge: 'Mudelid',
+          title: 'Mudelite loomine AI-ga',
+          subtitle: 'Looge AI mudeleid oma fotodest või laske AI-l genereerida uusi — kasutage neid fotode genereerimiseks ja sotsiaalmeedia postitusteks.',
+          feature1: 'Laadige üles oma fotod või looge mudel AI-ga ühe klõpsuga',
+          feature2: 'Kuni 5 fotot iga mudeli kohta — erinevad poosid ja nurgad',
+          feature3: 'Kasutage mudeleid fotode genereerimiseks ja sotsiaalmeedia postitusteks',
+          cta: 'Loo mudel'
         },
         postCreator: {
           badge: 'Kõik ühes',
@@ -2048,6 +2252,8 @@ export const translations = {
       done: 'Done',
       mood: 'Mood',
       addPose: 'Add pose',
+      deletePhoto: 'Delete',
+      batchCount: 'Count',
     },
     avatars: {
       'fashion-woman-full': { name: 'Fashion model', description: 'Full body, stylish pose' },
@@ -2070,6 +2276,15 @@ export const translations = {
       'office': { name: 'Office', description: 'Modern office interior' },
       'event': { name: 'Event', description: 'Elegant event venue' },
       'autumn': { name: 'Autumn', description: 'Autumn park, golden leaves' }
+    },
+    clothingTypes: {
+      'dress': { name: 'Dress', description: 'Dresses, sundresses' },
+      'top': { name: 'Top / Blouse', description: 'T-shirts, blouses, sweaters' },
+      'jacket': { name: 'Jacket / Blazer', description: 'Jackets, blazers, coats' },
+      'pants': { name: 'Pants / Skirt', description: 'Pants, jeans, skirts' },
+      'suit': { name: 'Suit', description: 'Business suit, set' },
+      'sportswear': { name: 'Sportswear', description: 'Athletic clothing, athleisure' },
+      'accessory': { name: 'Accessory', description: 'Hats, scarves, glasses, bags' }
     },
     moods: {
       'serious': { name: 'Serious', description: 'Professional, focused' },
@@ -2345,7 +2560,64 @@ export const translations = {
           description: 'Create social media posts with AI — text, images, or both together'
         }
       },
-      pricing: {},
+      pricing: {
+        title: 'Simple, Transparent Pricing',
+        subtitle: 'Choose the plan that fits your needs',
+        mostPopular: 'Most Popular',
+        perMonth: '/month',
+        getPlan: 'Get Plan',
+        plans: {
+          starter: {
+            badge: 'Starter',
+            name: 'Starter',
+            subtitle: 'Start creating with AI',
+            price: '€9.99',
+            features: [
+              '50 credits per month',
+              'Photos on models',
+              'Image generator',
+              'Standard quality'
+            ]
+          },
+          pro: {
+            badge: 'Pro',
+            name: 'Pro',
+            subtitle: 'More power for growing businesses',
+            price: '€24.99',
+            features: [
+              '200 credits per month',
+              'All generation tools',
+              'High quality',
+              'Priority generation',
+              'Post creator'
+            ]
+          },
+          unlimited: {
+            badge: 'Business',
+            name: 'Unlimited',
+            subtitle: 'For unlimited content creation',
+            price: '€49.99',
+            features: [
+              '500 credits per month',
+              'All tools and features',
+              'Highest quality',
+              'Priority support',
+              'Social media publishing'
+            ]
+          }
+        },
+        credits: {
+          title: 'Need More Credits?',
+          subtitle: 'Buy additional credits anytime. No subscription required.',
+          save: 'Save',
+          buyNow: 'Buy Now',
+          packs: [
+            { price: '€4.99', credits: '25' },
+            { price: '€9.99', credits: '60', save: '17%' },
+            { price: '€19.99', credits: '150', save: '25%' }
+          ]
+        }
+      },
       faq: {
         title: 'Frequently Asked Questions',
         subtitle: 'Got questions? We have answers',
@@ -2394,6 +2666,15 @@ export const translations = {
           feature2: 'Choose the style, composition, and mood to match your brand',
           feature3: 'Export in high resolution, ready for print and web',
           cta: 'Start Creating'
+        },
+        modelCreator: {
+          badge: 'Models',
+          title: 'AI Model Creator',
+          subtitle: 'Create AI models from your own photos or let AI generate new ones — use them for photo generation and social media posts.',
+          feature1: 'Upload your photos or create a model with AI in one click',
+          feature2: 'Up to 5 photos per model — different poses and angles',
+          feature3: 'Use models for photo generation and social media posts',
+          cta: 'Create Model'
         },
         postCreator: {
           badge: 'All-in-One',

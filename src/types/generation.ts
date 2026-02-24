@@ -22,4 +22,5 @@ export interface GenerationState {
 export interface GenerationResponse {
   success: boolean;
   images?: GeneratedImage[];
+  message?: string;
 }

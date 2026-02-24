@@ -98,8 +98,8 @@ export function useGeneration() {
         // Save to Supabase if user is authenticated
         if (user) {
           try {
-            const savedImages = await Promise.all(
-              data.images.map((image, index) => {
+            const _savedImages = await Promise.all(
+              data.images.map((image, _index) => {
                 return saveGeneratedImage({
                   imageUrl: image.url,
                   imageBase64: image.base64,

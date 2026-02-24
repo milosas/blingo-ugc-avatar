@@ -329,7 +329,7 @@ function PaginationControls({
   const pageStart = page * pageSize;
   const pageEnd = Math.min(pageStart + visibleCount, totalCount);
   const isCollapsed = visibleCount <= initialCount;
-  const hasMoreOnPage = pageEnd < Math.min(pageStart + pageSize, totalCount);
+  const _hasMoreOnPage = pageEnd < Math.min(pageStart + pageSize, totalCount);
 
   return (
     <div className="flex items-center justify-center gap-3 mt-4">

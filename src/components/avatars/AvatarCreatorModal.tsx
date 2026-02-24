@@ -87,7 +87,6 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     generateAvatar,
     setGeneratedImage,
     clearImage,
-    setPoseMode,
     reset,
   } = useAvatarCreator(language);
 
@@ -191,13 +190,6 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   const handleGenerate = useCallback(async () => {
     await generateAvatar();
   }, [generateAvatar]);
-
-  // Enter pose mode after first save (lock traits, use PuLID reference for subsequent photos)
-  const _enterPoseModeAfterSave = useCallback((description: string, referenceUrl?: string) => {
-    setIsPoseMode(true);
-    setModelBaseDescription(description);
-    setPoseMode(description, referenceUrl);
-  }, [setPoseMode]);
 
   const handleDeletePhoto = async (photoId: string, storagePath: string) => {
     if (!effectiveModelId || isDeletingPhoto) return;

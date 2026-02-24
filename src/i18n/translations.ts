@@ -2107,7 +2107,10 @@ export const translations = {
       technicalSettings: 'Technical settings',
       imageCount: 'Number of photos',
       format: 'Format',
-      quality: 'Quality'
+      quality: 'Quality',
+      clothingTypeLabel: 'Clothing type',
+      customPromptLabel: 'Additional instructions',
+      customPromptPlaceholder: 'E.g.: raised hand, sitting on a bench, looking to the side...'
     },
     actions: {
       generate: 'Generate',
@@ -2125,7 +2128,8 @@ export const translations = {
     validation: {
       noImages: 'Upload a photo',
       noAvatar: 'Select a model',
-      noPrompt: 'Enter instructions (min. 3 characters)'
+      noPrompt: 'Enter instructions (min. 3 characters)',
+      noClothingType: 'Select a clothing type'
     },
     loading: {
       sending: 'Sending...',
@@ -2287,13 +2291,13 @@ export const translations = {
       'accessory': { name: 'Accessory', description: 'Hats, scarves, glasses, bags' }
     },
     moods: {
-      'serious': { name: 'Serious', description: 'Professional, focused' },
-      'playful': { name: 'Playful', description: 'Fun, energetic' },
-      'relaxed': { name: 'Relaxed', description: 'Calm, natural' },
+      'natural': { name: 'Natural', description: 'Calm, natural expression' },
       'confident': { name: 'Confident', description: 'Strong, assured' },
+      'happy': { name: 'Happy', description: 'Cheerful, smiling' },
+      'serious': { name: 'Serious', description: 'Professional, focused' },
       'mysterious': { name: 'Mysterious', description: 'Intriguing, mysterious' },
-      'energetic': { name: 'Energetic', description: 'Dynamic, full of energy' },
-      'dreamy': { name: 'Dreamy', description: 'Romantic, dreamy' },
+      'playful': { name: 'Playful', description: 'Fun, energetic' },
+      'elegant': { name: 'Elegant', description: 'Subtle, refined' },
       'fierce': { name: 'Fierce', description: 'Strong, determined' }
     },
     poses: {

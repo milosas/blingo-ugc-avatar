@@ -242,11 +242,22 @@ export function PublishButtons({ text, imageUrl }: PublishButtonsProps) {
       {publishResult && (
         <div className={`rounded-xl p-4 ${publishResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
           {publishResult.success ? (
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-sm font-medium text-green-700">Paskelbta sekmingai!</span>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-sm font-medium text-green-700">Paskelbta sėkmingai!</span>
+              </div>
+              <button
+                onClick={() => {
+                  setPublishResult(null);
+                  setSelectedAccounts(new Set());
+                }}
+                className="w-full py-2.5 text-sm font-medium text-[#FF6B35] border border-[#FF6B35]/30 rounded-xl hover:bg-[#FFF0EB] transition-colors"
+              >
+                Kurti naują įrašą
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">

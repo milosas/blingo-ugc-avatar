@@ -323,7 +323,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={handleClose}>
       <div
-        className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl"
+        className="bg-white rounded-2xl w-full max-w-[calc(100vw-2rem)] md:max-w-lg max-h-[90vh] overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -628,7 +628,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   <label className="block text-xs font-medium text-[#666666] mb-1.5">
                     {tm?.batchCount || 'Kiekis'}
                   </label>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {[1, 2, 3, 4, 5].map((count) => (
                       <button
                         key={count}

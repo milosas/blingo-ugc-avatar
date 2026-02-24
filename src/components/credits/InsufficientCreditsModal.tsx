@@ -53,7 +53,7 @@ export function InsufficientCreditsModal({ isOpen, onClose, required, balance }:
               </div>
 
               {/* Stats */}
-              <div className="flex justify-center gap-8">
+              <div className="flex justify-center gap-4 md:gap-8">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-red-500">{balance}</p>
                   <p className="text-xs text-gray-500 mt-1">Turite</p>

@@ -44,6 +44,18 @@ serve(async (req) => {
             break
           }
 
+          // Idempotency check: skip if this session was already processed
+          const { data: existing } = await supabase
+            .from('credit_transactions')
+            .select('id')
+            .eq('stripe_session_id', session.id)
+            .maybeSingle()
+
+          if (existing) {
+            console.log(`Session ${session.id} already processed, skipping`)
+            break
+          }
+
           // Add credits to profile
           const { error: updateError } = await supabase.rpc('increment_credits', {
             p_user_id: userId,

@@ -241,9 +241,9 @@ export default function Generator() {
             />
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             {/* Left Column: Upload */}
-            <AnimatedSection direction="left" className="w-full lg:w-1/2">
+            <AnimatedSection direction="left" className="w-full md:w-1/2">
               <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-sm text-white font-bold">
@@ -271,7 +271,7 @@ export default function Generator() {
             </AnimatedSection>
 
             {/* Right Column: Configuration */}
-            <AnimatedSection direction="right" delay={0.1} className="w-full lg:w-1/2">
+            <AnimatedSection direction="right" delay={0.1} className="w-full md:w-1/2">
               <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
                   <span className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm text-white font-bold">

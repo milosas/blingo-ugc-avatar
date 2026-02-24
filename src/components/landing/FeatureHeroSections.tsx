@@ -164,7 +164,7 @@ function FeatureBlock({
 }: FeatureBlockProps) {
   return (
     <div className={`py-16 md:py-24 px-4 ${bgColor}`}>
-      <div className={`max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center ${reversed ? 'lg:[direction:rtl]' : ''}`}>
+      <div className={`max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center ${reversed ? 'lg:[direction:rtl]' : ''}`}>
         {/* Text content */}
         <AnimatedSection direction={reversed ? 'right' : 'left'} className={reversed ? 'lg:[direction:ltr]' : ''}>
           <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 ${badgeColor}`}>
@@ -258,7 +258,7 @@ function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: any
   return (
     <div className="relative bg-[#1A1A1A] py-10 px-4 overflow-hidden">
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="grid grid-cols-3 gap-6 md:gap-12">
+        <div className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-12">
           {items.map((item, i) => (
             <AnimatedSection key={i} delay={i * 0.1} className="text-center">
               <div className="flex justify-center mb-2">

@@ -37,14 +37,21 @@ serve(async (req) => {
     // Get user from auth header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      throw new Error('Missing authorization header')
+      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
-    const token = authHeader.replace('Bearer ', '')
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    const userId = payload.sub
-    if (!userId) {
-      throw new Error('Invalid token: no user ID')
+    let userId: string
+    try {
+      const token = authHeader.replace('Bearer ', '')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      userId = payload.sub
+      if (!userId) throw new Error('No user ID in token')
+    } catch {
+      return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     const body: CheckCreditsRequest = await req.json()

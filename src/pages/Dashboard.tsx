@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useDashboard } from '../hooks/useDashboard';
+import { useSocialAccounts } from '../hooks/useSocialAccounts';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LoginModal } from '../components/auth/LoginModal';
 import { TiltCard } from '../components/animation/TiltCard';
@@ -13,7 +14,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { stats, loading: dashboardLoading, error, refresh } = useDashboard();
+  const { accounts: socialAccounts, isLoading: socialLoading, syncAccounts, connectAccount, fetchAccounts } = useSocialAccounts();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [disconnecting, setDisconnecting] = useState<string | null>(null);
 
   // Personal info state
   const [name, setName] = useState('');
@@ -46,6 +49,18 @@ export default function Dashboard() {
       setTimeout(() => setSaveMessage(null), 4000);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDisconnect = async (accountId: string) => {
+    setDisconnecting(accountId);
+    try {
+      await supabase.from('social_accounts').delete().eq('id', accountId);
+      await fetchAccounts();
+    } catch (err) {
+      console.error('Error disconnecting account:', err);
+    } finally {
+      setDisconnecting(null);
     }
   };
 
@@ -179,6 +194,49 @@ export default function Dashboard() {
             </span>
           )}
         </div>
+      </div>
+
+      {/* Social Accounts */}
+      <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6 mb-8">
+        <h2 className="text-lg font-semibold text-[#1A1A1A] mb-4">Socialinės paskyros</h2>
+        {socialAccounts.length > 0 ? (
+          <div className="space-y-3">
+            {socialAccounts.map(acc => (
+              <div key={acc.id} className="flex items-center justify-between p-3 bg-[#F7F7F5] rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center text-white text-xs font-bold uppercase">
+                    {acc.platform.slice(0, 2)}
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-[#1A1A1A] capitalize">{acc.platform}</span>
+                    {acc.platform_username && (
+                      <p className="text-xs text-[#999]">@{acc.platform_username}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-[#999]">
+                    {new Date(acc.connected_at).toLocaleDateString('lt-LT')}
+                  </span>
+                  <button
+                    onClick={() => handleDisconnect(acc.id)}
+                    disabled={disconnecting === acc.id}
+                    className="px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                  >
+                    {disconnecting === acc.id ? 'Atjungiama...' : 'Atjungti'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[#999]">
+            Nėra prijungtų paskyrų. Prijunkite paskyras per{' '}
+            <button onClick={() => navigate('/post-creator')} className="text-[#FF6B35] hover:underline font-medium">
+              Įrašų kūrėją
+            </button>.
+          </p>
+        )}
       </div>
 
       {/* Stats Cards */}

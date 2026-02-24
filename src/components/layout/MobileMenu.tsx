@@ -68,7 +68,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         ref={panelRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`fixed top-0 right-0 h-full w-[280px] bg-white z-50 shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-[min(280px,85vw)] bg-white z-50 shadow-2xl transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

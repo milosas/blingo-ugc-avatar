@@ -9,10 +9,17 @@ const CREDIT_COST = 3 // post_image
 const CREDIT_DESCRIPTION = 'Iraso nuotrauka'
 
 async function checkCredits(authHeader: string, cost: number): Promise<{ userId: string; balance: number }> {
-  const token = authHeader.replace('Bearer ', '')
-  const payload = JSON.parse(atob(token.split('.')[1]))
-  const userId = payload.sub
-  if (!userId) throw new Error('Invalid token')
+  let userId: string
+  try {
+    const token = authHeader.replace('Bearer ', '')
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    userId = payload.sub
+    if (!userId) throw new Error('No user ID in token')
+  } catch {
+    const err = new Error('Unauthorized') as any
+    err.type = 'unauthorized'
+    throw err
+  }
 
   const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
   const { data: profile } = await supabase
@@ -72,6 +79,11 @@ serve(async (req) => {
     try {
       creditUser = await checkCredits(authHeader, CREDIT_COST)
     } catch (creditErr: any) {
+      if (creditErr.type === 'unauthorized') {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
       if (creditErr.type === 'insufficient_credits') {
         return new Response(JSON.stringify({
           error: 'insufficient_credits',

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useLanguage } from '../contexts/LanguageContext';
+import type { Translations } from '../i18n/translations';
 import { useAuth } from '../hooks/useAuth';
 import { usePostCreator } from '../hooks/usePostCreator';
 import { LoginModal } from '../components/auth/LoginModal';
@@ -14,6 +16,7 @@ import { PublishButtons } from '../components/post-creator/PublishButtons';
 import { InsufficientCreditsModal } from '../components/credits/InsufficientCreditsModal';
 
 export default function PostCreator() {
+  usePageTitle('Turinio kūrimas');
   const { t } = useLanguage();
   const { user } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -21,7 +24,7 @@ export default function PostCreator() {
   const location = useLocation();
 
   // Accept gallery image from navigation state
-  const galleryImageUrl = (location.state as any)?.galleryImageUrl as string | undefined;
+  const galleryImageUrl = (location.state as { galleryImageUrl?: string } | null)?.galleryImageUrl;
 
   useEffect(() => {
     if (galleryImageUrl) {
@@ -32,7 +35,7 @@ export default function PostCreator() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const p = t.postCreatorPage || {} as any;
+  const p = t.postCreatorPage || ({} as Partial<NonNullable<Translations['postCreatorPage']>>);
   const canGenerate = pc.prompt.trim().length >= 3;
   const isLoading = pc.isLoadingText || pc.isLoadingImage;
 

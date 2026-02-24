@@ -128,9 +128,7 @@ export function useDashboard(): UseDashboardReturn {
           .from('profiles')
           .insert({ id: user.id, email: user.email, credits: 10, subscription: 'free' });
 
-        if (insertError) {
-          console.error('Failed to create profile:', insertError);
-        }
+        // Profile creation failed silently - will retry on next load
       }
 
       setStats({

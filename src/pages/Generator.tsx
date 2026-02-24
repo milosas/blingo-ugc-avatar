@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useCustomAvatars } from '../hooks/useCustomAvatars';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useGeneration } from '../hooks/useGeneration';
@@ -22,6 +23,7 @@ import type { Config } from '../types';
 import { InsufficientCreditsModal } from '../components/credits/InsufficientCreditsModal';
 
 export default function Generator() {
+  usePageTitle('Generatorius');
   const { t } = useLanguage();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();

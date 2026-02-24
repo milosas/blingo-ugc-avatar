@@ -1,4 +1,8 @@
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export default function Privacy() {
+  usePageTitle('Privatumo politika');
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">

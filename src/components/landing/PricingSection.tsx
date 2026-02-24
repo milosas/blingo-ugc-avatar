@@ -116,7 +116,7 @@ export function PricingSection() {
             </p>
 
             <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4" staggerDelay={0.08}>
-              {(pricing?.credits?.packs || []).map((pack: any, index: number) => (
+              {(pricing?.credits?.packs || []).map((pack: { price: string; credits: string; save?: string }, index: number) => (
                 <StaggerItem key={index}>
                   <TiltCard className="relative h-full">
                     <div className="bg-[#F7F7F5] border border-[#E5E5E3] rounded-2xl p-5 text-center hover:border-[#FF6B35] hover:shadow-md transition-all h-full">

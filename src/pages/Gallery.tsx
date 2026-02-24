@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useGallery } from '../hooks/useGallery';
 import { usePostProcess } from '../hooks/usePostProcess';
 import { useSupabaseStorage } from '../hooks/useSupabaseStorage';
@@ -11,6 +12,7 @@ import { EmptyState } from '../components/gallery/EmptyState';
 import { PostProcessToolbar } from '../components/generation/PostProcessToolbar';
 import { LoginModal } from '../components/auth/LoginModal';
 import { formatRelativeTime } from '../utils/date';
+import { Skeleton, SkeletonCard, SkeletonPostCard } from '../components/ui/Skeleton';
 import type { AvatarModel, GeneratedPost } from '../types/database';
 
 function SectionHeader({
@@ -111,7 +113,7 @@ function PostCard({
         <div className="aspect-video overflow-hidden bg-gray-100">
           <img
             src={post.image_url}
-            alt=""
+            alt="Įrašo nuotrauka"
             className="w-full h-full object-cover"
             loading="lazy"
           />
@@ -250,7 +252,7 @@ function ModelDetailModal({
                         i === selectedIndex ? 'border-[#FF6B35] ring-1 ring-[#FF6B35]/30' : 'border-transparent hover:border-[#E5E5E3]'
                       }`}
                     >
-                      <img src={photo.image_url} alt="" className="w-full h-full object-cover" />
+                      <img src={photo.image_url} alt={`${model.name} nuotrauka ${i + 1}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -376,6 +378,7 @@ function PaginationControls({
 }
 
 export default function Gallery() {
+  usePageTitle('Galerija');
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const { images, models, posts, loading: galleryLoading, error, deleteImage, deletePost, refresh } = useGallery();
@@ -576,8 +579,38 @@ export default function Gallery() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-center py-16">
-          <div className="w-12 h-12 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-5 w-20" />
+        </div>
+        {/* Skeleton: generated photos */}
+        <div className="mb-8">
+          <Skeleton className="h-6 w-56 mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {[0, 1, 2, 3].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
+        {/* Skeleton: models */}
+        <div className="mb-8">
+          <Skeleton className="h-6 w-32 mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="rounded-lg overflow-hidden">
+                <div className="skeleton w-full aspect-square" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Skeleton: posts */}
+        <div>
+          <Skeleton className="h-6 w-28 mb-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[0, 1, 2].map((i) => (
+              <SkeletonPostCard key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -785,7 +818,7 @@ export default function Gallery() {
             <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#F7F7F5] flex-shrink-0 ring-2 ring-[#FF6B35]">
               <img
                 src={editingImage.image_url}
-                alt=""
+                alt="Redaguojama nuotrauka"
                 className="w-full h-full object-cover object-top"
               />
             </div>

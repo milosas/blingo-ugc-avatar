@@ -385,7 +385,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                         : 'border border-[#E5E5E3]'
                   }`}
                 >
-                  <img src={photo.image_url} alt="" className="w-full h-full object-cover object-top" />
+                  <img src={photo.image_url} alt={`Modelio nuotrauka ${i + 1}`} className="w-full h-full object-cover object-top" />
                   <span className="absolute bottom-0 left-0 bg-black/50 text-white text-[8px] px-1 rounded-tr">{i + 1}</span>
                 </button>
               ))}
@@ -434,7 +434,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                 <div className="flex gap-2 flex-wrap justify-center mt-2">
                   {batchResults.map((result, i) => (
                     <div key={i} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-[#FF6B35]">
-                      <img src={result.base64} alt="" className="w-full h-full object-cover object-top" />
+                      <img src={result.base64} alt={`Sugeneruota nuotrauka ${i + 1}`} className="w-full h-full object-cover object-top" />
                     </div>
                   ))}
                 </div>
@@ -470,7 +470,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   <div className="grid grid-cols-3 gap-2">
                     {batchResults.map((result, i) => (
                       <div key={i} className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#FF6B35] shadow-sm">
-                        <img src={result.base64} alt="" className="w-full h-full object-cover object-top" />
+                        <img src={result.base64} alt={`Sugeneruota nuotrauka ${i + 1}`} className="w-full h-full object-cover object-top" />
                       </div>
                     ))}
                   </div>
@@ -562,7 +562,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                 <div className="flex items-center gap-2 px-3 py-2 bg-[#F7F7F5] rounded-xl">
                   {currentModel.photos?.[0] && (
                     <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={currentModel.photos[0].image_url} alt="" className="w-full h-full object-cover object-top" />
+                      <img src={currentModel.photos[0].image_url} alt={`${currentModel.name} avataro peržiūra`} className="w-full h-full object-cover object-top" />
                     </div>
                   )}
                   <div className="min-w-0">

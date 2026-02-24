@@ -245,7 +245,13 @@ function CountUpNumber({ value }: { value: number }) {
   return <span ref={ref}>{count.toLocaleString()}</span>;
 }
 
-function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: any }) {
+interface PlatformStatsLabels {
+  imagesCreated?: string;
+  imagesEdited?: string;
+  postsCreated?: string;
+}
+
+function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: PlatformStatsLabels | undefined }) {
   const hasStats = stats.images > 0 || stats.avatars > 0 || stats.posts > 0;
   if (!hasStats) return null;
 

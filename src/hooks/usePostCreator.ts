@@ -15,8 +15,6 @@ export type ImageSource = 'upload' | 'ai' | 'gallery';
 
 interface UsePostCreatorReturn {
   // Form state
-  industry: string;
-  setIndustry: (v: string) => void;
   prompt: string;
   setPrompt: (v: string) => void;
   tone: PostConfig['tone'];
@@ -48,10 +46,6 @@ interface UsePostCreatorReturn {
   creditError: { required: number; balance: number } | null;
   clearCreditError: () => void;
 
-  // Improvise
-  isImprovising: boolean;
-  improvise: () => Promise<void>;
-
   // Generate text from image
   isGeneratingFromImage: boolean;
   generateFromImage: () => Promise<void>;
@@ -69,7 +63,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   const { user } = useAuth();
 
   // Form state
-  const [industry, setIndustry] = useState('');
+  const industry = 'general';
   const [prompt, setPrompt] = useState('');
   const [tone, setTone] = useState<PostConfig['tone']>('friendly');
   const [emoji, setEmoji] = useState<PostConfig['emoji']>('minimal');
@@ -90,43 +84,9 @@ export function usePostCreator(): UsePostCreatorReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [savedPostId, setSavedPostId] = useState<string | null>(null);
 
-  const [isImprovising, setIsImprovising] = useState(false);
   const [isGeneratingFromImage, setIsGeneratingFromImage] = useState(false);
   const [creditError, setCreditError] = useState<{ required: number; balance: number } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  const improvise = useCallback(async () => {
-    setIsImprovising(true);
-    try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/improvise-text`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
-          'apikey': supabaseAnonKey,
-        },
-        body: JSON.stringify({
-          industry: industry || 'general',
-          existingText: prompt || undefined,
-          target: 'topic',
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.text) {
-        setPrompt(data.text);
-      } else {
-        setError(data.error || 'Improvizavimas nepavyko');
-      }
-    } catch (err) {
-      setError((err as Error).message || 'Improvizavimas nepavyko');
-    } finally {
-      setIsImprovising(false);
-    }
-  }, [industry, prompt]);
 
   const generateFromImage = useCallback(async () => {
     if (!imagePreview) return;
@@ -169,7 +129,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   }, [imagePreview, tone, emoji, length]);
 
   const getConfig = useCallback((): PostConfig => ({
-    industry: industry || 'general',
+    industry,
     prompt,
     tone,
     emoji,
@@ -184,7 +144,7 @@ export function usePostCreator(): UsePostCreatorReturn {
 
     try {
       const response = await generatePostText({
-        industry: industry || 'general', prompt, tone, emoji, length, signal,
+        industry, prompt, tone, emoji, length, signal,
       });
 
       let fullText = '';
@@ -212,7 +172,7 @@ export function usePostCreator(): UsePostCreatorReturn {
   const generateImage = useCallback(async () => {
     setIsLoadingImage(true);
     try {
-      const result = await generatePostImage({ industry: industry || 'general', prompt });
+      const result = await generatePostImage({ industry, prompt });
       setGeneratedImageUrl(result.imageUrl);
       notifyCreditChange();
       return result.imageUrl;
@@ -344,7 +304,6 @@ export function usePostCreator(): UsePostCreatorReturn {
   }, [cancel]);
 
   return {
-    industry, setIndustry,
     prompt, setPrompt,
     tone, setTone,
     emoji, setEmoji,
@@ -362,8 +321,6 @@ export function usePostCreator(): UsePostCreatorReturn {
     savedPostId,
     creditError,
     clearCreditError: () => setCreditError(null),
-    isImprovising,
-    improvise,
     isGeneratingFromImage,
     generateFromImage,
     generate,

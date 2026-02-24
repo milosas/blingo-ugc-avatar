@@ -71,7 +71,7 @@ export function useGallery(): UseGalleryReturn {
       // --- Process generated images with signed URLs ---
       const imagesData = imagesResult.data || [];
       if (imagesResult.error) {
-        console.error('Gallery images fetch error:', imagesResult.error);
+        // Gallery images fetch failed - continue with empty array
       }
 
       let processedImages: GeneratedImage[] = [];
@@ -84,7 +84,6 @@ export function useGallery(): UseGalleryReturn {
               .createSignedUrl(img.storage_path, 60 * 60); // 1 hour
 
             if (signedUrlError || !signedUrlData) {
-              console.error('Failed to create signed URL for', img.storage_path, signedUrlError);
               return img;
             }
 
@@ -98,10 +97,7 @@ export function useGallery(): UseGalleryReturn {
       const modelsData = modelsResult.data || [];
       const photosData: CustomAvatar[] = photosResult.data || [];
 
-      if (modelsResult.error && modelsResult.error.code !== 'PGRST116') {
-        // avatar_models table might not exist; just log and skip
-        console.warn('avatar_models fetch:', modelsResult.error.message);
-      }
+      // avatar_models table might not exist - skip silently
 
       // Group photos by model_id
       const photosByModel = new Map<string, CustomAvatar[]>();
@@ -121,9 +117,6 @@ export function useGallery(): UseGalleryReturn {
       setModels(enrichedModels);
 
       // --- Process posts ---
-      if (postsResult.error) {
-        console.error('Posts fetch error:', postsResult.error);
-      }
       setPosts(postsResult.data || []);
 
     } catch (err) {

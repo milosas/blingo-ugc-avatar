@@ -26,14 +26,11 @@ export function useSupabaseStorage() {
   ): Promise<SavedImage> {
     // Guest mode - throw error (caller should check for user first)
     if (!user) {
-      console.warn('Guest user - skipping storage');
       throw new Error('User not authenticated');
     }
 
     setUploading(true);
     setError(null);
-
-    console.log('saveGeneratedImage started:', { imageUrl: options.imageUrl.substring(0, 50) + '...' });
 
     try {
       // 0. Ensure profile exists (backfill for users created before migration)
@@ -52,10 +49,8 @@ export function useSupabaseStorage() {
           .single();
 
         if (insertProfileError) {
-          console.error('Failed to create profile:', insertProfileError);
           throw new Error(`Profile creation failed: ${insertProfileError.message}`);
         }
-        console.log('Profile backfilled for user:', user.id);
       }
 
       // 1. Get image blob - prefer base64 (CORS-free) over URL fetch
@@ -63,20 +58,15 @@ export function useSupabaseStorage() {
 
       if (options.imageBase64) {
         // Use base64 data directly (from Edge Function) - no CORS issues
-        console.log('Using base64 data from Edge Function...');
         const base64Response = await fetch(options.imageBase64);
         blob = await base64Response.blob();
-        console.log('Base64 converted to blob, size:', blob.size);
       } else {
         // Fallback: fetch from URL (may fail due to CORS)
-        console.log('Fetching image from URL...');
         const response = await fetch(options.imageUrl);
         if (!response.ok) {
-          console.error('Failed to fetch image:', response.status, response.statusText);
           throw new Error(`Failed to fetch image: ${response.statusText}`);
         }
         blob = await response.blob();
-        console.log('Image fetched, blob size:', blob.size);
       }
 
       // 2. Generate unique storage path: user_id/timestamp-uuid.png
@@ -84,7 +74,6 @@ export function useSupabaseStorage() {
       const storagePath = `${user.id}/${fileName}`;
 
       // 3. Upload to Supabase Storage bucket
-      console.log('Uploading to Supabase storage...');
       const { error: uploadError } = await supabase
         .storage
         .from('generated-images')
@@ -95,10 +84,8 @@ export function useSupabaseStorage() {
         });
 
       if (uploadError) {
-        console.error('Storage upload error:', uploadError);
         throw new Error(`Storage upload failed: ${uploadError.message}`);
       }
-      console.log('Upload successful, path:', storagePath);
 
       // 4. Get signed URL for private bucket (valid for 1 year)
       const { data: signedUrlData, error: signedUrlError } = await supabase
@@ -107,12 +94,10 @@ export function useSupabaseStorage() {
         .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
 
       if (signedUrlError || !signedUrlData) {
-        console.error('Failed to create signed URL:', signedUrlError);
         throw new Error(`Signed URL creation failed: ${signedUrlError?.message}`);
       }
 
       // 5. Insert metadata into generated_images table
-      console.log('Inserting into database...');
       const { data: dbData, error: dbError } = await supabase
         .from('generated_images')
         .insert({
@@ -126,10 +111,8 @@ export function useSupabaseStorage() {
         .single();
 
       if (dbError) {
-        console.error('Database insert error:', dbError);
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
-      console.log('Database insert successful, id:', dbData.id);
 
       return {
         id: dbData.id,

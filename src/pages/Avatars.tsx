@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useAvatarModels } from '../hooks/useAvatarModels';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LoginModal } from '../components/auth/LoginModal';
 import { AvatarCreatorModal } from '../components/avatars/AvatarCreatorModal';
+import { Skeleton } from '../components/ui/Skeleton';
 
 export default function Avatars() {
+  usePageTitle('Modeliai');
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const {
@@ -25,8 +28,19 @@ export default function Avatars() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-center py-16">
-          <div className="w-12 h-12 rounded-full border-2 border-[#10B981] border-t-transparent animate-spin" />
+        {/* Header skeleton */}
+        <div className="text-center mb-8">
+          <Skeleton className="h-8 w-56 mx-auto mb-2" />
+          <Skeleton className="h-4 w-72 mx-auto" />
+        </div>
+        {/* Main card skeleton */}
+        <div className="bg-white border border-[#E5E5E3] rounded-2xl p-8 md:p-12">
+          <div className="flex flex-col items-center">
+            <div className="skeleton w-24 h-24 rounded-3xl mb-6" />
+            <Skeleton className="h-6 w-52 mb-2" />
+            <Skeleton className="h-4 w-80 mb-8" />
+            <Skeleton className="h-14 w-60 rounded-full" />
+          </div>
         </div>
       </div>
     );

@@ -1,9 +1,16 @@
 // Hook re-exports for convenient imports
 export { useAuth } from '../contexts/AuthContext';
+export { useAvatarCreator } from './useAvatarCreator';
+export { useAvatarModels } from './useAvatarModels';
 export { useCredits } from './useCredits';
 export { useCustomAvatars } from './useCustomAvatars';
+export { useDashboard } from './useDashboard';
 export { useGallery } from './useGallery';
 export { useGeneration } from './useGeneration';
 export { useImageUpload } from './useImageUpload';
+export { useMediaQuery } from './useMediaQuery';
 export { useNotes } from './useNotes';
+export { usePostCreator } from './usePostCreator';
+export { usePostProcess } from './usePostProcess';
+export { useSocialAccounts } from './useSocialAccounts';
 export { useSupabaseStorage } from './useSupabaseStorage';

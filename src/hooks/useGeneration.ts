@@ -81,8 +81,6 @@ export function useGeneration() {
       // Call Edge Function - it handles fal.ai queue polling
       const data = await generateImages(config, images, combinedSignal);
 
-      console.log('Generation response:', data);
-
       // Clear timers on success
       progressTimersRef.current.forEach(timer => clearTimeout(timer));
       progressTimersRef.current = [];
@@ -99,12 +97,9 @@ export function useGeneration() {
 
         // Save to Supabase if user is authenticated
         if (user) {
-          console.log('User authenticated, saving images to gallery...', { userId: user.id, imageCount: data.images?.length || 0 });
-
           try {
             const savedImages = await Promise.all(
               data.images.map((image, index) => {
-                console.log(`Saving image ${index + 1}/${data.images?.length || 0}:`, image.url.substring(0, 50) + '...', 'has base64:', !!image.base64);
                 return saveGeneratedImage({
                   imageUrl: image.url,
                   imageBase64: image.base64,
@@ -117,15 +112,11 @@ export function useGeneration() {
                 });
               })
             );
-            console.log('All images saved to gallery successfully:', savedImages);
           } catch (err) {
             console.error('Failed to save images to gallery:', err);
           }
-        } else {
-          console.log('User not authenticated, skipping gallery save');
         }
       } else {
-        console.error('No images in response:', data);
         setState({
           status: 'error',
           progress: 'sending',

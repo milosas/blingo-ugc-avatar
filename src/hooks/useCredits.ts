@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from './useAuth';
 
 export type CreditAction = 'model_photo' | 'tryon_photo' | 'post_image' | 'post_text' | 'text_from_image';
 

@@ -71,12 +71,9 @@ export async function generateImages(
 
   if (config.avatar?.imageUrl) {
     if (config.avatar.isCustom) {
-      console.log('Converting custom avatar to base64...');
       try {
         avatarImageBase64 = await urlToBase64(config.avatar.imageUrl);
-        console.log('Custom avatar converted to base64, length:', avatarImageBase64.length);
       } catch (err) {
-        console.error('CRITICAL: Failed to convert custom avatar to base64:', err);
         throw new Error('AVATAR_LOAD_FAILED');
       }
     } else {

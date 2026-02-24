@@ -205,7 +205,6 @@ export async function savePost(params: {
     .single();
 
   if (error) {
-    console.error('Failed to save post:', error);
     return null;
   }
 
@@ -223,7 +222,6 @@ export async function getUserPosts(limit = 20, offset = 0): Promise<GeneratedPos
     .range(offset, offset + limit - 1);
 
   if (error) {
-    console.error('Failed to fetch posts:', error);
     return [];
   }
 

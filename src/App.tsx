@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Layout } from './components/layout/Layout';
 import LandingPage from './pages/LandingPage';
 import Generator from './pages/Generator';
@@ -7,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Avatars from './pages/Avatars';
 import PostCreator from './pages/PostCreator';
 import Privacy from './pages/Privacy';
+import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -44,12 +46,20 @@ const router = createBrowserRouter([
         path: '/privacy',
         element: <Privacy />,
       },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
     ],
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../hooks/useAuth';
 import { useDashboard } from '../hooks/useDashboard';
 import { useSocialAccounts } from '../hooks/useSocialAccounts';
 import { useLanguage } from '../contexts/LanguageContext';
+import type { Translations } from '../i18n/translations';
 import { LoginModal } from '../components/auth/LoginModal';
 import { TiltCard } from '../components/animation/TiltCard';
 import { StaggerContainer, StaggerItem } from '../components/animation/StaggerChildren';
 import { supabase } from '../lib/supabase';
+import { Skeleton, SkeletonStatCard, SkeletonFormSection } from '../components/ui/Skeleton';
 
 export default function Dashboard() {
+  usePageTitle('Valdymo skydelis');
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -44,8 +48,8 @@ export default function Dashboard() {
       if (error) throw error;
       setSaveMessage('Išsaugota!');
       setTimeout(() => setSaveMessage(null), 2500);
-    } catch (err: any) {
-      setSaveMessage('Klaida: ' + (err.message || 'Nepavyko išsaugoti'));
+    } catch (err: unknown) {
+      setSaveMessage('Klaida: ' + (err instanceof Error ? err.message : 'Nepavyko išsaugoti'));
       setTimeout(() => setSaveMessage(null), 4000);
     } finally {
       setSaving(false);
@@ -57,8 +61,8 @@ export default function Dashboard() {
     try {
       await supabase.from('social_accounts').delete().eq('id', accountId);
       await fetchAccounts();
-    } catch (err) {
-      console.error('Error disconnecting account:', err);
+    } catch {
+      // Disconnect failed silently
     } finally {
       setDisconnecting(null);
     }
@@ -69,9 +73,37 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className=" max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-center py-16">
-          <div className="w-12 h-12 rounded-full border-2 border-[#FF6B35] border-t-transparent animate-spin" />
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header skeleton */}
+        <div className="mb-8">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-56" />
+        </div>
+        {/* Personal info skeleton */}
+        <SkeletonFormSection />
+        {/* Social accounts skeleton */}
+        <div className="bg-white border border-[#E5E5E3] rounded-2xl p-6 mt-8 mb-8">
+          <Skeleton className="h-5 w-44 mb-4" />
+          <div className="space-y-3">
+            {[0, 1].map((i) => (
+              <div key={i} className="flex items-center justify-between p-3 bg-[#F7F7F5] rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="skeleton w-8 h-8 rounded-lg" />
+                  <div>
+                    <div className="skeleton h-4 w-20 rounded mb-1" />
+                    <div className="skeleton h-3 w-16 rounded" />
+                  </div>
+                </div>
+                <div className="skeleton h-7 w-16 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
         </div>
       </div>
     );
@@ -316,7 +348,7 @@ function StatCard({ icon, label, value, color, onClick }: StatCardProps) {
   );
 }
 
-function getPlanLabel(subscription: string, dashboard: any): string {
+function getPlanLabel(subscription: string, dashboard: Translations['dashboard']): string {
   const plans: Record<string, string> = {
     free: dashboard?.plans?.free || 'Free',
     pro: dashboard?.plans?.pro || 'Pro',

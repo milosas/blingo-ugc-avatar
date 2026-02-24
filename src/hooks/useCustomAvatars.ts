@@ -119,10 +119,8 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
           .single();
 
         if (insertProfileError) {
-          console.error('Failed to create profile:', insertProfileError);
           throw new Error(`Profile creation failed: ${insertProfileError.message}`);
         }
-        console.log('Profile backfilled for user:', user.id);
       }
 
       // Validate file type
@@ -154,7 +152,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         });
 
       if (uploadError) {
-        console.error('Storage upload error:', uploadError);
         throw new Error(`Storage upload failed: ${uploadError.message}`);
       }
 
@@ -165,7 +162,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
 
       if (signedUrlError || !signedUrlData) {
-        console.error('Failed to create signed URL:', signedUrlError);
         throw new Error(`Signed URL creation failed: ${signedUrlError?.message}`);
       }
 
@@ -183,7 +179,6 @@ export function useCustomAvatars(): UseCustomAvatarsReturn {
         .single();
 
       if (dbError) {
-        console.error('Database insert error:', dbError);
         throw new Error(`Database insert failed: ${dbError.message}`);
       }
 

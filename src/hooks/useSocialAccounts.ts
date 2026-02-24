@@ -34,8 +34,8 @@ export function useSocialAccounts() {
 
       if (error) throw error;
       setAccounts(data || []);
-    } catch (err) {
-      console.error('Error fetching social accounts:', err);
+    } catch {
+      // Fetch failed silently
     } finally {
       setIsLoading(false);
     }
@@ -77,8 +77,8 @@ export function useSocialAccounts() {
         // Refresh local state
         await fetchAccounts();
       }
-    } catch (err) {
-      console.error('Error syncing social accounts:', err);
+    } catch {
+      // Sync failed silently
     }
   }, [fetchAccounts]);
 
@@ -98,7 +98,6 @@ export function useSocialAccounts() {
         throw new Error('Nepavyko gauti prisijungimo nuorodos');
       }
     } catch (err) {
-      console.error('Error connecting account:', err);
       throw err;
     }
   }, []);

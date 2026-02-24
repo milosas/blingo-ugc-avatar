@@ -133,7 +133,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </DialogTitle>
             <button
               onClick={handleClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none"
               aria-label="Close"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -219,7 +219,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5">
                 <path
@@ -251,7 +251,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={switchMode}
-                className="text-indigo-600 hover:text-indigo-500 font-medium"
+                className="text-indigo-600 hover:text-indigo-500 font-medium rounded focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none"
                 disabled={loading}
               >
                 {mode === 'signin' ? t.auth.signUp : t.auth.signIn}
@@ -263,7 +263,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                className="text-gray-500 hover:text-gray-700 text-sm font-medium rounded focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none"
                 disabled={loading}
               >
                 {t.auth.continueAsGuest}

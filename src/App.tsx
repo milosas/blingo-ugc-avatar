@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
+import { Analytics } from '@vercel/analytics/react';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Layout } from './components/layout/Layout';
 import LandingPage from './pages/LandingPage';
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ErrorBoundary>
+      <Analytics />
       <RouterProvider router={router} />
     </ErrorBoundary>
   );

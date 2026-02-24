@@ -31,7 +31,7 @@ export function InsufficientCreditsModal({ isOpen, onClose, required, balance }:
               </DialogTitle>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
                 aria-label="Uzdaryti"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,14 +71,14 @@ export function InsufficientCreditsModal({ isOpen, onClose, required, balance }:
               {/* CTA */}
               <button
                 onClick={handleBuy}
-                className="w-full px-5 py-3 bg-[#FF6B35] text-white font-medium rounded-lg hover:bg-[#E55A2B] transition-colors text-sm"
+                className="w-full px-5 py-3 bg-[#FF6B35] text-white font-medium rounded-lg hover:bg-[#E55A2B] transition-colors text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
               >
                 Pirkti kreditu
               </button>
 
               <button
                 onClick={onClose}
-                className="w-full text-center text-sm text-gray-500 hover:text-gray-700"
+                className="w-full text-center text-sm text-gray-500 hover:text-gray-700 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
               >
                 Atsaukti
               </button>

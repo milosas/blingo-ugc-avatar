@@ -306,6 +306,16 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     }
   };
 
+  // Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const hasSavedAny = savedPhotos.length > 0;
@@ -313,7 +323,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   const isBatchGenerating = batchProgress > 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={handleClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="avatar-creator-title" onClick={handleClose}>
       <div
         className="bg-white rounded-2xl w-full max-w-[calc(100vw-2rem)] md:max-w-lg max-h-[90vh] overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
@@ -321,7 +331,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-[#E5E5E3]">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-[#1A1A1A]">
+            <h2 id="avatar-creator-title" className="text-lg font-semibold text-[#1A1A1A]">
               {isPoseMode ? (tm?.addPose || 'Add pose') : tc.title}
             </h2>
             {(hasSavedAny || totalPhotos > 0) && (
@@ -330,7 +340,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
               </span>
             )}
           </div>
-          <button onClick={handleClose} className="p-1 rounded-lg hover:bg-[#F7F7F5] transition-colors">
+          <button onClick={handleClose} aria-label="Uzdaryti" className="p-1 rounded-lg hover:bg-[#F7F7F5] transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none">
             <svg className="w-5 h-5 text-[#999999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -502,14 +512,14 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
               <div className="flex gap-3 w-full mt-2">
                 <button
                   onClick={handleBackToSelection}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
                 >
                   Generuoti dar
                 </button>
                 <button
                   onClick={batchResults.length > 0 ? handleBatchSave : handleSaveAndClose}
                   disabled={isSaving}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
                 >
                   {isSaving ? (
                     <>
@@ -681,7 +691,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
           <div className="flex gap-3 p-5 border-t border-[#E5E5E3]">
             <button
               onClick={handleClose}
-              className="px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors"
+              className="px-4 py-2.5 rounded-xl border border-[#E5E5E3] text-[#666666] text-sm font-medium hover:bg-[#F7F7F5] transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
             >
               {hasSavedAny ? (tm?.done || 'Done') : tc.cancel}
             </button>
@@ -690,7 +700,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
               <button
                 onClick={isBatchMode ? handleBatchGenerate : handleGenerate}
                 disabled={isGenerating || !canAddMore}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-medium hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
               >
                 {!canAddMore
                   ? (tm?.photoLimit || 'Limitas pasiektas')

@@ -14,7 +14,7 @@ export function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'relative px-6 py-3 rounded-full font-semibold transition-all duration-200 focus:outline-none overflow-hidden';
+  const baseStyles = 'relative px-6 py-3 rounded-full font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] overflow-hidden';
 
   const variants = {
     primary: `

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useCredits } from '../../hooks/useCredits';
+import { useToast } from '../../hooks/useToast';
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -33,14 +34,17 @@ const PACKAGES = [
 
 export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
   const { balance, purchaseCredits, subscribeSocial, socialSubscriptionActive } = useCredits();
+  const { showToast } = useToast();
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handlePurchase = async (packageId: '50' | '150' | '500') => {
     try {
       setLoadingId(packageId);
       await purchaseCredits(packageId);
+      showToast('Pirkimas pradetas! Nukreipiame i mokejimo puslapi...', 'success');
     } catch (error) {
       console.error('Purchase error:', error);
+      showToast('Nepavyko pradeti pirkimo. Bandykite dar karta.', 'error');
       setLoadingId(null);
     }
   };
@@ -49,8 +53,10 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
     try {
       setLoadingId('social');
       await subscribeSocial();
+      showToast('Prenumerata pradeta! Nukreipiame...', 'success');
     } catch (error) {
       console.error('Subscribe error:', error);
+      showToast('Nepavyko pradeti prenumeratos. Bandykite dar karta.', 'error');
       setLoadingId(null);
     }
   };
@@ -73,7 +79,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
               aria-label="Uzdaryti"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -116,7 +122,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
                   <button
                     onClick={() => handlePurchase(pkg.id)}
                     disabled={loadingId !== null}
-                    className="px-5 py-2.5 bg-[#FF6B35] text-white font-medium rounded-lg hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-5 py-2.5 bg-[#FF6B35] text-white font-medium rounded-lg hover:bg-[#E55A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35] focus:outline-none"
                   >
                     {loadingId === pkg.id ? (
                       <span className="flex items-center gap-2">
@@ -189,7 +195,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
                   <button
                     onClick={handleSubscribe}
                     disabled={loadingId !== null}
-                    className="px-5 py-2.5 bg-[#10B981] text-white font-medium rounded-lg hover:bg-[#059669] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-5 py-2.5 bg-[#10B981] text-white font-medium rounded-lg hover:bg-[#059669] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#10B981] focus:outline-none"
                   >
                     {loadingId === 'social' ? (
                       <span className="flex items-center gap-2">

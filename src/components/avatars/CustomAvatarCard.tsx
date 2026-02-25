@@ -124,6 +124,7 @@ export function CustomAvatarCard({
             src={avatar.image_url}
             alt="Custom model"
             className="w-full h-full object-cover object-top"
+            loading="lazy"
             onError={handleImageError}
           />
         </div>

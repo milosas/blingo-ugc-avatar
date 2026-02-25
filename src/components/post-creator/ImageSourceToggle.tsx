@@ -83,7 +83,7 @@ export function ImageSourceToggle({
       {imageSource === 'gallery' ? (
         imagePreview ? (
           <div className="relative">
-            <img src={imagePreview} alt="Gallery" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" />
+            <img src={imagePreview} alt="Gallery" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" loading="lazy" />
             <button
               onClick={() => { onFileRemove(); onImageSourceChange('upload'); }}
               className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-[#666] hover:text-red-500 transition-colors shadow-sm"
@@ -97,7 +97,7 @@ export function ImageSourceToggle({
       ) : imageSource === 'upload' ? (
         imagePreview ? (
           <div className="relative">
-            <img src={imagePreview} alt="Uploaded" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" />
+            <img src={imagePreview} alt="Uploaded" className="w-full max-h-64 object-contain rounded-xl border border-[#E5E5E3]" loading="lazy" />
             <button
               onClick={onFileRemove}
               className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-[#666] hover:text-red-500 transition-colors shadow-sm"

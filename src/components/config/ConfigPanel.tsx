@@ -297,6 +297,7 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
                         src={avatar.imageUrl}
                         alt={getAvatarName(avatar)}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                         onError={(e) => {
                           const target = e.currentTarget;
                           target.style.display = 'none';

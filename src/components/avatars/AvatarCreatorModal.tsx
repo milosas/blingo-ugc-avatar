@@ -2,6 +2,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAvatarCreator } from '../../hooks/useAvatarCreator';
 import { InsufficientCreditsModal } from '../credits/InsufficientCreditsModal';
 import { useState, useEffect, useCallback } from 'react';
+import { avatarModelSchema, validateField } from '../../lib/validation';
 import {
   GENDER_OPTIONS,
   ETHNICITY_OPTIONS,
@@ -97,6 +98,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [selectedModelId, setSelectedModelId] = useState<string | 'new'>(targetModelId || 'new');
   const [newModelName, setNewModelName] = useState('');
+  const [modelNameError, setModelNameError] = useState<string | null>(null);
   const [savedPhotos, setSavedPhotos] = useState<string[]>([]);
   const [createdModelId, setCreatedModelId] = useState<string | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -160,6 +162,7 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     setCreatedModelId(null);
     setSelectedModelId('new');
     setNewModelName('');
+    setModelNameError(null);
     setShowPrompt(false);
     setBatchCount(1);
     setBatchResults([]);
@@ -249,6 +252,8 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
 
   // Save all batch results at once
   const handleBatchSave = async () => {
+    if (!effectiveModelId && !isPoseMode && !validateModelName()) return;
+
     setIsSaving(true);
     setError(null);
     try {
@@ -277,11 +282,27 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
     }
   };
 
+  const validateModelName = (): boolean => {
+    const trimmed = newModelName.trim();
+    // Only validate if user typed something; empty falls back to description
+    if (trimmed.length > 0) {
+      const err = validateField(avatarModelSchema, 'name', trimmed);
+      if (err) {
+        setModelNameError(err);
+        return false;
+      }
+    }
+    setModelNameError(null);
+    return true;
+  };
+
   const handleSaveAndClose = async () => {
     if (!generatedImage) {
       handleClose();
       return;
     }
+
+    if (!effectiveModelId && !isPoseMode && !validateModelName()) return;
 
     setIsSaving(true);
     setError(null);
@@ -494,10 +515,19 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   </label>
                   <input
                     value={newModelName}
-                    onChange={(e) => setNewModelName(e.target.value)}
+                    onChange={(e) => { setNewModelName(e.target.value); setModelNameError(null); }}
+                    onBlur={() => {
+                      if (newModelName.trim().length > 0) {
+                        const err = validateField(avatarModelSchema, 'name', newModelName.trim());
+                        setModelNameError(err);
+                      } else {
+                        setModelNameError(null);
+                      }
+                    }}
                     placeholder="Modelio pavadinimas (neprivaloma)"
-                    className="w-full px-3 py-2.5 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10"
+                    className={`w-full px-3 py-2.5 bg-white border rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/10 ${modelNameError ? 'border-red-400' : 'border-[#E5E5E3]'}`}
                   />
+                  {modelNameError && <p className="text-xs text-red-500 mt-1">{modelNameError}</p>}
                 </div>
               )}
 
@@ -552,10 +582,19 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   </label>
                   <input
                     value={newModelName}
-                    onChange={(e) => setNewModelName(e.target.value)}
+                    onChange={(e) => { setNewModelName(e.target.value); setModelNameError(null); }}
+                    onBlur={() => {
+                      if (newModelName.trim().length > 0) {
+                        const err = validateField(avatarModelSchema, 'name', newModelName.trim());
+                        setModelNameError(err);
+                      } else {
+                        setModelNameError(null);
+                      }
+                    }}
                     placeholder={'Modelio pavadinimas (neprivaloma)'}
-                    className="w-full px-3 py-2 bg-white border border-[#E5E5E3] rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35]"
+                    className={`w-full px-3 py-2 bg-white border rounded-xl text-sm text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:border-[#FF6B35] ${modelNameError ? 'border-red-400' : 'border-[#E5E5E3]'}`}
                   />
+                  {modelNameError && <p className="text-xs text-red-500 mt-1">{modelNameError}</p>}
                 </div>
               )}
 

@@ -1,15 +1,27 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { Analytics } from '@vercel/analytics/react';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Layout } from './components/layout/Layout';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
 import LandingPage from './pages/LandingPage';
 import Generator from './pages/Generator';
-import Gallery from './pages/Gallery';
-import Dashboard from './pages/Dashboard';
-import Avatars from './pages/Avatars';
-import PostCreator from './pages/PostCreator';
-import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
+
+// Lazy-loaded heavy pages
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Avatars = lazy(() => import('./pages/Avatars'));
+const PostCreator = lazy(() => import('./pages/PostCreator'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+
+function PageFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <LoadingSpinner size="lg" />
+    </div>
+  );
+}
 
 const router = createBrowserRouter([
   {
@@ -29,23 +41,23 @@ const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <Dashboard />,
+        element: <Suspense fallback={<PageFallback />}><Dashboard /></Suspense>,
       },
       {
         path: '/gallery',
-        element: <Gallery />,
+        element: <Suspense fallback={<PageFallback />}><Gallery /></Suspense>,
       },
       {
         path: '/modeliai',
-        element: <Avatars />,
+        element: <Suspense fallback={<PageFallback />}><Avatars /></Suspense>,
       },
       {
         path: '/post-creator',
-        element: <PostCreator />,
+        element: <Suspense fallback={<PageFallback />}><PostCreator /></Suspense>,
       },
       {
         path: '/privacy',
-        element: <Privacy />,
+        element: <Suspense fallback={<PageFallback />}><Privacy /></Suspense>,
       },
       {
         path: '*',

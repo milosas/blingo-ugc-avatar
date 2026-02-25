@@ -11,6 +11,7 @@ import { TiltCard } from '../components/animation/TiltCard';
 import { StaggerContainer, StaggerItem } from '../components/animation/StaggerChildren';
 import { supabase } from '../lib/supabase';
 import { Skeleton, SkeletonStatCard, SkeletonFormSection } from '../components/ui/Skeleton';
+import { profileSchema, validateField, validateAll } from '../lib/validation';
 
 export default function Dashboard() {
   usePageTitle('Valdymo skydelis');
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [company, setCompany] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Pre-fill from user metadata
   useEffect(() => {
@@ -38,7 +40,25 @@ export default function Dashboard() {
     }
   }, [user]);
 
+  const handleBlur = (field: 'name' | 'phone' | 'company', value: string) => {
+    const error = validateField(profileSchema, field, value);
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      if (error) {
+        next[field] = error;
+      } else {
+        delete next[field];
+      }
+      return next;
+    });
+  };
+
   const handleSavePersonalInfo = async () => {
+    // Validate all fields on submit
+    const errors = validateAll(profileSchema, { name, phone, company });
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setSaving(true);
     setSaveMessage(null);
     try {
@@ -178,9 +198,11 @@ export default function Dashboard() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => handleBlur('name', name)}
               placeholder={dashboard?.personalInfo?.namePlaceholder || 'Jūsų vardas'}
-              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+              className={`w-full px-3 py-2 border rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors ${fieldErrors.name ? 'border-red-400' : 'border-[#E5E5E3]'}`}
             />
+            {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.email || 'El. paštas'}</label>
@@ -197,9 +219,11 @@ export default function Dashboard() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              onBlur={() => handleBlur('phone', phone)}
               placeholder={dashboard?.personalInfo?.phonePlaceholder || '+370...'}
-              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+              className={`w-full px-3 py-2 border rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors ${fieldErrors.phone ? 'border-red-400' : 'border-[#E5E5E3]'}`}
             />
+            {fieldErrors.phone && <p className="text-xs text-red-500 mt-1">{fieldErrors.phone}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-[#333] mb-1">{dashboard?.personalInfo?.company || 'Įmonė'}</label>
@@ -207,9 +231,11 @@ export default function Dashboard() {
               type="text"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
+              onBlur={() => handleBlur('company', company)}
               placeholder={dashboard?.personalInfo?.companyPlaceholder || 'Įmonės pavadinimas'}
-              className="w-full px-3 py-2 border border-[#E5E5E3] rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors"
+              className={`w-full px-3 py-2 border rounded-lg text-[#1A1A1A] placeholder-[#AAAAAA] focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-colors ${fieldErrors.company ? 'border-red-400' : 'border-[#E5E5E3]'}`}
             />
+            {fieldErrors.company && <p className="text-xs text-red-500 mt-1">{fieldErrors.company}</p>}
           </div>
         </div>
         <div className="flex items-center gap-3 mt-5">

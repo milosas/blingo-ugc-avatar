@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useGallery } from '../hooks/useGallery';
@@ -15,7 +15,7 @@ import { formatRelativeTime } from '../utils/date';
 import { Skeleton, SkeletonCard, SkeletonPostCard } from '../components/ui/Skeleton';
 import type { AvatarModel, GeneratedPost } from '../types/database';
 
-function SectionHeader({
+const SectionHeader = memo(function SectionHeader({
   title,
   count,
   isOpen,
@@ -45,9 +45,9 @@ function SectionHeader({
       </svg>
     </button>
   );
-}
+});
 
-function ModelCard({ model, onClick }: { model: AvatarModel; onClick: () => void }) {
+const ModelCard = memo(function ModelCard({ model, onClick }: { model: AvatarModel; onClick: () => void }) {
   const coverPhoto = model.photos?.find(p => p.id === model.cover_photo_id) || model.photos?.[0];
   const photoCount = model.photos?.length || 0;
 
@@ -83,9 +83,9 @@ function ModelCard({ model, onClick }: { model: AvatarModel; onClick: () => void
       </div>
     </div>
   );
-}
+});
 
-function PostCard({
+const PostCard = memo(function PostCard({
   post,
   onDelete,
   onCopy,
@@ -170,9 +170,9 @@ function PostCard({
       </div>
     </div>
   );
-}
+});
 
-function ModelDetailModal({
+const ModelDetailModal = memo(function ModelDetailModal({
   model,
   onClose,
   onCreatePost,
@@ -252,7 +252,7 @@ function ModelDetailModal({
                         i === selectedIndex ? 'border-[#FF6B35] ring-1 ring-[#FF6B35]/30' : 'border-transparent hover:border-[#E5E5E3]'
                       }`}
                     >
-                      <img src={photo.image_url} alt={`${model.name} nuotrauka ${i + 1}`} className="w-full h-full object-cover" />
+                      <img src={photo.image_url} alt={`${model.name} nuotrauka ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                     </button>
                   ))}
                 </div>
@@ -302,9 +302,9 @@ function ModelDetailModal({
       </div>
     </>
   );
-}
+});
 
-function PaginationControls({
+const PaginationControls = memo(function PaginationControls({
   totalCount,
   visibleCount,
   page,
@@ -372,7 +372,7 @@ function PaginationControls({
       )}
     </div>
   );
-}
+});
 
 export default function Gallery() {
   usePageTitle('Galerija');

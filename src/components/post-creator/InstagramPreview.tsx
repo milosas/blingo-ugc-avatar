@@ -20,7 +20,7 @@ export function InstagramPreview({ text, imageUrl, isMobile }: InstagramPreviewP
       {/* Image */}
       <div className="w-full aspect-square bg-[#F7F7F5]">
         {imageUrl ? (
-          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" />
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[#999] text-sm">
             Paveikslėlis

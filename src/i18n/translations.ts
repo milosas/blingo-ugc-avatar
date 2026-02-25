@@ -16,7 +16,7 @@ export const LANGUAGES: LanguageOption[] = [
 export const translations = {
   lt: {
     header: {
-      title: 'Re Edit Me',
+      title: 'reEDITme',
       subtitle: 'Produktų nuotraukos ir turinys su AI — be fotografo, be studijos'
     },
     upload: {
@@ -87,7 +87,7 @@ export const translations = {
       insufficientCredits: 'Nepakanka kreditų. Papildykite kreditų balansą.',
       default: 'Įvyko klaida. Bandykite dar kartą.'
     },
-    footer: 'Re Edit Me',
+    footer: 'reEDITme',
     privacyPolicy: 'Privatumo politika',
     footerSection: {
       tagline: 'Produktų nuotraukos ir turinys su AI',
@@ -563,8 +563,8 @@ export const translations = {
         subtitle: 'Dažniausiai klausiama prieš pradedant',
         items: {
           whatIsTool: {
-            question: 'Kas yra Re Edit Me?',
-            answer: 'Re Edit Me — tai AI platforma, kuri padeda kurti profesionalias produktų nuotraukas ir socialinių tinklų turinį. Įkeliate drabužio ar produkto nuotrauką, pasirenkate modelį, foną ir nuotaiką — AI sugeneruoja paruoštą marketingo paveikslėlį per 30–60 sekundžių.'
+            question: 'Kas yra reEDITme?',
+            answer: 'reEDITme — tai AI platforma, kuri padeda kurti profesionalias produktų nuotraukas ir socialinių tinklų turinį. Įkeliate drabužio ar produkto nuotrauką, pasirenkate modelį, foną ir nuotaiką — AI sugeneruoja paruoštą marketingo paveikslėlį per 30–60 sekundžių.'
           },
           howGeneration: {
             question: 'Kaip veikia nuotraukų generavimas?',
@@ -584,7 +584,7 @@ export const translations = {
           },
           howContact: {
             question: 'Kaip susisiekti su palaikymu?',
-            answer: 'Rašykite mums support@reeditme.com — atsakome per 24 valandas darbo dienomis.'
+            answer: 'Rašykite mums info@reEDITme.com — atsakome per 24 valandas darbo dienomis.'
           }
         }
       },
@@ -706,7 +706,7 @@ export const translations = {
   },
   lv: {
     header: {
-      title: 'Re Edit Me',
+      title: 'reEDITme',
       subtitle: 'Produktu fotogrāfijas un saturs ar AI — bez fotogrāfa, bez studijas'
     },
     upload: {
@@ -777,7 +777,7 @@ export const translations = {
       insufficientCredits: 'Nepietiek kredītu. Papildiniet kredītu atlikumu.',
       default: 'Radās kļūda. Mēģiniet vēlreiz.'
     },
-    footer: 'Re Edit Me',
+    footer: 'reEDITme',
     privacyPolicy: 'Privātuma politika',
     footerSection: {
       tagline: 'Produktu fotogrāfijas un saturs ar AI',
@@ -1251,8 +1251,8 @@ export const translations = {
         subtitle: 'Biežāk uzdotie jautājumi pirms sākšanas',
         items: {
           whatIsTool: {
-            question: 'Kas ir Re Edit Me?',
-            answer: 'Re Edit Me — AI platforma, kas palīdz veidot profesionālas produktu fotogrāfijas un sociālo tīklu saturu. Augšupielādējiet apģērba fotogrāfiju, izvēlieties modeli, fonu un noskaņojumu — AI izveidos gatavu mārketinga attēlu 30–60 sekundēs.'
+            question: 'Kas ir reEDITme?',
+            answer: 'reEDITme — AI platforma, kas palīdz veidot profesionālas produktu fotogrāfijas un sociālo tīklu saturu. Augšupielādējiet apģērba fotogrāfiju, izvēlieties modeli, fonu un noskaņojumu — AI izveidos gatavu mārketinga attēlu 30–60 sekundēs.'
           },
           howGeneration: {
             question: 'Kā darbojas attēlu ģenerēšana?',
@@ -1272,7 +1272,7 @@ export const translations = {
           },
           howContact: {
             question: 'Kā sazināties ar atbalstu?',
-            answer: 'Rakstiet mums support@reeditme.com — atbildam 24 stundu laikā darba dienās.'
+            answer: 'Rakstiet mums info@reEDITme.com — atbildam 24 stundu laikā darba dienās.'
           }
         }
       },
@@ -1394,7 +1394,7 @@ export const translations = {
   },
   ee: {
     header: {
-      title: 'Re Edit Me',
+      title: 'reEDITme',
       subtitle: 'Tootefotod ja sisu AI-ga — ilma fotograafita, ilma stuudiota'
     },
     upload: {
@@ -1465,7 +1465,7 @@ export const translations = {
       insufficientCredits: 'Krediiti pole piisavalt. Täiendage oma krediidijääki.',
       default: 'Tekkis viga. Proovige uuesti.'
     },
-    footer: 'Re Edit Me',
+    footer: 'reEDITme',
     privacyPolicy: 'Privaatsuspoliitika',
     footerSection: {
       tagline: 'Tootefotod ja sisu AI-ga',
@@ -1939,8 +1939,8 @@ export const translations = {
         subtitle: 'Kõige sagedamini küsitav enne alustamist',
         items: {
           whatIsTool: {
-            question: 'Mis on Re Edit Me?',
-            answer: 'Re Edit Me — AI platvorm, mis aitab luua professionaalseid tootefotosid ja sotsiaalmeedia sisu. Laadige üles rõivafoto, valige mudel, taust ja meeleolu — AI loob valmis turundusfoto 30–60 sekundiga.'
+            question: 'Mis on reEDITme?',
+            answer: 'reEDITme — AI platvorm, mis aitab luua professionaalseid tootefotosid ja sotsiaalmeedia sisu. Laadige üles rõivafoto, valige mudel, taust ja meeleolu — AI loob valmis turundusfoto 30–60 sekundiga.'
           },
           howGeneration: {
             question: 'Kuidas piltide genereerimine töötab?',
@@ -1960,7 +1960,7 @@ export const translations = {
           },
           howContact: {
             question: 'Kuidas võtta ühendust toega?',
-            answer: 'Kirjutage meile support@reeditme.com — vastame 24 tunni jooksul tööpäevadel.'
+            answer: 'Kirjutage meile info@reEDITme.com — vastame 24 tunni jooksul tööpäevadel.'
           }
         }
       },
@@ -2082,7 +2082,7 @@ export const translations = {
   },
   en: {
     header: {
-      title: 'Re Edit Me',
+      title: 'reEDITme',
       subtitle: 'Upload a photo and create professional images with AI'
     },
     upload: {
@@ -2153,7 +2153,7 @@ export const translations = {
       insufficientCredits: 'Insufficient credits. Please top up your credit balance.',
       default: 'An error occurred. Please try again.'
     },
-    footer: 'Re Edit Me',
+    footer: 'reEDITme',
     privacyPolicy: 'Privacy Policy',
     footerSection: {
       tagline: 'AI-powered content creation platform',
@@ -2627,8 +2627,8 @@ export const translations = {
         subtitle: 'Got questions? We have answers',
         items: {
           whatIsTool: {
-            question: 'What is Re Edit Me?',
-            answer: 'Re Edit Me is an AI-powered tool that transforms your photos into professional UGC (User Generated Content) marketing images. Simply upload a photo and our AI will generate stunning variations based on your selected style, scene, and mood preferences.'
+            question: 'What is reEDITme?',
+            answer: 'reEDITme is an AI-powered tool that transforms your photos into professional UGC (User Generated Content) marketing images. Simply upload a photo and our AI will generate stunning variations based on your selected style, scene, and mood preferences.'
           },
           howGeneration: {
             question: 'How does image generation work?',
@@ -2648,7 +2648,7 @@ export const translations = {
           },
           howContact: {
             question: 'How can I contact support?',
-            answer: 'You can reach our support team at support@reeditme.com. We typically respond within 24 hours on business days.'
+            answer: 'You can reach our support team at info@reEDITme.com. We typically respond within 24 hours on business days.'
           }
         }
       },

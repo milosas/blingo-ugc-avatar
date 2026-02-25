@@ -141,7 +141,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
           {/* Contact */}
           <a
-            href="mailto:support@reeditme.com"
+            href="mailto:info@reEDITme.com"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[#666666] hover:bg-[#F7F7F5] hover:text-[#1A1A1A] transition-colors min-h-[44px]"
           >
             <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" fill="none">
   <style>
-    .text { font-family: system-ui, -apple-system, sans-serif; font-weight: 700; }
+    .text { font-family: system-ui, -apple-system, sans-serif; font-weight: 800; }
   </style>
-  <text x="10" y="30" class="text" font-size="28" fill="#4f46e5">re</text>
-  <text x="10" y="58" class="text" font-size="28" fill="#3730a3">edit</text>
-  <text x="10" y="86" class="text" font-size="28" fill="#4f46e5">me</text>
+  <text x="0" y="30" class="text" font-size="32" fill="#1A1A1A">re</text>
+  <text x="42" y="30" class="text" font-size="32" fill="#FF6B35">EDIT</text>
+  <text x="120" y="30" class="text" font-size="32" fill="#1A1A1A">me</text>
 </svg>

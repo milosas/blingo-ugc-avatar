@@ -12,7 +12,7 @@ export function Footer() {
           <div>
             <Link to="/" className="inline-block mb-3">
               <span className="text-2xl font-black tracking-tight text-[#1A1A1A]">
-                re<span className="text-[#FF6B35]">edit</span>
+                re<span className="text-[#FF6B35]">EDIT</span>me
               </span>
             </Link>
             <p className="text-sm text-[#666666] max-w-xs">
@@ -48,10 +48,10 @@ export function Footer() {
             </h4>
             <div className="space-y-2">
               <a
-                href="mailto:support@reeditme.com"
+                href="mailto:info@reEDITme.com"
                 className="block text-sm text-[#666666] hover:text-[#FF6B35] transition-colors"
               >
-                support@reeditme.com
+                info@reEDITme.com
               </a>
               {/* Social icons */}
               <div className="flex items-center gap-3 pt-2">

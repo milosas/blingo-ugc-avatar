@@ -31,8 +31,8 @@ export function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-1 group shrink-0">
-              <span className="text-2xl font-black tracking-tight text-[#1A1A1A] group-hover:text-[#6366F1] transition-colors">
-                re<span className="text-[#6366F1]">edit</span>
+              <span className="text-2xl font-black tracking-tight text-[#1A1A1A] group-hover:opacity-80 transition-opacity">
+                re<span className="text-[#FF6B35]">EDIT</span>me
               </span>
             </Link>
 

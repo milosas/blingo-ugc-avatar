@@ -16,9 +16,9 @@ export default function Privacy() {
 
             <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-4">1. Introduction</h2>
             <p className="text-[#666666] mb-4">
-              Welcome to Re Edit Me ("we," "our," or "us"). We are committed to protecting your privacy
+              Welcome to reEDITme ("we," "our," or "us"). We are committed to protecting your privacy
               and personal information. This Privacy Policy explains how we collect, use, and safeguard
-              your information when you use our AI photo generation service at reeditme.com.
+              your information when you use our AI photo generation service at reEDITme.com.
             </p>
 
             <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-4">2. Information We Collect</h2>
@@ -82,7 +82,7 @@ export default function Privacy() {
             </ul>
 
             <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-4">7. Guest Mode</h2>
-            <p className="text-[#666666] mb-4">You can use Re Edit Me without creating an account. In guest mode:</p>
+            <p className="text-[#666666] mb-4">You can use reEDITme without creating an account. In guest mode:</p>
             <ul className="list-disc list-inside text-[#666666] mb-4 space-y-2">
               <li>Generated images are temporary and not saved to our servers</li>
               <li>No personal data is collected beyond what's necessary for image generation</li>
@@ -106,7 +106,7 @@ export default function Privacy() {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p className="text-[#FF6B35] font-medium">
-              support@reeditme.com
+              info@reEDITme.com
             </p>
           </div>
         </div>

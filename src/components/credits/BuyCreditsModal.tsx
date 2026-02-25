@@ -12,22 +12,22 @@ const PACKAGES = [
   {
     id: '50' as const,
     credits: 50,
-    price: '4,99',
-    pricePerCredit: '0,10',
+    price: '9,99',
+    pricePerCredit: '0,20',
     badge: null,
   },
   {
     id: '150' as const,
     credits: 150,
-    price: '12,99',
-    pricePerCredit: '0,087',
+    price: '24,99',
+    pricePerCredit: '0,17',
     badge: 'Populiariausias',
   },
   {
     id: '500' as const,
     credits: 500,
-    price: '34,99',
-    pricePerCredit: '0,07',
+    price: '79,99',
+    pricePerCredit: '0,16',
     badge: 'Geriausia kaina',
   },
 ];

@@ -15,9 +15,9 @@ interface CheckoutRequest {
 }
 
 const CREDIT_PACKAGES: Record<string, { credits: number; priceInCents: number; name: string }> = {
-  '50': { credits: 50, priceInCents: 499, name: '50 kreditu' },
-  '150': { credits: 150, priceInCents: 1299, name: '150 kreditu' },
-  '500': { credits: 500, priceInCents: 3499, name: '500 kreditu' },
+  '50': { credits: 50, priceInCents: 999, name: '50 kreditu' },
+  '150': { credits: 150, priceInCents: 2499, name: '150 kreditu' },
+  '500': { credits: 500, priceInCents: 7999, name: '500 kreditu' },
 }
 
 serve(async (req) => {

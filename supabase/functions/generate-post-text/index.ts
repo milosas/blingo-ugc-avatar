@@ -463,15 +463,6 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured')
     }
 
-    // Credit check and deduct BEFORE streaming (can't verify stream success)
-    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'auth_error', message: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     // Parse and validate body BEFORE credit deduction
     const body: GenerateRequest = await req.json()
 
@@ -482,30 +473,42 @@ serve(async (req) => {
       )
     }
 
-    let creditUser: { userId: string; balance: number }
-    try {
-      creditUser = await checkCredits(authHeader, CREDIT_COST)
-    } catch (creditErr: any) {
-      if (creditErr.type === 'unauthorized') {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+    // Credit check and deduct BEFORE streaming (skip for guest users)
+    const isGuest = (body as any).guest === true
+    if (!isGuest) {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'auth_error', message: 'Missing authorization header' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
-      if (creditErr.type === 'insufficient_credits') {
-        return new Response(JSON.stringify({
-          error: 'insufficient_credits',
-          message: 'Nepakanka kreditų',
-          required: creditErr.required,
-          balance: creditErr.balance,
-        }), {
-          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
-      throw creditErr
-    }
 
-    // Deduct before streaming since we can't check stream success after
-    await deductCredits(creditUser.userId, CREDIT_COST, CREDIT_DESCRIPTION)
+      let creditUser: { userId: string; balance: number }
+      try {
+        creditUser = await checkCredits(authHeader, CREDIT_COST)
+      } catch (creditErr: any) {
+        if (creditErr.type === 'unauthorized') {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        if (creditErr.type === 'insufficient_credits') {
+          return new Response(JSON.stringify({
+            error: 'insufficient_credits',
+            message: 'Nepakanka kreditų',
+            required: creditErr.required,
+            balance: creditErr.balance,
+          }), {
+            status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        throw creditErr
+      }
+
+      // Deduct before streaming since we can't check stream success after
+      await deductCredits(creditUser.userId, CREDIT_COST, CREDIT_DESCRIPTION)
+    }
 
     const systemPrompt = getSystemPrompt(body.industry)
     const userPrompt = buildUserPrompt(body)

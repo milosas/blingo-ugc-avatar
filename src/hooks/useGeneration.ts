@@ -5,7 +5,7 @@ import { API_CONFIG } from '../constants/api';
 import { generateImages } from '../services/generationService';
 import { useSupabaseStorage } from './useSupabaseStorage';
 import { useAuth } from './useAuth';
-import { notifyCreditChange } from './useCredits';
+import { useCredits, notifyCreditChange } from './useCredits';
 
 const INITIAL_STATE: GenerationState = {
   status: 'idle',
@@ -20,6 +20,7 @@ export function useGeneration() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const progressTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { user } = useAuth();
+  const { isGuest, deductGuestCredits, balance: guestBalance } = useCredits();
   const { saveGeneratedImage } = useSupabaseStorage();
 
   // Cleanup on unmount
@@ -78,6 +79,24 @@ export function useGeneration() {
     progressTimersRef.current = [timer1, timer2, timer3];
 
     try {
+      // Guest credit check: deduct on frontend before calling edge function
+      if (isGuest) {
+        const TRYON_COST = 3;
+        if (guestBalance < TRYON_COST) {
+          setCreditError({ required: TRYON_COST, balance: guestBalance });
+          setState({ status: 'error', progress: 'sending', results: null, error: 'INSUFFICIENT_CREDITS' });
+          progressTimersRef.current.forEach(timer => clearTimeout(timer));
+          return;
+        }
+        const success = deductGuestCredits(TRYON_COST);
+        if (!success) {
+          setCreditError({ required: TRYON_COST, balance: guestBalance });
+          setState({ status: 'error', progress: 'sending', results: null, error: 'INSUFFICIENT_CREDITS' });
+          progressTimersRef.current.forEach(timer => clearTimeout(timer));
+          return;
+        }
+      }
+
       // Call Edge Function - it handles fal.ai queue polling
       const data = await generateImages(config, images, combinedSignal);
 
@@ -161,7 +180,7 @@ export function useGeneration() {
         error: errorType
       });
     }
-  }, [user, saveGeneratedImage]);
+  }, [user, saveGeneratedImage, isGuest, deductGuestCredits, guestBalance]);
 
   const cancel = useCallback(() => {
     abortControllerRef.current?.abort();

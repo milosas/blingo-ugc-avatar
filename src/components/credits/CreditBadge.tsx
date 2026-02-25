@@ -5,10 +5,12 @@ import { BuyCreditsModal } from './BuyCreditsModal';
 
 export function CreditBadge() {
   const { user } = useAuth();
-  const { balance, loading } = useCredits();
+  const { balance, loading, isGuest } = useCredits();
   const [showBuyModal, setShowBuyModal] = useState(false);
 
-  if (!user) return null;
+  // Show for both authenticated users and guests with credits
+  if (!user && !isGuest) return null;
+  if (isGuest && balance <= 0) return null;
 
   if (loading) {
     return (
@@ -19,9 +21,9 @@ export function CreditBadge() {
   return (
     <>
       <button
-        onClick={() => setShowBuyModal(true)}
+        onClick={() => !isGuest && setShowBuyModal(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FFF4ED] border border-[#FFD4B8] hover:bg-[#FFE8D6] transition-colors text-sm font-medium text-[#FF6B35]"
-        title="Kreditai"
+        title={isGuest ? 'Nemokami kreditai' : 'Kreditai'}
       >
         {/* Coin icon */}
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

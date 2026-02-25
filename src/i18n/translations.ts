@@ -552,9 +552,9 @@ export const translations = {
           save: 'Sutaupykite',
           buyNow: 'Pirkti',
           packs: [
-            { price: '€4.99', credits: '25' },
-            { price: '€9.99', credits: '60', save: '17%' },
-            { price: '€19.99', credits: '150', save: '25%' }
+            { price: '€9.99', credits: '50' },
+            { price: '€24.99', credits: '150', save: '17%' },
+            { price: '€79.99', credits: '500', save: '20%' }
           ]
         }
       },
@@ -1240,9 +1240,9 @@ export const translations = {
           save: 'Ietaupiet',
           buyNow: 'Pirkt',
           packs: [
-            { price: '€4.99', credits: '25' },
-            { price: '€9.99', credits: '60', save: '17%' },
-            { price: '€19.99', credits: '150', save: '25%' }
+            { price: '€9.99', credits: '50' },
+            { price: '€24.99', credits: '150', save: '17%' },
+            { price: '€79.99', credits: '500', save: '20%' }
           ]
         }
       },
@@ -1928,9 +1928,9 @@ export const translations = {
           save: 'Säästate',
           buyNow: 'Osta',
           packs: [
-            { price: '€4.99', credits: '25' },
-            { price: '€9.99', credits: '60', save: '17%' },
-            { price: '€19.99', credits: '150', save: '25%' }
+            { price: '€9.99', credits: '50' },
+            { price: '€24.99', credits: '150', save: '17%' },
+            { price: '€79.99', credits: '500', save: '20%' }
           ]
         }
       },
@@ -2616,9 +2616,9 @@ export const translations = {
           save: 'Save',
           buyNow: 'Buy Now',
           packs: [
-            { price: '€4.99', credits: '25' },
-            { price: '€9.99', credits: '60', save: '17%' },
-            { price: '€19.99', credits: '150', save: '25%' }
+            { price: '€9.99', credits: '50' },
+            { price: '€24.99', credits: '150', save: '17%' },
+            { price: '€79.99', credits: '500', save: '20%' }
           ]
         }
       },

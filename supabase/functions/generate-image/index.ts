@@ -59,6 +59,7 @@ const corsHeaders = {
 
 interface GenerateRequest {
   mode: 'tryon' | 'background' | 'relight' | 'edit'
+  guest?: boolean
   // tryon fields:
   qualityMode: 'performance' | 'balanced' | 'quality'
   imageCount: number
@@ -529,9 +530,10 @@ serve(async (req) => {
     const mode = body!.mode || 'tryon'
     console.log(`Processing request: mode=${mode}`)
 
-    // Credit check for tryon mode only
+    // Credit check for tryon mode only (skip for guest users)
+    const isGuest = body!.guest === true
     let creditUser: { userId: string; balance: number } | null = null
-    if (mode === 'tryon') {
+    if (mode === 'tryon' && !isGuest) {
       const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
       if (!authHeader) {
         return new Response(JSON.stringify({
@@ -584,8 +586,8 @@ serve(async (req) => {
         throw new Error(`Unknown mode: ${mode}`)
     }
 
-    // Deduct credits after successful tryon generation
-    if (mode === 'tryon' && creditUser && response.success) {
+    // Deduct credits after successful tryon generation (skip for guests)
+    if (mode === 'tryon' && creditUser && response.success && !isGuest) {
       await deductCredits(creditUser.userId, TRYON_CREDIT_COST, TRYON_CREDIT_DESCRIPTION)
     }
 

@@ -107,37 +107,40 @@ serve(async (req) => {
       throw new Error('FAL_KEY not configured')
     }
 
-    // Credit check
-    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ success: false, error: 'Missing authorization header' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
-    }
+    const body: GenerateAvatarRequest = await req.json()
 
-    let creditUser: { userId: string; balance: number }
-    try {
-      creditUser = await checkCredits(authHeader, CREDIT_COST)
-    } catch (creditErr: any) {
-      if (creditErr.type === 'unauthorized') {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    // Credit check (skip for guest users)
+    const isGuest = (body as any).guest === true
+    let creditUser: { userId: string; balance: number } | null = null
+    if (!isGuest) {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+      if (!authHeader) {
+        return new Response(JSON.stringify({ success: false, error: 'Missing authorization header' }), {
           status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
       }
-      if (creditErr.type === 'insufficient_credits') {
-        return new Response(JSON.stringify({
-          error: 'insufficient_credits',
-          message: 'Nepakanka kreditų',
-          required: creditErr.required,
-          balance: creditErr.balance,
-        }), {
-          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
-      throw creditErr
-    }
 
-    const body: GenerateAvatarRequest = await req.json()
+      try {
+        creditUser = await checkCredits(authHeader, CREDIT_COST)
+      } catch (creditErr: any) {
+        if (creditErr.type === 'unauthorized') {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        if (creditErr.type === 'insufficient_credits') {
+          return new Response(JSON.stringify({
+            error: 'insufficient_credits',
+            message: 'Nepakanka kreditų',
+            required: creditErr.required,
+            balance: creditErr.balance,
+          }), {
+            status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          })
+        }
+        throw creditErr
+      }
+    }
 
     if (!body.prompt) {
       throw new Error('No prompt provided')
@@ -201,8 +204,10 @@ serve(async (req) => {
     const base64Image = await downloadImageAsBase64(imageUrl)
     console.log('Avatar generated successfully')
 
-    // Deduct credits after successful generation
-    await deductCredits(creditUser.userId, CREDIT_COST, CREDIT_DESCRIPTION)
+    // Deduct credits after successful generation (skip for guests)
+    if (creditUser && !isGuest) {
+      await deductCredits(creditUser.userId, CREDIT_COST, CREDIT_DESCRIPTION)
+    }
 
     return new Response(JSON.stringify({
       success: true,

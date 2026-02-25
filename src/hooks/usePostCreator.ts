@@ -9,7 +9,7 @@ import {
   InsufficientCreditsError,
 } from '../services/postService';
 import { useAuth } from './useAuth';
-import { notifyCreditChange } from './useCredits';
+import { useCredits, notifyCreditChange } from './useCredits';
 
 export type ImageSource = 'upload' | 'ai' | 'gallery';
 
@@ -61,6 +61,7 @@ interface UsePostCreatorReturn {
 
 export function usePostCreator(): UsePostCreatorReturn {
   const { user } = useAuth();
+  const { isGuest, deductGuestCredits, balance: guestBalance } = useCredits();
 
   // Form state
   const industry = 'general';
@@ -90,6 +91,20 @@ export function usePostCreator(): UsePostCreatorReturn {
 
   const generateFromImage = useCallback(async () => {
     if (!imagePreview) return;
+
+    // Guest credit check for text_from_image (cost: 1)
+    if (isGuest) {
+      const cost = 1;
+      if (guestBalance < cost) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return;
+      }
+      if (!deductGuestCredits(cost)) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return;
+      }
+    }
+
     setIsGeneratingFromImage(true);
     setIsStreaming(true);
     setGeneratedText('');
@@ -126,7 +141,7 @@ export function usePostCreator(): UsePostCreatorReturn {
       setIsGeneratingFromImage(false);
       setIsStreaming(false);
     }
-  }, [imagePreview, tone, emoji, length]);
+  }, [imagePreview, tone, emoji, length, isGuest, guestBalance, deductGuestCredits]);
 
   const getConfig = useCallback((): PostConfig => ({
     industry,
@@ -137,6 +152,19 @@ export function usePostCreator(): UsePostCreatorReturn {
   }), [industry, prompt, tone, emoji, length]);
 
   const streamText = useCallback(async (signal: AbortSignal) => {
+    // Guest credit check for post_text (cost: 1)
+    if (isGuest) {
+      const cost = 1;
+      if (guestBalance < cost) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return null;
+      }
+      if (!deductGuestCredits(cost)) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return null;
+      }
+    }
+
     setIsLoadingText(true);
     setIsStreaming(true);
     setGeneratedText('');
@@ -167,9 +195,22 @@ export function usePostCreator(): UsePostCreatorReturn {
       setIsLoadingText(false);
       setIsStreaming(false);
     }
-  }, [industry, prompt, tone, emoji, length]);
+  }, [industry, prompt, tone, emoji, length, isGuest, guestBalance, deductGuestCredits]);
 
   const generateImage = useCallback(async () => {
+    // Guest credit check for post_image (cost: 3)
+    if (isGuest) {
+      const cost = 3;
+      if (guestBalance < cost) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return null;
+      }
+      if (!deductGuestCredits(cost)) {
+        setCreditError({ required: cost, balance: guestBalance });
+        return null;
+      }
+    }
+
     setIsLoadingImage(true);
     try {
       const result = await generatePostImage({ industry, prompt });
@@ -185,7 +226,7 @@ export function usePostCreator(): UsePostCreatorReturn {
     } finally {
       setIsLoadingImage(false);
     }
-  }, [industry, prompt]);
+  }, [industry, prompt, isGuest, guestBalance, deductGuestCredits]);
 
   const doSave = useCallback(async (text: string | null, imageUrl: string | null) => {
     if (!user) return;

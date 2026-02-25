@@ -8,6 +8,11 @@ async function getAuthToken(): Promise<string> {
   return session?.access_token || API_CONFIG.supabaseAnonKey;
 }
 
+async function isGuestUser(): Promise<boolean> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return !session;
+}
+
 /**
  * Convert File to base64 data URL
  */
@@ -81,6 +86,8 @@ export async function generateImages(
     }
   }
 
+  const guest = await isGuestUser();
+
   const requestBody = {
     mode: 'tryon' as const,
     qualityMode: config.qualityMode,
@@ -88,7 +95,8 @@ export async function generateImages(
     images: base64Images,
     avatarImageUrl: avatarImageUrl,
     avatarImageBase64: avatarImageBase64,
-    avatarIsCustom: config.avatar?.isCustom || false
+    avatarIsCustom: config.avatar?.isCustom || false,
+    ...(guest ? { guest: true } : {}),
   };
 
   const token = await getAuthToken();

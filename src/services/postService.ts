@@ -10,6 +10,11 @@ async function getAuthToken(): Promise<string> {
   return session?.access_token || supabaseAnonKey;
 }
 
+async function isGuestUser(): Promise<boolean> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return !session;
+}
+
 class InsufficientCreditsError extends Error {
   required: number;
   balance: number;
@@ -44,6 +49,7 @@ interface GenerateImageParams {
 export async function generatePostText(params: GenerateTextParams): Promise<Response> {
   const { signal, ...body } = params;
   const token = await getAuthToken();
+  const guest = await isGuestUser();
 
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-post-text`, {
     method: 'POST',
@@ -52,7 +58,7 @@ export async function generatePostText(params: GenerateTextParams): Promise<Resp
       'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, ...(guest ? { guest: true } : {}) }),
     signal,
   });
 
@@ -76,6 +82,7 @@ export async function generatePostText(params: GenerateTextParams): Promise<Resp
  */
 export async function generatePostImage(params: GenerateImageParams): Promise<{ imageUrl: string }> {
   const token = await getAuthToken();
+  const guest = await isGuestUser();
 
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-post-image`, {
     method: 'POST',
@@ -84,7 +91,7 @@ export async function generatePostImage(params: GenerateImageParams): Promise<{ 
       'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
-    body: JSON.stringify(params),
+    body: JSON.stringify({ ...params, ...(guest ? { guest: true } : {}) }),
   });
 
   if (!response.ok) {
@@ -115,6 +122,7 @@ export async function generateTextFromImage(params: {
 }): Promise<Response> {
   const { signal, ...body } = params;
   const token = await getAuthToken();
+  const guest = await isGuestUser();
 
   const response = await fetch(`${supabaseUrl}/functions/v1/generate-text-from-image`, {
     method: 'POST',
@@ -123,7 +131,7 @@ export async function generateTextFromImage(params: {
       'Authorization': `Bearer ${token}`,
       'apikey': supabaseAnonKey,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, ...(guest ? { guest: true } : {}) }),
     signal,
   });
 

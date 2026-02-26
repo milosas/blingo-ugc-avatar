@@ -375,7 +375,7 @@ const PaginationControls = memo(function PaginationControls({
 });
 
 export default function Gallery() {
-  usePageTitle('Galerija');
+  usePageTitle('Galerija/Įrašai');
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const { images, models, posts, loading: galleryLoading, error, deleteImage, deletePost, refresh } = useGallery();
@@ -766,14 +766,14 @@ export default function Gallery() {
         );
       })()}
 
-      {/* ===== Section 3: Irasai (Posts) ===== */}
+      {/* ===== Section 3: Įrašai (Posts) ===== */}
       {posts.length > 0 && (() => {
         const start = postsPage * PAGE_SIZE;
         const slicedPosts = posts.slice(start, start + postsVisible);
         return (
           <div className="mb-8">
             <SectionHeader
-              title="Irasai"
+              title="Įrašai"
               count={posts.length}
               isOpen={openSections.posts}
               onToggle={() => toggleSection('posts')}

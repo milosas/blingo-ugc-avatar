@@ -686,8 +686,8 @@ export function AvatarCreatorModal({ isOpen, onClose, targetModelId, onSaved, mo
                   </div>
                   <p className="text-[10px] text-[#999999] mt-1">
                     {batchCount === 1
-                      ? 'FLUX 2 Pro'
-                      : `1x FLUX 2 Pro + ${batchCount - 1}x PuLID`}
+                      ? '4 kreditai'
+                      : `${4 + (batchCount - 1) * 4} kreditų (${batchCount} nuotr.)`}
                   </p>
                 </div>
               )}

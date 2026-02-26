@@ -33,16 +33,9 @@ export function useNotes(imageId: string | null): UseNotesReturn {
         .from('image_notes')
         .select('*')
         .eq('image_id', imageId)
-        .single();
+        .maybeSingle();
 
-      // Handle PGRST116 (no rows) - this is expected when no note exists
-      if (queryError) {
-        if (queryError.code === 'PGRST116') {
-          setNote(null);
-          return;
-        }
-        throw queryError;
-      }
+      if (queryError) throw queryError;
 
       setNote(data);
     } catch (err) {

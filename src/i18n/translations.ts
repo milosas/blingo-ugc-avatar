@@ -363,7 +363,7 @@ export const translations = {
     },
     nav: {
       home: 'Pradinis',
-      gallery: 'Galerija',
+      gallery: 'Galerija/Įrašai',
       generate: 'Generuoti',
       avatars: 'Modeliai',
       dashboard: 'Tavo kūryba',
@@ -376,7 +376,8 @@ export const translations = {
       postCreator: 'Įrašų kūrėjas',
       postCreatorDesc: 'Socialinių tinklų įrašai',
       tryOn: 'Try-on',
-      posts: 'Įrašai',
+      posts: 'Įrašų kūrėjas',
+      models: 'Modelių kūrimas',
       settings: 'Nustatymai',
       privacy: 'Privatumas'
     },

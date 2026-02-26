@@ -289,31 +289,23 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
     throw new Error('No clothing images provided')
   }
 
-  // Upload clothing image to fal storage
-  console.log('Uploading clothing image to fal storage...')
-  const garmentUrl = await uploadToFalStorage(body.images[0])
-  console.log('Clothing image uploaded:', garmentUrl)
+  // Prepare clothing image as data URI (fal.ai accepts base64 data URIs directly)
+  const garmentDataUri = body.images[0]
+  console.log('Clothing image ready (data URI)')
 
-  // Upload/prepare avatar image
-  let modelImageUrl: string
+  // Prepare avatar image as data URI
+  let modelImageInput: string
 
   if (body.avatarImageBase64) {
-    console.log('Uploading custom avatar (base64) to fal storage...')
-    try {
-      modelImageUrl = await uploadToFalStorage(body.avatarImageBase64)
-      console.log('Custom avatar uploaded:', modelImageUrl)
-    } catch (avatarError) {
-      console.error('Failed to upload custom avatar:', avatarError.message)
-      throw new Error('AVATAR_UPLOAD_FAILED: Could not process custom avatar image')
-    }
+    console.log('Using custom avatar (base64 data URI)')
+    modelImageInput = body.avatarImageBase64
   } else if (body.avatarImageUrl) {
-    console.log('Processing preset avatar image...')
+    console.log('Fetching preset avatar image...')
     try {
-      const avatarBase64 = await fetchImageAsBase64(body.avatarImageUrl)
-      modelImageUrl = await uploadToFalStorage(avatarBase64)
-      console.log('Preset avatar uploaded:', modelImageUrl)
+      modelImageInput = await fetchImageAsBase64(body.avatarImageUrl)
+      console.log('Preset avatar fetched as base64')
     } catch (avatarError) {
-      console.error('Failed to upload preset avatar:', avatarError.message)
+      console.error('Failed to fetch preset avatar:', avatarError.message)
       throw new Error('AVATAR_UPLOAD_FAILED: Could not process avatar image')
     }
   } else {
@@ -325,20 +317,11 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
 
   console.log(`FASHN try-on: mode=${mode}, samples=${numSamples}`)
 
-  // Log full request body for debugging
-  console.log('FASHN request body:', JSON.stringify({
-    model_image: modelImageUrl,
-    garment_image: garmentUrl,
-    mode,
-    num_samples: numSamples,
-    output_format: 'png',
-  }))
-
-  // Call FASHN v1.6 via fal queue
-  // category & garment_photo_type default to 'auto' — FASHN auto-detects both
+  // Call FASHN v1.6 via fal queue — pass base64 data URIs directly
+  // fal.ai accepts data URIs as file inputs, no separate storage upload needed
   const result = await falQueueSubmitAndPoll('fal-ai/fashn/tryon/v1.6', {
-    model_image: modelImageUrl,
-    garment_image: garmentUrl,
+    model_image: modelImageInput,
+    garment_image: garmentDataUri,
     mode,
     num_samples: numSamples,
     output_format: 'png',
@@ -371,16 +354,16 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
 }
 
 // Upload source image URL to fal storage (needed for post-processing — some fal.ai models only accept fal storage URLs)
-async function ensureFalStorageUrl(imageUrl: string): Promise<string> {
-  // If already a fal storage URL, use as-is
+async function ensureFalInputUrl(imageUrl: string): Promise<string> {
+  // If already a fal storage/CDN URL, use as-is
   if (imageUrl.includes('fal.media') || imageUrl.includes('fal-cdn') || imageUrl.includes('fal.run')) {
     return imageUrl
   }
-  console.log('Uploading source image to fal storage...')
+  // Convert to base64 data URI — fal.ai accepts these directly
+  console.log('Fetching source image as base64...')
   const base64 = await fetchImageAsBase64(imageUrl)
-  const falUrl = await uploadToFalStorage(base64)
-  console.log('Source image uploaded to fal storage:', falUrl)
-  return falUrl
+  console.log('Source image ready as base64 data URI')
+  return base64
 }
 
 // Handle background replacement via Bria
@@ -393,7 +376,7 @@ async function handleBackgroundReplace(body: GenerateRequest): Promise<GenerateR
   }
 
   console.log('Background replace:', body.backgroundPrompt)
-  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/bria/background/replace', {
     image_url: sourceUrl,
@@ -432,7 +415,7 @@ async function handleRelight(body: GenerateRequest): Promise<GenerateResponse> {
   }
 
   console.log('Relighting:', body.lightingStyle)
-  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/image-apps-v2/relighting', {
     image_url: sourceUrl,
@@ -471,7 +454,7 @@ async function handleKontextEdit(body: GenerateRequest): Promise<GenerateRespons
   }
 
   console.log('Kontext edit:', body.editPrompt)
-  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/flux-pro/kontext', {
     image_url: sourceUrl,

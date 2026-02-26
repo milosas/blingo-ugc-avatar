@@ -46,8 +46,10 @@ function ImageToImageVisual() {
     <div className="relative">
       <div className="bg-gradient-to-br from-[#FFF0EB] to-[#FFE0D4] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="flex items-center gap-4">
-          <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md overflow-hidden">
-            <img src="/images/hero/tryon-before.jpg" alt="Drabužio nuotrauka" className="w-full h-full object-cover" loading="lazy" />
+          <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md flex items-center justify-center">
+            <svg className="w-10 h-10 text-[#CCCCCC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center">
@@ -57,8 +59,10 @@ function ImageToImageVisual() {
             </div>
             <span className="text-xs text-[#FF6B35] font-medium">AI</span>
           </div>
-          <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md border-2 border-[#FF6B35] overflow-hidden">
-            <img src="/images/hero/tryon-after.jpg" alt="Modelis su drabužiu" className="w-full h-full object-cover" loading="lazy" />
+          <div className="w-24 h-32 md:w-32 md:h-40 bg-white rounded-xl shadow-md border-2 border-[#FF6B35] flex items-center justify-center">
+            <svg className="w-10 h-10 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
         </div>
       </div>
@@ -75,11 +79,15 @@ function ModelCreatorVisual() {
       <div className="bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-3">
-            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md overflow-hidden border-2 border-[#10B981]">
-              <img src="/images/hero/model1.jpg" alt="AI modelis 1" className="w-full h-full object-cover" loading="lazy" />
+            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md flex items-center justify-center border-2 border-[#10B981]">
+              <svg className="w-8 h-8 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
-            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md overflow-hidden">
-              <img src="/images/hero/model2.jpg" alt="AI modelis 2" className="w-full h-full object-cover" loading="lazy" />
+            <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#CCCCCC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
             <div className="w-16 h-20 md:w-20 md:h-24 bg-white rounded-xl shadow-md border-2 border-dashed border-[#10B981]/40 flex items-center justify-center">
               <svg className="w-6 h-6 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,15 +114,13 @@ function PostCreatorVisual() {
       <div className="bg-gradient-to-br from-[#F0EBFF] to-[#E0D4FF] rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
         <div className="bg-white rounded-xl shadow-md p-4 max-w-[220px] w-full">
           <div className="flex items-center gap-2 mb-3">
-            <img src="/images/hero/model3.jpg" alt="Profilis" className="w-8 h-8 rounded-full object-cover" loading="lazy" />
+            <div className="w-8 h-8 rounded-full bg-[#9B6CF7]" />
             <div>
               <div className="h-2 bg-[#1A1A1A] rounded-full w-20 mb-1" />
               <div className="h-1.5 bg-[#E5E5E3] rounded-full w-14" />
             </div>
           </div>
-          <div className="w-full h-20 rounded-lg mb-3 overflow-hidden">
-            <img src="/images/hero/post-photo.jpg" alt="Įrašo nuotrauka" className="w-full h-full object-cover" loading="lazy" />
-          </div>
+          <div className="w-full h-20 bg-gradient-to-br from-[#F0EBFF] to-[#E0D4FF] rounded-lg mb-3" />
           <div className="space-y-1.5">
             <div className="h-2 bg-[#E5E5E3] rounded-full w-full" />
             <div className="h-2 bg-[#E5E5E3] rounded-full w-4/5" />
@@ -246,8 +252,8 @@ interface PlatformStatsLabels {
 }
 
 function PlatformStatsBar({ stats, labels }: { stats: PlatformStats; labels: PlatformStatsLabels | undefined }) {
-  const hasStats = stats.images > 0 || stats.avatars > 0 || stats.posts > 0;
-  if (!hasStats) return null;
+  const total = stats.images + stats.avatars + stats.posts;
+  if (total < 50) return null;
 
   const items = [
     { value: stats.images, label: labels?.imagesCreated || 'Sukurta paveikslėlių', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },

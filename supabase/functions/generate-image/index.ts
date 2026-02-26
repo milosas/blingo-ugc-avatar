@@ -119,63 +119,47 @@ async function uploadToFalStorage(base64Data: string): Promise<string> {
     contentType = 'image/webp'
   }
 
-  console.log(`Uploading to fal storage: ${bytes.length} bytes, type: ${contentType}`)
+  const fileName = `upload-${Date.now()}.${contentType === 'image/png' ? 'png' : 'jpg'}`
+  console.log(`Uploading to fal CDN: ${bytes.length} bytes, type: ${contentType}`)
 
-  // Try direct upload via fal.run
-  const response = await fetch('https://fal.run/fal-ai/fal-file-storage/upload', {
-    method: 'PUT',
+  // Step 1: Initiate upload via fal CDN v3
+  const initResponse = await fetch('https://rest.alpha.fal.ai/storage/upload/initiate?storage_type=fal-cdn-v3', {
+    method: 'POST',
     headers: {
       'Authorization': `Key ${FAL_KEY}`,
-      'Content-Type': contentType,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      file_name: fileName,
+      content_type: contentType,
+    }),
+  })
+
+  if (!initResponse.ok) {
+    const initError = await initResponse.text()
+    console.error('Fal CDN initiate failed:', initResponse.status, initError)
+    throw new Error(`Fal CDN initiate failed: ${initResponse.status} - ${initError}`)
+  }
+
+  const { upload_url, file_url } = await initResponse.json()
+  console.log('Got upload URL, uploading...')
+
+  // Step 2: PUT file data to presigned URL
+  const putResponse = await fetch(upload_url, {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType },
     body: bytes,
   })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    console.error(`Fal storage upload failed (${response.status}):`, errorText)
-
-    // Fallback: try REST API upload
-    console.log('Trying REST API upload fallback...')
-    const initResponse = await fetch('https://rest.alpha.fal.ai/storage/upload/url', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Key ${FAL_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content_type: contentType,
-        file_name: `upload-${Date.now()}.${contentType === 'image/png' ? 'png' : 'jpg'}`,
-      }),
-    })
-
-    if (!initResponse.ok) {
-      const initError = await initResponse.text()
-      console.error('REST API upload init failed:', initError)
-      throw new Error(`Fal storage upload failed: ${response.status} - ${errorText}`)
-    }
-
-    const { upload_url, file_url } = await initResponse.json()
-
-    const putResponse = await fetch(upload_url, {
-      method: 'PUT',
-      headers: { 'Content-Type': contentType },
-      body: bytes,
-    })
-
-    if (!putResponse.ok) {
-      const putError = await putResponse.text()
-      console.error('REST API PUT failed:', putError)
-      throw new Error(`Fal storage PUT failed: ${putResponse.status}`)
-    }
-
-    console.log('Upload via REST API succeeded:', file_url)
-    return file_url
+  if (!putResponse.ok) {
+    const putError = await putResponse.text()
+    console.error('Fal CDN PUT failed:', putResponse.status, putError)
+    throw new Error(`Fal CDN PUT failed: ${putResponse.status}`)
   }
 
-  const data = await response.json()
-  console.log('Upload succeeded:', data.url)
-  return data.url
+  console.log('Upload succeeded:', file_url)
+  return file_url
 }
 
 // Fetch and convert URL image to base64
@@ -236,11 +220,11 @@ async function falQueueSubmitAndPoll(endpoint: string, body: Record<string, unkn
   }
   console.log('Fal request submitted:', requestId)
 
-  // Poll for completion
+  // Poll for completion (stay under 150s Supabase edge function limit)
   const statusUrl = `${queueUrl}/requests/${requestId}/status`
   const resultUrl = `${queueUrl}/requests/${requestId}`
-  const maxPolls = 60 // up to 5 minutes
-  const pollInterval = 5000
+  const maxPolls = 40 // up to ~2 minutes
+  const pollInterval = 3000
 
   for (let i = 0; i < maxPolls; i++) {
     await new Promise(resolve => setTimeout(resolve, pollInterval))
@@ -283,31 +267,32 @@ async function falQueueSubmitAndPoll(endpoint: string, body: Record<string, unkn
   throw new Error('Fal generation timed out')
 }
 
-// Handle try-on via FASHN v1.6
+// Handle try-on via FASHN v1.6 (synchronous call — stays under 150s Supabase limit)
 async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
   if (!body.images || body.images.length === 0) {
     throw new Error('No clothing images provided')
   }
 
-  // Prepare clothing image as data URI (fal.ai accepts base64 data URIs directly)
-  const garmentDataUri = body.images[0]
-  console.log('Clothing image ready (data URI)')
+  // Upload clothing image to fal CDN storage
+  console.log('Uploading clothing image to fal storage...')
+  const garmentUrl = await uploadToFalStorage(body.images[0])
+  console.log('Clothing image uploaded:', garmentUrl)
 
-  // Prepare avatar image as data URI
-  let modelImageInput: string
+  // Prepare avatar image URL
+  let modelImageUrl: string
 
   if (body.avatarImageBase64) {
-    console.log('Using custom avatar (base64 data URI)')
-    modelImageInput = body.avatarImageBase64
-  } else if (body.avatarImageUrl) {
-    console.log('Fetching preset avatar image...')
+    console.log('Uploading custom avatar to fal storage...')
     try {
-      modelImageInput = await fetchImageAsBase64(body.avatarImageUrl)
-      console.log('Preset avatar fetched as base64')
+      modelImageUrl = await uploadToFalStorage(body.avatarImageBase64)
+      console.log('Custom avatar uploaded:', modelImageUrl)
     } catch (avatarError) {
-      console.error('Failed to fetch preset avatar:', avatarError.message)
-      throw new Error('AVATAR_UPLOAD_FAILED: Could not process avatar image')
+      console.error('Failed to upload custom avatar:', avatarError.message)
+      throw new Error('AVATAR_UPLOAD_FAILED: Could not process custom avatar image')
     }
+  } else if (body.avatarImageUrl) {
+    console.log('Using preset avatar URL directly:', body.avatarImageUrl)
+    modelImageUrl = body.avatarImageUrl
   } else {
     throw new Error('No avatar image provided')
   }
@@ -317,15 +302,32 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
 
   console.log(`FASHN try-on: mode=${mode}, samples=${numSamples}`)
 
-  // Call FASHN v1.6 via fal queue — pass base64 data URIs directly
-  // fal.ai accepts data URIs as file inputs, no separate storage upload needed
-  const result = await falQueueSubmitAndPoll('fal-ai/fashn/tryon/v1.6', {
-    model_image: modelImageInput,
-    garment_image: garmentDataUri,
-    mode,
-    num_samples: numSamples,
-    output_format: 'png',
-  }) as { images?: Array<{ url: string }> }
+  // Call FASHN v1.6 via synchronous fal.run endpoint (blocks until result)
+  const syncUrl = 'https://fal.run/fal-ai/fashn/tryon/v1.6'
+  console.log('Calling FASHN sync endpoint...')
+  const falResponse = await fetch(syncUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Key ${FAL_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model_image: modelImageUrl,
+      garment_image: garmentUrl,
+      mode,
+      num_samples: numSamples,
+      output_format: 'png',
+    }),
+  })
+
+  if (!falResponse.ok) {
+    const errText = await falResponse.text()
+    console.error('FASHN sync failed:', falResponse.status, errText)
+    throw new Error(`FASHN generation failed: ${falResponse.status} - ${errText.slice(0, 200)}`)
+  }
+
+  const result = await falResponse.json() as { images?: Array<{ url: string }> }
+  console.log('FASHN sync completed')
 
   if (!result.images || result.images.length === 0) {
     throw new Error('No images returned from FASHN')
@@ -354,16 +356,16 @@ async function handleTryOn(body: GenerateRequest): Promise<GenerateResponse> {
 }
 
 // Upload source image URL to fal storage (needed for post-processing — some fal.ai models only accept fal storage URLs)
-async function ensureFalInputUrl(imageUrl: string): Promise<string> {
+async function ensureFalStorageUrl(imageUrl: string): Promise<string> {
   // If already a fal storage/CDN URL, use as-is
   if (imageUrl.includes('fal.media') || imageUrl.includes('fal-cdn') || imageUrl.includes('fal.run')) {
     return imageUrl
   }
-  // Convert to base64 data URI — fal.ai accepts these directly
-  console.log('Fetching source image as base64...')
+  console.log('Uploading source image to fal storage...')
   const base64 = await fetchImageAsBase64(imageUrl)
-  console.log('Source image ready as base64 data URI')
-  return base64
+  const falUrl = await uploadToFalStorage(base64)
+  console.log('Source image uploaded to fal storage:', falUrl)
+  return falUrl
 }
 
 // Handle background replacement via Bria
@@ -376,7 +378,7 @@ async function handleBackgroundReplace(body: GenerateRequest): Promise<GenerateR
   }
 
   console.log('Background replace:', body.backgroundPrompt)
-  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/bria/background/replace', {
     image_url: sourceUrl,
@@ -415,7 +417,7 @@ async function handleRelight(body: GenerateRequest): Promise<GenerateResponse> {
   }
 
   console.log('Relighting:', body.lightingStyle)
-  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/image-apps-v2/relighting', {
     image_url: sourceUrl,
@@ -454,7 +456,7 @@ async function handleKontextEdit(body: GenerateRequest): Promise<GenerateRespons
   }
 
   console.log('Kontext edit:', body.editPrompt)
-  const sourceUrl = await ensureFalInputUrl(body.sourceImageUrl)
+  const sourceUrl = await ensureFalStorageUrl(body.sourceImageUrl)
 
   const result = await falQueueSubmitAndPoll('fal-ai/flux-pro/kontext', {
     image_url: sourceUrl,
@@ -513,7 +515,7 @@ serve(async (req) => {
     const mode = body!.mode || 'tryon'
     console.log(`Processing request: mode=${mode}`)
 
-    // Credit check for tryon mode only (skip for guest users)
+    // Credit check for tryon mode only (skip for guest users and poll requests)
     const isGuest = body!.guest === true
     let creditUser: { userId: string; balance: number } | null = null
     if (mode === 'tryon' && !isGuest) {

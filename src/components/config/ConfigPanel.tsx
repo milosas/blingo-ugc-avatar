@@ -21,7 +21,7 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
   const [showCreatorModal, setShowCreatorModal] = useState(false);
   const [creatorTargetModelId, setCreatorTargetModelId] = useState<string | undefined>();
   const [myAvatarsOpen, setMyAvatarsOpen] = useState(false);
-  const [presetsOpen, setPresetsOpen] = useState(false);
+  const [presetsOpen, setPresetsOpen] = useState(!user);
   const [expandedModelId, setExpandedModelId] = useState<string | null>(null);
   const [addPhotoTargetModelId, setAddPhotoTargetModelId] = useState<string | null>(null);
   const [showCreateModel, setShowCreateModel] = useState(false);
